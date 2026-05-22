@@ -8,6 +8,17 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 ## [Unreleased]
 
 ### Added
+- **Parser v0.2** (FR-03, ADR-02) — frozen public interface in `docs/parser-spec.md`.
+  - `parseDuration` rewritten with anchored patterns; new formats supported: `1h30`, `1h 30`, `1:30` (HH:MM duration), `2.25hr`, decimal hours. Ambiguous bare decimals + negatives → `0`.
+  - `durationFromSlot(slotStart, slotEnd)` added — derives minutes from a HH:MM range; never silently crosses midnight.
+  - `tidy` — adds `qa`, `pr` shorthand; trims trailing `, ; :` while keeping `. ! ?`.
+  - `validateEntry` — adds `HH:MM` regex (00–23:00–59), 1000-char description cap, friendly null-entry handling.
+  - `validateDay` — adds `duration_mismatch` and `large_gap` (>4h) warnings. Warnings never block Confirm — only `total > 24h` and per-entry errors do (PRD §9).
+- 41-test suite in `backend/test/parser.test.js` covering every duration format, all tidy rules, group ordering, every validation branch, and each day-level edge case.
+
+### Changed
+- `groupByTicket` uses a `Map` internally to preserve first-seen ordering deterministically.
+
 - Initial repository scaffold per DevDoc §1.
 - Monorepo layout: `backend/`, `web/`, `extension/`, `docs/`, `.claude/`.
 - DB schema `backend/schema.sql` with all 13 tables (TB-01..TB-13), including TB-13 `external_writes` idempotent sync ledger.
