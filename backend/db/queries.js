@@ -129,6 +129,78 @@ function updateEntry(id, { project_id, jira_task_id, description, duration_minut
 const _deleteEntry = db.prepare('DELETE FROM worklog_entries WHERE id = ?');
 function deleteEntry(id) { _deleteEntry.run(id); }
 
+// ── user_connections (encrypted tokens — TB-06, FR-19) ────────────────────
+// encrypt/decrypt happens here; callers always receive plaintext values.
+// The raw *_enc columns never leave this module.
+
+const { encrypt, decrypt } = require('../services/crypto');
+
+const _getConnection = db.prepare(
+  'SELECT * FROM user_connections WHERE user_id = ? AND provider = ?'
+);
+function getConnection(userId, provider) {
+  const row = _getConnection.get(userId, provider);
+  if (!row) return null;
+  return {
+    ...row,
+    access_token:  decrypt(row.access_token_enc),
+    refresh_token: row.refresh_token_enc ? decrypt(row.refresh_token_enc) : null,
+  };
+}
+
+const _upsertConnection = db.prepare(`
+  INSERT INTO user_connections
+    (user_id, provider, access_token_enc, refresh_token_enc, expires_at, scope)
+  VALUES (@user_id, @provider, @access_token_enc, @refresh_token_enc, @expires_at, @scope)
+  ON CONFLICT(user_id, provider) DO UPDATE SET
+    access_token_enc  = excluded.access_token_enc,
+    refresh_token_enc = excluded.refresh_token_enc,
+    expires_at        = excluded.expires_at,
+    scope             = excluded.scope,
+    connected_at      = datetime('now')
+`);
+function upsertConnection(userId, provider, { access_token, refresh_token = null, expires_at = null, scope = null }) {
+  _upsertConnection.run({
+    user_id:           userId,
+    provider,
+    access_token_enc:  encrypt(access_token),
+    refresh_token_enc: refresh_token ? encrypt(refresh_token) : null,
+    expires_at,
+    scope,
+  });
+  return getConnection(userId, provider);
+}
+
+// Atomic token rotation — only overwrites token fields, never scope (DevDoc §6.5).
+// The old refresh token is invalidated by Atlassian/Google the instant we exchange it,
+// so both writes MUST be inside one SQLite transaction or we risk a half-rotated state.
+const _rotateToken = db.prepare(`
+  UPDATE user_connections
+  SET access_token_enc  = @access_token_enc,
+      refresh_token_enc = @refresh_token_enc,
+      expires_at        = @expires_at,
+      connected_at      = datetime('now')
+  WHERE user_id = @user_id AND provider = @provider
+`);
+function rotateToken(userId, provider, { access_token, refresh_token, expires_at = null }) {
+  const tx = db.transaction(() => {
+    _rotateToken.run({
+      user_id:           userId,
+      provider,
+      access_token_enc:  encrypt(access_token),
+      refresh_token_enc: encrypt(refresh_token),
+      expires_at,
+    });
+  });
+  tx();
+  return getConnection(userId, provider);
+}
+
+const _deleteConnection = db.prepare(
+  'DELETE FROM user_connections WHERE user_id = ? AND provider = ?'
+);
+function deleteConnection(userId, provider) { _deleteConnection.run(userId, provider); }
+
 // ── external_writes (idempotent sync ledger — ADR-09) ─────────────────────
 
 const _getExternalWrite = db.prepare(
@@ -309,6 +381,8 @@ module.exports = {
   getTasksByProject, getTaskById,
   // worklog_entries
   getEntriesForDay, getEntryById, createEntry, updateEntry, deleteEntry,
+  // user_connections (encrypted)
+  getConnection, upsertConnection, rotateToken, deleteConnection,
   // external_writes
   getExternalWrite, insertExternalWrite, markExternalWriteSynced, markExternalWriteFailed, getExternalWritesForDay,
   // eod_reports
