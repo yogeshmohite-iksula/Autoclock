@@ -1,0 +1,20 @@
+/* global.css — minimal supplement to autoclock-theme.css.
+   The theme already does reset (* { margin: 0 }), box-sizing, body, headings,
+   :focus-visible, reduced-motion, and the .ac-* component classes. This file
+   only adds full-viewport sizing and the sr-only utility — nothing else. */
+
+html, body, #root { height: 100%; }
+
+/* Screen-reader-only utility (kept here, not the theme, because it's
+   structural rather than visual). */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

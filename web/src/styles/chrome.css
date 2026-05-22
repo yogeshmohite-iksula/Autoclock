@@ -1,0 +1,124 @@
+/* Chrome corners — shared by SignInPage and OnboardingPage (P01 + P02).
+   Sits absolutely positioned around the centred card. */
+
+.chrome {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  padding: var(--ac-space-8);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto 1fr auto;
+  z-index: 2;
+}
+.chrome > * { pointer-events: auto; }
+.chrome-tl { grid-column: 1; grid-row: 1; }
+.chrome-tr { grid-column: 2; grid-row: 1; justify-self: end; }
+.chrome-bl { grid-column: 1; grid-row: 3; align-self: end; }
+.chrome-br { grid-column: 2; grid-row: 3; align-self: end; justify-self: end; }
+
+.wordmark {
+  display: inline-flex; align-items: center; gap: 9px;
+  font-weight: var(--ac-weight-black);
+  font-size: var(--ac-text-base);
+  letter-spacing: -0.01em;
+  color: var(--ac-text);
+}
+.wordmark .dot {
+  width: 6px; height: 6px; border-radius: 999px;
+  background: var(--ac-secondary);
+  box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.10);
+}
+
+.status-line {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: var(--ac-font-mono);
+  font-size: var(--ac-text-xs);
+  color: var(--ac-text);
+  letter-spacing: 0.02em;
+  font-weight: var(--ac-weight-bold);
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.55);
+}
+.status-line .pulse {
+  width: 6px; height: 6px; border-radius: 999px;
+  background: var(--ac-success);
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6);
+  animation: ac-pulse 2.4s ease-out infinite;
+}
+@keyframes ac-pulse {
+  0%   { box-shadow: 0 0 0 0   rgba(16, 185, 129, 0.55); }
+  70%  { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);    }
+  100% { box-shadow: 0 0 0 0   rgba(16, 185, 129, 0);    }
+}
+
+.footer-line {
+  font-size: var(--ac-text-xs);
+  color: var(--ac-text);
+  font-weight: var(--ac-weight-semibold);
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.55);
+}
+.footer-line strong { color: var(--ac-primary); font-weight: var(--ac-weight-black); }
+
+.kbd-hint {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--ac-font-mono);
+  font-size: var(--ac-text-xs);
+  color: var(--ac-text);
+  font-weight: var(--ac-weight-bold);
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.55);
+}
+.kbd {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 22px; height: 22px; padding: 0 6px;
+  background: var(--ac-surface);
+  border: 1px solid var(--ac-border-strong);
+  border-bottom-width: 2px;
+  border-radius: 6px;
+  font-family: var(--ac-font-mono);
+  font-size: 11px; font-weight: 600;
+  color: var(--ac-text-muted);
+}
+
+/* User chip (P02) */
+.user-chip {
+  display: inline-flex; align-items: center; gap: 9px;
+  font-size: var(--ac-text-xs);
+  color: var(--ac-text);
+  font-weight: var(--ac-weight-bold);
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.55);
+}
+.user-chip .avatar {
+  width: 22px; height: 22px; border-radius: 999px;
+  background: var(--ac-primary);
+  color: #fff;
+  display: grid; place-items: center;
+  font-family: var(--ac-font-sans);
+  font-size: 10px; font-weight: var(--ac-weight-black);
+  text-shadow: none;
+}
+.user-chip .signout {
+  color: var(--ac-text-muted);
+  font-family: var(--ac-font-mono);
+  font-size: 11px;
+  margin-left: 4px;
+  border: 1px solid var(--ac-border-strong);
+  padding: 3px 7px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.6);
+  text-shadow: none;
+  transition: var(--ac-transition);
+}
+.user-chip .signout:hover { background: var(--ac-surface); color: var(--ac-text); }
+
+/* Entry animation shared by both chrome and centred cards */
+@keyframes ac-rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Mobile: the decorative corner chrome (wordmark, status-line, footer-line,
+   kbd-hint, user-chip) collides with the centred card at narrow viewports.
+   Hide the entire chrome below the tablet breakpoint — the brand mark inside
+   the card already serves as the AutoClock wordmark on small screens. */
+@media (max-width: 640px) {
+  .chrome { display: none; }
+}

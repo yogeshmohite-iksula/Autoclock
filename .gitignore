@@ -57,3 +57,15 @@ Thumbs.db
 # --- Misc ---
 *.tmp
 *.bak
+
+# --- Build / runtime caches (per-machine, never in git) ---
+node-compile-cache/
+playwright-transform-cache-*/
+
+# --- Large design-tool exports (kept locally, not in the repo) ---
+# The bundled HTML prototypes can be 1.5–5.5 MB each. The small .md docs
+# in docs/Project Docs/ stay tracked; only the bulky binary-ish exports
+# under "docs/FrontEnd Design /" are excluded.
+docs/FrontEnd Design /*.html
+docs/FrontEnd Design /*.zip
+docs/*.docx

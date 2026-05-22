@@ -1,0 +1,53 @@
+/* Logomark — ported faithfully from prototype P01. Uses --ac-primary (Ink
+   Charcoal) for the body and --ac-secondary (Signal Red) for the corner pip. */
+
+.ac-logomark {
+  width: 56px; height: 56px;
+  background: var(--ac-primary);
+  border-radius: 14px;
+  margin: 0 auto;
+  display: grid; place-items: center;
+  position: relative;
+  box-shadow: 0 6px 18px -8px rgba(15, 23, 42, 0.6);
+}
+
+/* tiny corner notch — a small red square = "the moment" */
+.ac-logomark::after {
+  content: ""; position: absolute;
+  top: 9px; right: 9px;
+  width: 5px; height: 5px;
+  border-radius: 1px;
+  background: var(--ac-secondary);
+}
+
+.ac-logomark .face {
+  width: 26px; height: 26px;
+  border-radius: 999px;
+  border: 1.6px solid rgba(255, 255, 255, 0.85);
+  position: relative;
+}
+
+.ac-logomark .hand {
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 1.6px; height: 10px;
+  background: #fff;
+  border-radius: 1px;
+  transform-origin: 50% 100%;
+  transform: translate(-50%, -100%) rotate(36deg);
+}
+
+.ac-logomark .pivot {
+  position: absolute; left: 50%; top: 50%;
+  width: 3px; height: 3px;
+  border-radius: 999px;
+  background: var(--ac-secondary);
+  transform: translate(-50%, -50%);
+}
+
+/* Phone size — slightly smaller */
+@media (max-width: 480px) {
+  .ac-logomark { width: 48px; height: 48px; border-radius: 12px; }
+  .ac-logomark .face { width: 22px; height: 22px; }
+  .ac-logomark .hand { height: 8px; }
+}

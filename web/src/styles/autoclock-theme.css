@@ -1,0 +1,410 @@
+/* ================================================================
+   AutoClock — Master Design System
+   File:   autoclock-theme.css
+   Theme:  "Tech Professional"
+   Brand:  Charcoal ink + one restrained Signal Red accent (zen restraint)
+   Use:    Single source of truth for colour, type, spacing & base
+           components. Import once in the web app (React/Vite) AND the
+           Chrome extension popup so every surface looks identical.
+
+   Import:   import './autoclock-theme.css'      (React)
+             <link rel="stylesheet" href="autoclock-theme.css">  (HTML/extension)
+
+   Iksula HackFest 2026 · Zero cost — Inter is a free, open-source font.
+   ================================================================ */
+
+/* ---- 0. Font ---------------------------------------------------- */
+/* Inter — the standard tech-professional UI typeface. Free.
+   For a fully offline / no-external-request build, self-host the
+   Inter .woff2 files and delete this @import.                       */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+/* ================================================================
+   1. DESIGN TOKENS  —  change the brand here, nowhere else
+   ================================================================ */
+:root {
+
+  /* ---- 1.1 Brand ------------------------------------------------ */
+  --ac-primary:          #0F172A;   /* Ink Charcoal — PRIMARY        */
+  --ac-primary-hover:    #1E293B;
+  --ac-primary-active:   #334155;
+  --ac-primary-contrast: #FFFFFF;   /* text on primary              */
+
+  --ac-secondary:         #DC2626;  /* Signal Red — SECONDARY/ACCENT */
+  --ac-secondary-hover:   #B91C1C;
+  --ac-secondary-active:  #991B1B;
+  --ac-secondary-soft:    #FEF2F2;  /* tinted background            */
+  --ac-secondary-contrast:#FFFFFF;
+
+  /* ---- 1.2 Neutrals (slate ramp) ------------------------------- */
+  --ac-n-50:   #F8FAFC;
+  --ac-n-100:  #F1F5F9;
+  --ac-n-200:  #E2E8F0;
+  --ac-n-300:  #CBD5E1;
+  --ac-n-400:  #94A3B8;
+  --ac-n-500:  #64748B;   /* "Slate" — brand secondary neutral      */
+  --ac-n-600:  #475569;
+  --ac-n-700:  #334155;
+  --ac-n-800:  #1E293B;
+  --ac-n-900:  #0F172A;   /* "Ink" — same as --ac-primary           */
+
+  /* ---- 1.3 Surfaces, text, borders (light theme) --------------- */
+  --ac-bg:           #F1F5F9;       /* app background ("Cloud")     */
+  --ac-surface:      #FFFFFF;       /* cards, panels                */
+  --ac-surface-2:    #F8FAFC;       /* subtle raised / striped rows */
+  --ac-text:         #0F172A;       /* primary text                 */
+  --ac-text-muted:   #475569;       /* secondary text               */
+  --ac-text-subtle:  #94A3B8;       /* captions, placeholders       */
+  --ac-text-invert:  #FFFFFF;
+  --ac-border:       #E2E8F0;       /* default hairline             */
+  --ac-border-strong:#CBD5E1;
+
+  /* ---- 1.4 Semantic / status ----------------------------------- */
+  --ac-success:      #10B981;  --ac-success-soft: #ECFDF5;  --ac-success-text:#065F46;
+  --ac-warning:      #F59E0B;  --ac-warning-soft: #FFFBEB;  --ac-warning-text:#B45309;
+  --ac-danger:       #DC2626;  --ac-danger-soft:  #FEF2F2;  --ac-danger-text: #991B1B;
+  --ac-info:         #2563EB;  --ac-info-soft:    #EFF6FF;  --ac-info-text:   #1D4ED8;
+  /* Note: --ac-danger == brand red by design. The brand accent is used
+     sparingly, so red reads as "important" consistently.            */
+
+  /* ---- 1.5 Typography ------------------------------------------ */
+  --ac-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                  Roboto, Helvetica, Arial, sans-serif;
+  --ac-font-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', 'Roboto Mono',
+                  Menlo, Consolas, monospace;  /* ticket keys, durations */
+
+  --ac-text-xs:   11px;
+  --ac-text-sm:   12.5px;
+  --ac-text-base: 14px;
+  --ac-text-md:   16px;
+  --ac-text-lg:   19px;
+  --ac-text-xl:   24px;
+  --ac-text-2xl:  30px;
+  --ac-text-3xl:  38px;
+
+  --ac-weight-regular:  400;
+  --ac-weight-medium:   500;
+  --ac-weight-semibold: 600;
+  --ac-weight-bold:     700;
+  --ac-weight-black:    800;
+
+  --ac-leading-tight:  1.25;
+  --ac-leading-normal: 1.5;
+  --ac-tracking-wide:  0.04em;   /* for small uppercase labels      */
+
+  /* ---- 1.6 Spacing scale (4px base) ---------------------------- */
+  --ac-space-1:  4px;
+  --ac-space-2:  8px;
+  --ac-space-3:  12px;
+  --ac-space-4:  16px;
+  --ac-space-5:  20px;
+  --ac-space-6:  24px;
+  --ac-space-8:  32px;
+  --ac-space-10: 40px;
+  --ac-space-12: 48px;
+
+  /* ---- 1.7 Radius --------------------------------------------- */
+  --ac-radius-sm:   8px;
+  --ac-radius-md:   12px;   /* default for cards, inputs, buttons   */
+  --ac-radius-lg:   16px;
+  --ac-radius-full: 999px;
+
+  /* ---- 1.8 Elevation ------------------------------------------ */
+  --ac-shadow-sm: 0 1px 2px rgba(15,23,42,.06);
+  --ac-shadow-md: 0 4px 14px rgba(15,23,42,.09);
+  --ac-shadow-lg: 0 16px 40px rgba(15,23,42,.16);
+
+  /* ---- 1.9 Motion & misc -------------------------------------- */
+  --ac-transition: 140ms ease;
+  --ac-focus-ring: 0 0 0 3px rgba(220,38,38,.35);  /* brand-red ring */
+  --ac-z-header:  100;
+  --ac-z-overlay: 900;
+  --ac-z-modal:   1000;
+  --ac-z-toast:   1100;
+}
+
+/* ---- 1.10 Dark theme (brand "reversed / dark" variant) ---------
+   Add  data-theme="dark"  to <html> to enable.                     */
+[data-theme="dark"] {
+  --ac-bg:            #0F172A;
+  --ac-surface:       #1E293B;
+  --ac-surface-2:     #334155;
+  --ac-text:          #F1F5F9;
+  --ac-text-muted:    #CBD5E1;
+  --ac-text-subtle:   #94A3B8;
+  --ac-border:        #334155;
+  --ac-border-strong: #475569;
+
+  --ac-primary:          #F1F5F9;   /* invert: light primary on dark */
+  --ac-primary-hover:    #FFFFFF;
+  --ac-primary-active:   #CBD5E1;
+  --ac-primary-contrast: #0F172A;
+  --ac-secondary:        #F87171;   /* lighter red for dark bg       */
+  --ac-secondary-hover:  #FCA5A5;
+  --ac-secondary-soft:   #2A1518;
+}
+
+/* ================================================================
+   2. RESET & BASE
+   ================================================================ */
+*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  font-family: var(--ac-font-sans);
+  font-size: var(--ac-text-base);
+  line-height: var(--ac-leading-normal);
+  color: var(--ac-text);
+  background: var(--ac-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'cv05', 'ss01';   /* refined Inter letterforms */
+}
+
+h1, h2, h3, h4 {
+  font-weight: var(--ac-weight-black);
+  line-height: var(--ac-leading-tight);
+  letter-spacing: -0.01em;
+  color: var(--ac-text);
+}
+h1 { font-size: var(--ac-text-2xl); }
+h2 { font-size: var(--ac-text-xl); }
+h3 { font-size: var(--ac-text-lg); }
+h4 { font-size: var(--ac-text-md); }
+
+a {
+  color: var(--ac-secondary);
+  text-decoration: none;
+  transition: color var(--ac-transition);
+}
+a:hover { color: var(--ac-secondary-hover); text-decoration: underline; }
+
+small { font-size: var(--ac-text-sm); }
+code, kbd, .ac-mono { font-family: var(--ac-font-mono); font-size: 0.92em; }
+
+/* A small uppercase label — used for section / field labels */
+.ac-label {
+  font-size: var(--ac-text-xs);
+  font-weight: var(--ac-weight-bold);
+  letter-spacing: var(--ac-tracking-wide);
+  text-transform: uppercase;
+  color: var(--ac-text-subtle);
+}
+
+/* Global focus-visible — accessibility (WCAG 2.1 AA) */
+:focus-visible {
+  outline: none;
+  box-shadow: var(--ac-focus-ring);
+  border-radius: var(--ac-radius-sm);
+}
+
+/* Honour reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+
+/* ================================================================
+   3. COMPONENTS
+   ================================================================ */
+
+/* ---- 3.1 Buttons ---------------------------------------------- */
+.ac-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ac-space-2);
+  font-family: var(--ac-font-sans);
+  font-size: var(--ac-text-base);
+  font-weight: var(--ac-weight-semibold);
+  line-height: 1;
+  padding: 10px 18px;
+  border: 1px solid transparent;
+  border-radius: var(--ac-radius-md);
+  cursor: pointer;
+  transition: background var(--ac-transition), border-color var(--ac-transition),
+              transform var(--ac-transition);
+  white-space: nowrap;
+}
+.ac-btn:active { transform: translateY(1px); }
+.ac-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+/* Primary — Ink Charcoal. The default action.                      */
+.ac-btn--primary {
+  background: var(--ac-primary);
+  color: var(--ac-primary-contrast);
+}
+.ac-btn--primary:hover:not(:disabled) { background: var(--ac-primary-hover); }
+.ac-btn--primary:active { background: var(--ac-primary-active); }
+
+/* Accent — Signal Red. Reserved for the hero action
+   ("Close My Day") and other high-emphasis moments. Use sparingly. */
+.ac-btn--accent {
+  background: var(--ac-secondary);
+  color: var(--ac-secondary-contrast);
+}
+.ac-btn--accent:hover:not(:disabled) { background: var(--ac-secondary-hover); }
+.ac-btn--accent:active { background: var(--ac-secondary-active); }
+
+/* Outline — secondary action */
+.ac-btn--outline {
+  background: var(--ac-surface);
+  color: var(--ac-text);
+  border-color: var(--ac-border-strong);
+}
+.ac-btn--outline:hover:not(:disabled) { background: var(--ac-surface-2); }
+
+/* Ghost — tertiary / toolbar action */
+.ac-btn--ghost {
+  background: transparent;
+  color: var(--ac-text-muted);
+}
+.ac-btn--ghost:hover:not(:disabled) { background: var(--ac-n-100); color: var(--ac-text); }
+
+/* Danger — destructive action */
+.ac-btn--danger {
+  background: var(--ac-danger-soft);
+  color: var(--ac-danger-text);
+  border-color: #FECACA;
+}
+.ac-btn--danger:hover:not(:disabled) { background: #FEE2E2; }
+
+/* Sizes */
+.ac-btn--sm { padding: 6px 12px; font-size: var(--ac-text-sm); border-radius: var(--ac-radius-sm); }
+.ac-btn--lg { padding: 13px 24px; font-size: var(--ac-text-md); }
+.ac-btn--block { width: 100%; }
+
+/* ---- 3.2 Form fields ------------------------------------------ */
+.ac-field { display: flex; flex-direction: column; gap: 6px; }
+
+.ac-input, .ac-select, .ac-textarea {
+  font-family: var(--ac-font-sans);
+  font-size: var(--ac-text-base);
+  color: var(--ac-text);
+  background: var(--ac-surface);
+  border: 1px solid var(--ac-border-strong);
+  border-radius: var(--ac-radius-md);
+  padding: 10px 12px;
+  width: 100%;
+  transition: border-color var(--ac-transition), box-shadow var(--ac-transition);
+}
+.ac-textarea { resize: vertical; min-height: 76px; line-height: var(--ac-leading-normal); }
+.ac-input::placeholder, .ac-textarea::placeholder { color: var(--ac-text-subtle); }
+
+.ac-input:focus, .ac-select:focus, .ac-textarea:focus {
+  outline: none;
+  border-color: var(--ac-secondary);
+  box-shadow: var(--ac-focus-ring);
+}
+.ac-input:disabled, .ac-select:disabled, .ac-textarea:disabled {
+  background: var(--ac-n-100); color: var(--ac-text-subtle); cursor: not-allowed;
+}
+/* Invalid state — paired with an icon + text message, never colour alone */
+.ac-input--error, .ac-select--error, .ac-textarea--error {
+  border-color: var(--ac-danger);
+}
+.ac-field-error { font-size: var(--ac-text-sm); color: var(--ac-danger-text); }
+
+/* ---- 3.3 Card / panel ----------------------------------------- */
+.ac-card {
+  background: var(--ac-surface);
+  border: 1px solid var(--ac-border);
+  border-radius: var(--ac-radius-lg);
+  box-shadow: var(--ac-shadow-sm);
+  padding: var(--ac-space-6);
+}
+.ac-card--flat { box-shadow: none; }
+.ac-card--raised { box-shadow: var(--ac-shadow-md); }
+
+/* ---- 3.4 Badge / pill (status) -------------------------------- */
+.ac-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--ac-text-xs);
+  font-weight: var(--ac-weight-bold);
+  padding: 3px 9px;
+  border-radius: var(--ac-radius-full);
+  letter-spacing: 0.01em;
+}
+.ac-badge--success { background: var(--ac-success-soft); color: var(--ac-success-text); }
+.ac-badge--warning { background: var(--ac-warning-soft); color: var(--ac-warning-text); }
+.ac-badge--danger  { background: var(--ac-danger-soft);  color: var(--ac-danger-text); }
+.ac-badge--info    { background: var(--ac-info-soft);    color: var(--ac-info-text); }
+.ac-badge--neutral { background: var(--ac-n-100);        color: var(--ac-text-muted); }
+
+/* Ticket key chip — uses the mono font */
+.ac-chip-ticket {
+  font-family: var(--ac-font-mono);
+  font-size: var(--ac-text-xs);
+  font-weight: var(--ac-weight-semibold);
+  background: var(--ac-n-100);
+  color: var(--ac-text-muted);
+  border: 1px solid var(--ac-border);
+  border-radius: var(--ac-radius-sm);
+  padding: 2px 7px;
+}
+
+/* ---- 3.5 Table ------------------------------------------------ */
+.ac-table { width: 100%; border-collapse: collapse; font-size: var(--ac-text-base); }
+.ac-table thead th {
+  text-align: left;
+  font-size: var(--ac-text-xs);
+  font-weight: var(--ac-weight-bold);
+  letter-spacing: var(--ac-tracking-wide);
+  text-transform: uppercase;
+  color: var(--ac-text-subtle);
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--ac-border);
+}
+.ac-table tbody td {
+  padding: 12px;
+  border-bottom: 1px solid var(--ac-border);
+  color: var(--ac-text);
+}
+.ac-table tbody tr:hover { background: var(--ac-surface-2); }
+.ac-table tbody tr:last-child td { border-bottom: none; }
+
+/* ---- 3.6 Progress bar (hours / compliance) -------------------- */
+.ac-bar { height: 8px; background: var(--ac-n-200); border-radius: var(--ac-radius-full); overflow: hidden; }
+.ac-bar__fill { height: 100%; border-radius: inherit; }
+.ac-bar__fill--full { background: var(--ac-success); }
+.ac-bar__fill--mid  { background: var(--ac-warning); }
+.ac-bar__fill--low  { background: var(--ac-danger); }
+
+/* ---- 3.7 Banner / inline alert -------------------------------- */
+.ac-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--ac-space-3);
+  padding: 11px 14px;
+  border-radius: var(--ac-radius-md);
+  font-size: var(--ac-text-base);
+  border: 1px solid transparent;
+}
+.ac-banner--info    { background: var(--ac-info-soft);    border-color: #BFDBFE; color: var(--ac-info-text); }
+.ac-banner--warning { background: var(--ac-warning-soft); border-color: #FDE68A; color: var(--ac-warning-text); }
+.ac-banner--danger  { background: var(--ac-danger-soft);  border-color: #FECACA; color: var(--ac-danger-text); }
+.ac-banner--success { background: var(--ac-success-soft); border-color: #A7F3D0; color: var(--ac-success-text); }
+
+/* ================================================================
+   4. UTILITIES (small, optional helpers)
+   ================================================================ */
+.ac-text-muted   { color: var(--ac-text-muted); }
+.ac-text-subtle  { color: var(--ac-text-subtle); }
+.ac-text-accent  { color: var(--ac-secondary); }
+.ac-mono-nums    { font-variant-numeric: tabular-nums; }  /* aligned durations */
+.ac-stack        { display: flex; flex-direction: column; gap: var(--ac-space-4); }
+.ac-row          { display: flex; align-items: center; gap: var(--ac-space-3); }
+.ac-spacer       { flex: 1; }
+.ac-divider      { height: 1px; background: var(--ac-border); border: none; }
+
+/* ================================================================
+   END — autoclock-theme.css
+   Quick reference:
+     Primary action  -> .ac-btn .ac-btn--primary   (Ink Charcoal)
+     Hero action     -> .ac-btn .ac-btn--accent    (Signal Red — sparingly)
+     Brand primary   -> var(--ac-primary)   #0F172A
+     Brand secondary -> var(--ac-secondary) #DC2626
+   ================================================================ */

@@ -12,14 +12,14 @@ export default function LogPage() {
   const [form, setForm] = useState({ project_id: '', jira_task_id: '', description: '', duration_raw: '', slot_start: '', slot_end: '', work_date: today });
   const [error, setError] = useState(null);
 
-  useEffect(() => { api.projects().then(d => setProjects(d.projects)).catch(e => setError(e.message)); }, []);
-  useEffect(() => { api.entries(today).then(d => setEntries(d.entries)).catch(e => setError(e.message)); }, [today]);
+  useEffect(() => { api.projects.list().then(d => setProjects(d.projects)).catch(e => setError(e.message)); }, []);
+  useEffect(() => { api.entries.list(today).then(d => setEntries(d.entries)).catch(e => setError(e.message)); }, [today]);
 
   function onProjectChange(e) {
     const project_id = e.target.value;
     setForm(f => ({ ...f, project_id, jira_task_id: '' }));
     if (!project_id) { setTasks([]); return; }
-    api.tasksForProject(project_id).then(d => setTasks(d.tasks)).catch(err => setError(err.message));
+    api.projects.tasks(project_id).then(d => setTasks(d.tasks)).catch(err => setError(err.message));
   }
 
   async function onSubmit(e) {
@@ -27,8 +27,8 @@ export default function LogPage() {
     setError(null);
     try {
       const payload = { ...form, project_id: parseInt(form.project_id, 10), jira_task_id: parseInt(form.jira_task_id, 10) };
-      await api.createEntry(payload);
-      const refreshed = await api.entries(today);
+      await api.entries.create(payload);
+      const refreshed = await api.entries.list(today);
       setEntries(refreshed.entries);
       setForm(f => ({ ...f, description: '', duration_raw: '', slot_start: '', slot_end: '' }));
     } catch (err) { setError(err.message); }
@@ -36,7 +36,7 @@ export default function LogPage() {
 
   return (
     <div style={{ display: 'grid', gap: 20 }}>
-      <section className="card" aria-labelledby="add-entry-heading">
+      <section className="ac-card" aria-labelledby="add-entry-heading">
         <h2 id="add-entry-heading" style={{ marginTop: 0 }}>Add entry</h2>
         {error && <p role="alert" style={{ color: 'var(--ac-danger)' }}>{error}</p>}
         <form onSubmit={onSubmit} style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 12 }}>
@@ -71,16 +71,16 @@ export default function LogPage() {
             <input id="desc" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} required />
           </div>
           <div style={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'flex-end' }}>
-            <button type="submit" className="btn btn-primary">Save entry</button>
+            <button type="submit" className="ac-btn ac-btn--primary">Save entry</button>
           </div>
         </form>
       </section>
 
-      <section className="card" aria-labelledby="today-heading">
+      <section className="ac-card" aria-labelledby="today-heading">
         <h2 id="today-heading" style={{ marginTop: 0 }}>Today</h2>
         {entries.length === 0
-          ? <p style={{ color: 'var(--ac-muted)' }}>No entries yet — log your first slot above.</p>
-          : <table><thead><tr><th>Slot</th><th>Ticket</th><th>Description</th><th>Duration</th></tr></thead>
+          ? <p style={{ color: 'var(--ac-text-muted)' }}>No entries yet — log your first slot above.</p>
+          : <table className="ac-table"><thead><tr><th>Slot</th><th>Ticket</th><th>Description</th><th>Duration</th></tr></thead>
               <tbody>
                 {entries.map(e => (
                   <tr key={e.id}>
