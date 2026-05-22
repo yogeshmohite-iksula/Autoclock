@@ -110,7 +110,9 @@ function groupByTicket(entries) {
     const key = e.jira_key;
     if (!map.has(key)) map.set(key, { jira_key: key, minutes: 0, lines: [] });
     const g = map.get(key);
-    g.minutes += Number.isFinite(e.duration_minutes) ? e.duration_minutes : 0;
+    // Use Number.isInteger to match validateEntry (PR #1 review medium 1) —
+    // a non-integer duration_minutes never reaches a synced worklog anyway.
+    g.minutes += Number.isInteger(e.duration_minutes) ? e.duration_minutes : 0;
     g.lines.push(tidy(e.description));
   }
   return [...map.values()];
