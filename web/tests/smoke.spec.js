@@ -1,86 +1,24 @@
-// Smoke E2E — proves the three signed-in/out routes render cleanly at both
-// desktop (1280×800) and mobile (375×812) under VITE_USE_MOCKS.
+// Smoke E2E — proves the three signed-in/out routes ship by PR #2 render
+// cleanly at the AutoClock viewports (desktop 1440×900, mobile 390×844)
+// under VITE_USE_MOCKS.
 //
 // For each (path × viewport) we assert:
 //   1) no console errors during load
 //   2) no horizontal overflow (document scrollWidth ≤ viewport width)
 //   3) the main heading + primary action are visible
-//   4) a full-page screenshot lands in playwright-report/ or test-results/
+//   4) a full-page screenshot lands in test-results/screenshots/
 //
 // Run: `cd web && npx playwright test`. CLI only — NEVER Playwright MCP.
-//
-// Mock backend lives in web/src/api/mocks.js. SESSION_USER is null on boot so
-// the app starts at /sign-in; helpers click through the real UI to sign in /
-// complete onboarding instead of poking module state directly.
 
 import { test, expect } from '@playwright/test';
-
-const VIEWPORTS = [
-  { name: 'desktop', width: 1280, height: 800 },
-  { name: 'mobile',  width: 375,  height: 812 },
-];
-
-// Some browser-internal console noise we explicitly tolerate.
-const IGNORABLE_CONSOLE_RE = /favicon|\/icon\.svg|Download the React DevTools|Vite is unable to resolve/i;
-
-/** Watch console + uncaught exceptions for the lifetime of the test. */
-function trackErrors(page) {
-  const errors = [];
-  page.on('console', (msg) => {
-    if (msg.type() === 'error' && !IGNORABLE_CONSOLE_RE.test(msg.text())) {
-      errors.push(`[console.error] ${msg.text()}`);
-    }
-  });
-  page.on('pageerror', (err) => {
-    errors.push(`[pageerror] ${err.message}`);
-  });
-  return errors;
-}
-
-/** Sign in via the UI. Leaves the page at /onboarding (mock user
- *  starts with onboarding_status = 'active'). */
-async function signIn(page) {
-  await page.goto('/sign-in');
-  await page.getByRole('button', { name: /Sign in with Google/i }).click();
-  await page.waitForURL(/\/onboarding$/);
-}
-
-/** Sign in AND complete the mock onboarding flow. Leaves the page at /today. */
-async function signInAndOnboard(page) {
-  await signIn(page);
-  await page.getByRole('button', { name: /^Connect Jira/i }).click();
-  await page.getByRole('button', { name: /^Connect Google/i }).click();
-  // Finish enables when both providers are 'connected' (≈ 1.6 s mock delay).
-  await expect(page.getByRole('button', { name: /Finish setup/i })).toBeEnabled({ timeout: 6_000 });
-  await page.getByRole('button', { name: /Finish setup/i }).click();
-  await page.waitForURL(/\/today$/);
-}
-
-/** Assert no horizontal overflow at the current viewport. Reports the
- *  widest offending element if it fails — saves time hunting in DevTools. */
-async function assertNoHorizontalOverflow(page) {
-  const m = await page.evaluate(() => {
-    const inner = window.innerWidth;
-    const scroll = document.documentElement.scrollWidth;
-    const offenders = [];
-    if (scroll > inner) {
-      document.querySelectorAll('*').forEach((el) => {
-        const r = el.getBoundingClientRect();
-        if (r.right > inner + 0.5) {
-          offenders.push({
-            tag: el.tagName, cls: (el.className || '').toString().slice(0, 60),
-            right: Math.round(r.right), w: Math.round(r.width),
-            text: (el.textContent || '').slice(0, 30).trim(),
-          });
-        }
-      });
-      offenders.sort((a, b) => b.right - a.right);
-    }
-    return { scroll, inner, offenders: offenders.slice(0, 5) };
-  });
-  expect(m.scroll, `horizontal overflow ${m.scroll}px > ${m.inner}px viewport\n  offenders:\n${m.offenders.map(o => `   ${o.right}px ${o.tag}.${o.cls} "${o.text}"`).join('\n')}`)
-    .toBeLessThanOrEqual(m.inner);
-}
+import {
+  VIEWPORTS,
+  trackErrors,
+  signIn,
+  signInAndOnboard,
+  assertNoHorizontalOverflow,
+  screenshot,
+} from './_helpers';
 
 // ===========================================================================
 // Root redirect — proves the boot path
@@ -111,7 +49,7 @@ for (const vp of VIEWPORTS) {
       await expect(page.getByRole('button', { name: /Sign in with Google/i })).toBeVisible();
       await assertNoHorizontalOverflow(page);
 
-      await page.screenshot({ path: `test-results/screenshots/sign-in--${vp.name}.png`, fullPage: true });
+      await screenshot(page, `sign-in--${vp.name}`);
       expect(errors, `console errors:\n${errors.join('\n')}`).toEqual([]);
     });
 
@@ -124,7 +62,7 @@ for (const vp of VIEWPORTS) {
       await expect(page.getByRole('button', { name: /Finish setup/i })).toBeVisible();
       await assertNoHorizontalOverflow(page);
 
-      await page.screenshot({ path: `test-results/screenshots/onboarding--${vp.name}.png`, fullPage: true });
+      await screenshot(page, `onboarding--${vp.name}`);
       expect(errors, `console errors:\n${errors.join('\n')}`).toEqual([]);
     });
 
@@ -138,7 +76,7 @@ for (const vp of VIEWPORTS) {
       await expect(page.getByRole('button', { name: /Close My Day/ }).first()).toBeVisible();
       await assertNoHorizontalOverflow(page);
 
-      await page.screenshot({ path: `test-results/screenshots/today--${vp.name}.png`, fullPage: true });
+      await screenshot(page, `today--${vp.name}`);
       expect(errors, `console errors:\n${errors.join('\n')}`).toEqual([]);
     });
   });

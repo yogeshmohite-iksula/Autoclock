@@ -29,6 +29,18 @@ function RequireOnboarded({ children }) {
   return children;
 }
 
+/** Role-gated route guard. `admin` is always allowed.
+ *  Used by the 14 new pages — server-side RBAC is the source of truth (ERD §8). */
+// eslint-disable-next-line react-refresh/only-export-components
+export function RequireRole({ roles, children }) {
+  const { user, loading } = useAuth();
+  if (loading) return null;
+  if (!user) return <Navigate to="/sign-in" replace />;
+  const allowed = new Set([...roles, 'admin']);
+  if (!allowed.has(user.role)) return <Navigate to="/today" replace />;
+  return children;
+}
+
 function RootIndex() {
   const { isAuthed, onboardingComplete, loading } = useAuth();
   if (loading) return null;
