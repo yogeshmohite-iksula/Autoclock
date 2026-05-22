@@ -35,12 +35,6 @@ router.get('/reminders', ops, (_req, res) => {
   res.json({ runs: Q.getRecentReminderRuns(50) });
 });
 
-// EP-23 POST /api/worklogs/sync — pull all Jira worklogs since a date via reader account (STRETCH)
-router.post('/worklogs/sync', ops, (_req, res) => {
-  // TODO(stretch): worklogSync.pullSince(since); aggregate; cache for dashboards. See DevDoc §6.7.
-  res.status(501).json({ error: { code: 'NOT_IMPLEMENTED', message: 'EP-23 is a stretch goal (Hr 12 gate) — DevDoc §6.7' } });
-});
-
 function isoWeek(d) {
   const target = new Date(d.valueOf());
   const dayNr = (d.getDay() + 6) % 7;
@@ -51,4 +45,12 @@ function isoWeek(d) {
   return Math.ceil((firstThu - target) / 604800000) + 1;
 }
 
+// EP-23 POST /api/worklogs/sync — mounted separately at /api/worklogs in server.js (ERD §6)
+const worklogsRouter = express.Router();
+worklogsRouter.post('/sync', ops, (_req, res) => {
+  // TODO(stretch): worklogSync.pullSince(since); aggregate; cache for dashboards. See DevDoc §6.7.
+  res.status(501).json({ error: { code: 'NOT_IMPLEMENTED', message: 'EP-23 is a stretch goal (Hr 12 gate) — DevDoc §6.7' } });
+});
+
 module.exports = router;
+module.exports.worklogsRouter = worklogsRouter;
