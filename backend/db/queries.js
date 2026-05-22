@@ -54,6 +54,11 @@ const _activeProjects = db.prepare(
 );
 function getActiveProjects() { return _activeProjects.all(); }
 
+const _projectById = db.prepare(
+  'SELECT id, name, jira_project_key FROM projects WHERE id = ? AND is_active = 1'
+);
+function getProjectById(id) { return _projectById.get(id); }
+
 const _allProjectsAdmin = db.prepare('SELECT * FROM projects ORDER BY name');
 function getAllProjectsAdmin() { return _allProjectsAdmin.all(); }
 
@@ -299,7 +304,7 @@ module.exports = {
   // teams
   getAllTeams,
   // projects
-  getActiveProjects, getAllProjectsAdmin, createProject,
+  getActiveProjects, getProjectById, getAllProjectsAdmin, createProject,
   // jira_tasks
   getTasksByProject, getTaskById,
   // worklog_entries
