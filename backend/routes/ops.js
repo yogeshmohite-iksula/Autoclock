@@ -1,7 +1,7 @@
 // routes/ops.js — EP-16..EP-18 (Operations compliance) + EP-23 (worklog read-sync, stretch).
 
 const express = require('express');
-const { db } = require('../db');
+const Q = require('../db/queries');
 const { requireRole } = require('../auth/rbac');
 
 const router = express.Router();
@@ -11,13 +11,12 @@ const ops = requireRole('operations', 'admin');
 router.get('/compliance', ops, (req, res) => {
   // TODO(M1): compute weekly hours per user, adjusted for leave_days (FR-17).
   const week = req.query.week || isoWeek(new Date());
-  const users = db.prepare(`
-    SELECT u.id, u.name, u.email
-    FROM users u
-    WHERE u.is_active = 1
-    ORDER BY u.name
-  `).all();
-  res.json({ week, target_hours: 40, rows: users.map(u => ({ user_id: u.id, name: u.name, week_hours: 0, hours_short: 40, status: 'pending' })) });
+  const users = Q.getAllActiveUsers();
+  res.json({
+    week,
+    target_hours: 40,
+    rows: users.map(u => ({ user_id: u.id, name: u.name, week_hours: 0, hours_short: 40, status: 'pending' })),
+  });
 });
 
 // EP-17 POST /api/ops/run-check — Run Fri/Mon check (manual trigger) (M1)
@@ -27,16 +26,13 @@ router.post('/run-check', ops, (req, res) => {
     return res.status(400).json({ error: { code: 'BAD_REQUEST', message: 'type must be friday or monday' } });
   }
   // TODO(M1): perform the check + send reminder emails via Gmail.
-  const info = db.prepare(`
-    INSERT INTO reminder_runs (run_type, triggered_by, created_by_user_id) VALUES (?, 'manual', ?)
-  `).run(type, req.user.id);
-  res.json({ run_id: info.lastInsertRowid, type, recipients: [] });
+  const run_id = Q.createReminderRun({ run_type: type, triggered_by: 'manual', created_by_user_id: req.user.id });
+  res.json({ run_id, type, recipients: [] });
 });
 
 // EP-18 GET /api/ops/reminders — reminder history / email log (M1)
 router.get('/reminders', ops, (_req, res) => {
-  const runs = db.prepare(`SELECT * FROM reminder_runs ORDER BY run_at DESC LIMIT 50`).all();
-  res.json({ runs });
+  res.json({ runs: Q.getRecentReminderRuns(50) });
 });
 
 // EP-23 POST /api/worklogs/sync — pull all Jira worklogs since a date via reader account (STRETCH)

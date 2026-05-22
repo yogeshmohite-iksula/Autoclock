@@ -2,7 +2,7 @@
 // EP-01 Google OIDC sign-in (ADR-10). EP-02..EP-05 per-user OAuth (M1).
 
 const express = require('express');
-const { db } = require('../db');
+const Q = require('../db/queries');
 const { setSession, clearSession } = require('../auth/session');
 const jiraOAuth = require('../auth/jiraOAuth');
 const googleOAuth = require('../auth/googleOAuth');
@@ -15,7 +15,7 @@ router.post('/login', (req, res) => {
   // M1 will replace this with the OIDC id_token verify flow (ADR-10).
   const { email } = req.body || {};
   if (!email) return res.status(400).json({ error: { code: 'BAD_REQUEST', message: 'email required' } });
-  const user = db.prepare('SELECT id, name, email, role, team_id FROM users WHERE email = ? AND is_active = 1').get(email);
+  const user = Q.getUserByEmail(email);
   if (!user) return res.status(401).json({ error: { code: 'UNAUTHENTICATED', message: 'User not found / inactive' } });
   setSession(res, { id: user.id, email: user.email, role: user.role, team_id: user.team_id });
   res.json({ user });

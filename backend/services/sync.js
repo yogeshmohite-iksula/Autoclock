@@ -2,7 +2,7 @@
 // Keyed on (user_id, work_date). One row per (entry × system) in TB-13 external_writes.
 // A double-click, refresh, or retry NEVER creates a duplicate worklog/row/draft.
 
-const { db } = require('../db');
+const Q = require('../db/queries');
 
 const SYSTEMS = ['jira', 'sheet', 'gmail'];
 
@@ -13,46 +13,38 @@ const SYSTEMS = ['jira', 'sheet', 'gmail'];
  * @param {() => Promise<string>} doWrite - performs the side-effect; returns the external_id
  */
 async function syncOne(entry, system, doWrite) {
-  let row = db.prepare(
-    'SELECT * FROM external_writes WHERE worklog_entry_id = ? AND system = ?'
-  ).get(entry.id, system);
+  let row = Q.getExternalWrite(entry.id, system);
 
   if (row && row.status === 'synced') return row; // already done — skip
 
   if (!row) {
-    db.prepare(`
-      INSERT INTO external_writes (worklog_entry_id, user_id, work_date, system, status, attempt_count, created_at, updated_at)
-      VALUES (?, ?, ?, ?, 'pending', 0, datetime('now'), datetime('now'))
-    `).run(entry.id, entry.user_id, entry.work_date, system);
-    row = db.prepare(
-      'SELECT * FROM external_writes WHERE worklog_entry_id = ? AND system = ?'
-    ).get(entry.id, system);
+    row = Q.insertExternalWrite({
+      worklog_entry_id: entry.id,
+      user_id: entry.user_id,
+      work_date: entry.work_date,
+      system,
+    });
   }
 
   try {
     const externalId = await doWrite();
-    db.prepare(`
-      UPDATE external_writes
-      SET status='synced', external_id=?, attempt_count=attempt_count+1, last_error=NULL, updated_at=datetime('now')
-      WHERE id = ?
-    `).run(externalId, row.id);
+    Q.markExternalWriteSynced(row.id, externalId);
   } catch (e) {
-    db.prepare(`
-      UPDATE external_writes
-      SET status='failed', last_error=?, attempt_count=attempt_count+1, updated_at=datetime('now')
-      WHERE id = ?
-    `).run(String(e?.message || e), row.id);
+    Q.markExternalWriteFailed(row.id, String(e?.message || e));
   }
-  return db.prepare('SELECT * FROM external_writes WHERE id = ?').get(row.id);
+  return Q.getExternalWrite(entry.id, system);
 }
 
 /** Aggregate the day's external_writes into a per-system result for the response. */
 function buildResult(userId, workDate) {
-  const rows = db.prepare(
-    'SELECT * FROM external_writes WHERE user_id = ? AND work_date = ?'
-  ).all(userId, workDate);
+  const rows = Q.getExternalWritesForDay(userId, workDate);
 
-  const result = { jira: { ok: 0, failed: 0, worklog_ids: [] }, sheet: { ok: false, rows_appended: 0 }, gmail: { ok: false, draft_id: null }, overall: 'ok' };
+  const result = {
+    jira:    { ok: 0, failed: 0, worklog_ids: [] },
+    sheet:   { ok: false, rows_appended: 0 },
+    gmail:   { ok: false, draft_id: null },
+    overall: 'ok',
+  };
 
   for (const r of rows) {
     if (r.system === 'jira') {
@@ -66,8 +58,8 @@ function buildResult(userId, workDate) {
   }
 
   const anyFailed = rows.some(r => r.status === 'failed');
-  const anyOk = rows.some(r => r.status === 'synced');
-  result.overall = anyFailed ? (anyOk ? 'partial' : 'failed') : 'ok';
+  const anyOk     = rows.some(r => r.status === 'synced');
+  result.overall  = anyFailed ? (anyOk ? 'partial' : 'failed') : 'ok';
   return result;
 }
 

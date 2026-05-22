@@ -2,7 +2,7 @@
 // See PRD §7 Flow B, ERD §6 example, DevDoc §6.8 idempotency.
 
 const express = require('express');
-const { db } = require('../db');
+const Q = require('../db/queries');
 const { requireRole } = require('../auth/rbac');
 const { groupByTicket, validateDay, toJiraStarted } = require('../services/parser');
 const { syncOne, buildResult } = require('../services/sync');
@@ -13,20 +13,10 @@ const gmailSvc = require('../services/gmail');
 const router = express.Router();
 const employees = requireRole('employee', 'pm_lead', 'management', 'operations', 'admin');
 
-function loadDayEntries(userId, workDate) {
-  return db.prepare(`
-    SELECT e.*, t.jira_key
-    FROM worklog_entries e
-    JOIN jira_tasks t ON t.id = e.jira_task_id
-    WHERE e.user_id = ? AND e.work_date = ?
-    ORDER BY e.slot_start
-  `).all(userId, workDate);
-}
-
 // EP-12 POST /api/day/preview — parse + group → preview payload
 router.post('/preview', employees, (req, res) => {
   const work_date = req.body?.work_date || new Date().toISOString().slice(0, 10);
-  const entries = loadDayEntries(req.user.id, work_date);
+  const entries = Q.getEntriesForDay(req.user.id, work_date);
   const { errors, warnings, total_minutes } = validateDay(entries);
   const groups = groupByTicket(entries);
   res.json({ work_date, groups, total_minutes, warnings, errors });
@@ -39,7 +29,7 @@ router.post('/close', employees, async (req, res, next) => {
     if (!work_date) return res.status(400).json({ error: { code: 'BAD_REQUEST', message: 'work_date required' } });
     if (!req.body?.confirmed) return res.status(400).json({ error: { code: 'NOT_CONFIRMED', message: 'must call /api/day/preview and confirm first (FR-04)' } });
 
-    const entries = loadDayEntries(req.user.id, work_date);
+    const entries = Q.getEntriesForDay(req.user.id, work_date);
     const { errors } = validateDay(entries);
     if (errors.length) return res.status(400).json({ error: { code: 'VALIDATION', message: 'Entries invalid — see errors', errors } });
 
@@ -53,7 +43,6 @@ router.post('/close', employees, async (req, res, next) => {
 
     // 2. Sheet append — one row per ticket group (ERD §14.3 row-per-ticket).
     const groups = groupByTicket(entries);
-    // Use the first entry of each group as the "anchor" so we can keep one external_writes row per group.
     for (const group of groups) {
       const anchor = entries.find(e => e.jira_key === group.jira_key);
       if (!anchor) continue;
@@ -66,7 +55,7 @@ router.post('/close', employees, async (req, res, next) => {
       });
     }
 
-    // 3. Gmail draft — one per day (use the first entry as the anchor).
+    // 3. Gmail draft — one per day.
     if (entries.length > 0) {
       const anchor = entries[0];
       await syncOne(anchor, 'gmail', async () => {
