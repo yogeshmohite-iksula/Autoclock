@@ -7,7 +7,23 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 
 ## [Unreleased]
 
-### Fixed — Frontend (PR #2 review)
+### Fixed — Frontend (PR #2 visual review)
+- **Issue 1 — `/sign-in` never displayed.** Mock backend auto-signed-in the demo user on module load, and `RequireAuth` bounced any visit to `/sign-in` straight to `/onboarding`. Mocks now start signed-out (`SESSION_USER = null`; `/api/auth/me` → 401), `/api/auth/login` sets the session, `/api/auth/logout` clears it, and onboarding completion flips `connections.jira` to `connected` via a new `_setMockOnboardingComplete()` helper so the demo walks the full Sign-in → Onboarding → Today flow.
+- **Issue 2 — mobile chrome corners overlapped centered content.** `.chrome` decorations now hide at `≤640px` (`chrome.css`). Sign-in + Onboarding shells switch from `position:absolute` centring on fixed `100vh` to flow layout with `min-height:100vh` + `padding:24px 16px` so the card vertically centres on small viewports without the corner overlap. Today page hides the sidebar, collapses `.tdy-body-grid` to a single column, and adds `min-width:0` + `overflow-wrap:anywhere` so the form chain (`.tdy-field`, `.tdy-dd-btn`) no longer overflows 375px. Project / ticket pills stay on one line via `white-space:nowrap` while the slot top-line wraps.
+- **Issue 3 — onboarding background didn't match prototype.** Both `/sign-in` and `/onboarding` now render the prototype's photo aurora: `bg-photo` + `bg-photo-overlay` instead of `bg-mesh + bg-stars`. New asset `web/public/assets/bg-soft.png` (3 MB, extracted from the `Onboarding.html` `__bundler/manifest`) drives it.
+- **UX polish:** `Close My Day` button + Time-mode toggle are now centered on Today (`.tdy-hero .right` + `.tdy-time-mode { align-self:center }`). The `What did you work on?` textarea grows to `min-height:132px / max-height:220px` with an internal `overflow-y:auto` scrollbar instead of pushing the form taller.
+
+### Tested — Frontend
+- Playwright CLI smoke rewritten: 3 pages (`/sign-in`, `/onboarding`, `/today`) × 2 viewports (1280×800 desktop + 375×812 mobile) + a root-redirect test. Helpers click through the real Sign-in → Onboarding → Today flow (no module-state pokes). Each test asserts no console errors, no horizontal overflow (with offender diagnostics), heading + primary action visible, and saves a full-page screenshot to `test-results/screenshots/`. 7 tests, all green.
+
+### Added — Frontend (assets)
+- `web/public/assets/bg-soft.png` — prototype aurora background (gitignored caches stripped from the repo at the same time).
+- `web/package-lock.json` — deterministic install lockfile.
+
+### Repo hygiene
+- `.gitignore`: added `node-compile-cache/`, `playwright-transform-cache-*/`, `docs/FrontEnd Design /*.html`, `docs/FrontEnd Design /*.zip`, `docs/*.docx`. Bundled prototype exports stay locally — the small `.md` docs remain tracked.
+
+### Fixed — Frontend (PR #2 code review)
 - **A11y blocker:** `TodayPage` description chips ("+ #bug", "+ #review", "+ #standup") were `<span onClick>` — not in the tab order, not keyboard-activated, not announced as actionable. Switched to `<button type="button">`. `.tdy-chip` CSS picks up `appearance:none` + a pill-shaped `:focus-visible` ring so the visual is identical. WCAG 2.1.1 (Keyboard) + 4.1.2 (Name, Role, Value), required by PRD §11.
 
 ### Added — Frontend (feat/frontend)
