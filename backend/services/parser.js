@@ -104,6 +104,9 @@ function tidy(desc) {
 function groupByTicket(entries) {
   const map = new Map();
   for (const e of entries || []) {
+    // Defensive: skip null/undefined or entries missing a jira_key.
+    // EP-12 preview must never crash on a half-saved draft or sparse array.
+    if (!e || !e.jira_key) continue;
     const key = e.jira_key;
     if (!map.has(key)) map.set(key, { jira_key: key, minutes: 0, lines: [] });
     const g = map.get(key);

@@ -210,6 +210,20 @@ describe('groupByTicket', () => {
     assert.equal(groups[0].minutes, 30);
     assert.deepEqual(groups[0].lines, ['X']);
   });
+
+  test('null / undefined / jira_key-less elements are skipped (no crash)', () => {
+    // Defensive: the EP-12 preview must not blow up on a half-saved draft or sparse array.
+    const groups = groupByTicket([
+      null,
+      undefined,
+      { duration_minutes: 30, description: 'no key' },     // missing jira_key
+      { jira_key: '', duration_minutes: 30, description: 'empty key' }, // falsy jira_key
+      { jira_key: 'OK-1', duration_minutes: 30, description: 'real one' },
+    ]);
+    assert.equal(groups.length, 1);
+    assert.equal(groups[0].jira_key, 'OK-1');
+    assert.equal(groups[0].minutes, 30);
+  });
 });
 
 // ===========================================================================
