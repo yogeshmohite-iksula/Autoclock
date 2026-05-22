@@ -186,7 +186,12 @@
   .signin-card { padding: 30px 24px 24px; }
 }
 @media (max-width: 640px) {
-  .signin-center { padding: 20px; }
+  /* Mobile: switch the shell from fixed-100vh + overflow:hidden + absolute
+     centring to a normal vertical-flow column, but keep the card vertically
+     centred in the viewport (was top-aligned, leaving a big empty area below).
+     The decorative .chrome corners are hidden by chrome.css at this breakpoint. */
+  .signin-shell { width: 100%; height: auto; min-height: 100vh; overflow: visible; }
+  .signin-center { position: static; min-height: 100vh; padding: 24px 16px; }
   .signin-card { padding: 30px 24px 24px; border-radius: 18px; }
   .signin-brand { font-size: 24px; margin-top: 16px; }
   .signin-tagline { font-size: 13.5px; }

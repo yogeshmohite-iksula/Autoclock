@@ -114,3 +114,11 @@
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+
+/* Mobile: the decorative corner chrome (wordmark, status-line, footer-line,
+   kbd-hint, user-chip) collides with the centred card at narrow viewports.
+   Hide the entire chrome below the tablet breakpoint — the brand mark inside
+   the card already serves as the AutoClock wordmark on small screens. */
+@media (max-width: 640px) {
+  .chrome { display: none; }
+}

@@ -17,6 +17,23 @@
   gap: var(--ac-space-5);
 }
 
+/* Mobile: switch the shell from fixed-100vh + overflow:hidden + absolute
+   centring to a normal vertical-flow column. The decorative .chrome corners
+   are hidden by chrome.css at this breakpoint. */
+@media (max-width: 640px) {
+  /* width:100% (not 100vw) — viewport units include the scrollbar on some
+     platforms and would force horizontal overflow. */
+  .onboarding-shell { width: 100%; height: auto; min-height: 100vh; overflow: visible; }
+  .onboarding-center { position: static; padding: 24px 16px; overflow: visible; }
+  /* Allow flex/grid children to shrink below their content size, and let
+     long mono strings (Jira/Google email addresses) wrap instead of forcing
+     horizontal scroll. */
+  .onboarding-card { min-width: 0; }
+  .conn-row .body { min-width: 0; }
+  .conn-row .conn-info { flex-wrap: wrap; }
+  .conn-row .conn-info .email { overflow-wrap: anywhere; word-break: break-word; }
+}
+
 /* ---- head ---- */
 .onboarding-head { text-align: center; margin-bottom: 4px; }
 .onboarding-head .eyebrow {
