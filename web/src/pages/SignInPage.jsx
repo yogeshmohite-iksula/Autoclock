@@ -57,9 +57,10 @@ export default function SignInPage() {
 
   return (
     <div className="signin-shell">
-      {/* Backgrounds — bg-photo if /assets/bg-soft.png ships; bg-mesh fallback */}
-      <div className="bg-layer bg-mesh" />
-      <div className="bg-layer bg-stars" />
+      {/* Backgrounds — match the prototype default ("photo" aurora). The asset
+          is shipped at web/public/assets/bg-soft.png (extracted from the bundle). */}
+      <div className="bg-layer bg-photo" />
+      <div className="bg-layer bg-photo-overlay" />
 
       {/* Corner chrome */}
       <div className="chrome">

@@ -66,7 +66,9 @@ export default function OnboardingPage() {
 
   return (
     <div className="onboarding-shell">
-      <div className="bg-layer bg-mesh" />
+      {/* Backgrounds — match the prototype default ("photo" aurora). */}
+      <div className="bg-layer bg-photo" />
+      <div className="bg-layer bg-photo-overlay" />
 
       {/* Corner chrome */}
       <div className="chrome">
