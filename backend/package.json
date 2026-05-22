@@ -12,7 +12,8 @@
     "init-db": "node -e \"require('./db.js').init()\"",
     "pm2:start": "pm2 start server.js --name autoclock",
     "pm2:logs": "pm2 logs autoclock",
-    "pm2:stop": "pm2 stop autoclock"
+    "pm2:stop": "pm2 stop autoclock",
+    "verify-db": "node scripts/verify-db.js"
   },
   "engines": {
     "node": ">=18"
