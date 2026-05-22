@@ -1,0 +1,28 @@
+# node_modules — each stage installs its own deps
+**/node_modules/
+
+# SQLite database files — volume-managed on Fly.io; never baked into the image
+**/*.db
+**/*.db-shm
+**/*.db-wal
+
+# Secrets — set via fly secrets, never in the image
+.env
+*.env.*
+!*.env.example
+
+# Git history — not needed at runtime
+.git/
+.gitignore
+.githooks/
+.gitleaks.toml
+
+# Docs & assets — not served at runtime
+docs/*.pdf
+
+# Chrome extension — not deployed with the backend
+extension/
+
+# Claude config — not needed at runtime
+.claude/
+Prompt/

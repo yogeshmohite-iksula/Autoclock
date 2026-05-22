@@ -14,9 +14,14 @@ function makeAuth() {
   return oauth2;
 }
 
+function encodeSubject(subject) {
+  // RFC 2047 UTF-8 base64 word — handles em dashes and any non-ASCII safely.
+  return `=?UTF-8?B?${Buffer.from(subject).toString('base64')}?=`;
+}
+
 function buildMime(to, subject, html) {
   const msg =
-    `To: ${to}\r\nSubject: ${subject}\r\nMIME-Version: 1.0\r\n` +
+    `To: ${to}\r\nSubject: ${encodeSubject(subject)}\r\nMIME-Version: 1.0\r\n` +
     `Content-Type: text/html; charset=UTF-8\r\n\r\n${html}`;
   return Buffer.from(msg).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
@@ -24,7 +29,7 @@ function buildMime(to, subject, html) {
 function groupsToHtml(groups) {
   const total = groups.reduce((a, g) => a + g.minutes, 0);
   const rows = groups.map(g =>
-    `<tr><td>${escape(g.jira_key)}</td><td>${Math.floor(g.minutes / 60)}h ${g.minutes % 60}m</td><td>${escape(g.lines.join('; '))}</td></tr>`
+    `<tr><td>${escapeHtml(g.jira_key)}</td><td>${Math.floor(g.minutes / 60)}h ${g.minutes % 60}m</td><td>${escapeHtml(g.lines.join('; '))}</td></tr>`
   ).join('');
   return `<html><body><p>EOD report — total ${Math.floor(total / 60)}h ${total % 60}m.</p>
   <table border="1" cellpadding="6" cellspacing="0">
@@ -33,7 +38,7 @@ function groupsToHtml(groups) {
   </table></body></html>`;
 }
 
-function escape(s) {
+function escapeHtml(s) {
   return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 }
 
