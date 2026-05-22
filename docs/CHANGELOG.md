@@ -7,6 +7,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 
 ## [Unreleased]
 
+### Fixed — Frontend (PR #2 review)
+- **A11y blocker:** `TodayPage` description chips ("+ #bug", "+ #review", "+ #standup") were `<span onClick>` — not in the tab order, not keyboard-activated, not announced as actionable. Switched to `<button type="button">`. `.tdy-chip` CSS picks up `appearance:none` + a pill-shaped `:focus-visible` ring so the visual is identical. WCAG 2.1.1 (Keyboard) + 4.1.2 (Name, Role, Value), required by PRD §11.
+
 ### Added — Frontend (feat/frontend)
 - **Three new screens** ported from `docs/FrontEnd Design/` prototypes as production React under `web/`:
   - `/sign-in` (P01) — Google OIDC sign-in with G keyboard shortcut, IST clock, real `default/loading/error` state machine (FR-23).

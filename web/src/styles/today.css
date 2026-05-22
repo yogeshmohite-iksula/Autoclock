@@ -265,12 +265,18 @@ body[data-tdy-collapsed="true"] .tdy-collapse-btn .label { display: none; }
 }
 .tdy-desc-foot .chips { display: flex; gap: 6px; }
 .tdy-chip {
+  /* Reset native <button> defaults so the visual matches the prior <span>.
+     Switched to <button> for keyboard a11y (WCAG 2.1.1 / 4.1.2 — PR #2 review). */
+  appearance: none; -webkit-appearance: none;
   font-family: var(--ac-font-mono); font-size: 10.5px; font-weight: var(--ac-weight-semibold);
+  line-height: 1.4;
   padding: 2px 7px; border-radius: 999px;
   border: 1px solid var(--ac-border); background: var(--ac-n-100);
   color: var(--ac-text-muted); cursor: pointer; transition: var(--ac-transition);
 }
 .tdy-chip:hover { background: var(--ac-surface); color: var(--ac-text); }
+/* Pill-shaped focus ring (the theme's default is radius-sm = 8px, which clips a 999px pill). */
+.tdy-chip:focus-visible { outline: none; box-shadow: var(--ac-focus-ring); border-radius: 999px; }
 
 .tdy-time-mode { display: inline-flex; padding: 3px; background: var(--ac-n-100); border-radius: 8px; }
 .tdy-time-mode button {

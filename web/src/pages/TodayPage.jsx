@@ -392,9 +392,9 @@ export default function TodayPage() {
                   <div className="tdy-desc-foot">
                     <span>Plain text. Mentions, links, and ticket keys auto-format.</span>
                     <div className="chips">
-                      <span className="tdy-chip" onClick={() => setDesc(d => (d ? d + ' ' : '') + '#bug')}>+ #bug</span>
-                      <span className="tdy-chip" onClick={() => setDesc(d => (d ? d + ' ' : '') + '#review')}>+ #review</span>
-                      <span className="tdy-chip" onClick={() => setDesc(d => (d ? d + ' ' : '') + '#standup')}>+ #standup</span>
+                      <button type="button" className="tdy-chip" onClick={() => setDesc(d => (d ? d + ' ' : '') + '#bug')}>+ #bug</button>
+                      <button type="button" className="tdy-chip" onClick={() => setDesc(d => (d ? d + ' ' : '') + '#review')}>+ #review</button>
+                      <button type="button" className="tdy-chip" onClick={() => setDesc(d => (d ? d + ' ' : '') + '#standup')}>+ #standup</button>
                     </div>
                   </div>
                 </div>
