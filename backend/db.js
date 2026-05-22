@@ -11,6 +11,10 @@ const SCHEMA_FILE = path.join(__dirname, 'schema.sql');
 const db = new Database(DB_FILE);
 db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = ON');
+db.pragma('busy_timeout = 5000');   // wait up to 5s instead of immediate SQLITE_BUSY (Fly restarts cause brief contention)
+db.pragma('synchronous = NORMAL');  // safe with WAL; ~2x faster writes vs FULL on rotational disk
+db.pragma('cache_size = -16000');   // 16 MB page cache (negative = kibibytes); hot dataset fits easily
+db.pragma('temp_store = MEMORY');   // ORDER BY / GROUP BY temp tables in RAM
 
 function init() {
   const ddl = fs.readFileSync(SCHEMA_FILE, 'utf8');
@@ -36,7 +40,7 @@ function seedIfEmpty() {
       .run('Priya K', 'priya@iksula.com', 'pm_lead', 1);
     db.prepare(`INSERT INTO users (name, email, role, team_id, onboarding_status, is_active)
                 VALUES (?, ?, ?, ?, 'active', 1)`)
-      .run('Omkar P', 'omkar@iksula.com', 'operations', NULL);
+      .run('Omkar P', 'omkar@iksula.com', 'operations', null);
 
     // Projects (ERD §5.2)
     const projects = [
