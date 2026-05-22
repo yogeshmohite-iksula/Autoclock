@@ -14,6 +14,12 @@ const app = require('../server');
 let server, base;
 
 before(() => new Promise(resolve => {
+  // Purge entries accumulated from previous test runs on the far-future test dates.
+  const { db } = require('../db');
+  db.prepare(
+    "DELETE FROM worklog_entries WHERE work_date IN ('2099-01-15','2099-01-16','2099-01-17','2099-01-18')"
+  ).run();
+
   server = app.listen(0, () => {
     base = `http://localhost:${server.address().port}`;
     resolve();
@@ -204,6 +210,8 @@ for (const { label, send, expected } of durationCases) {
     const body = await res.json();
     assert.equal(res.status, 201, `${label}: create should succeed`);
     assert.equal(body.entry.duration_minutes, expected, `${label}: stored minutes`);
+    // Clean up — delete the entry so accumulated runs never push DATE_FORMATS over 24h.
+    await del(`/api/entries/${body.entry.id}`, cookie);
   });
 }
 
