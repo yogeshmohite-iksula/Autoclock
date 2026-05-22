@@ -257,7 +257,15 @@ body[data-tdy-collapsed="true"] .tdy-collapse-btn .label { display: none; }
 .tdy-field-lbl .req { color: var(--ac-secondary); margin-left: 4px; }
 
 .tdy-desc-area {
-  min-height: 84px; resize: vertical; line-height: 1.5;
+  /* Generous starting height (was 84px — too short for a real day's
+     work description). Capped at 220px so a long entry doesn't push
+     the rest of the form below the fold; the textarea scrolls
+     internally instead. */
+  min-height: 132px;
+  max-height: 220px;
+  resize: vertical;
+  overflow-y: auto;
+  line-height: 1.5;
 }
 .tdy-desc-foot {
   display: flex; align-items: center; justify-content: space-between;
@@ -544,4 +552,33 @@ body[data-tdy-collapsed="true"] .tdy-collapse-btn .label { display: none; }
   .tdy-row-2 { grid-template-columns: 1fr; }
   .tdy-topbar-center { display: none; }
   .tdy-user-meta { display: none; }
+
+  /* Phone: hide the sidebar entirely and let main column own the viewport.
+     Reduce padding; allow grid/flex children to shrink below content width
+     so long ticket summaries / project names don't force horizontal scroll. */
+  .tdy-root { overflow-x: hidden; }
+  .tdy-body-grid { grid-template-columns: 1fr; }
+  .tdy-sidebar { display: none; }
+  .tdy-main { padding: var(--ac-space-4) var(--ac-space-4) 120px; min-width: 0; }
+  .tdy-main-inner, .tdy-form-card, .tdy-form-body,
+  .tdy-row-2, .tdy-field, .tdy-dd { min-width: 0; }
+  .tdy-ticket-line, .tdy-ticket-desc, .tdy-dd-label { min-width: 0; max-width: 100%; }
+  .tdy-topbar { padding: 0 var(--ac-space-4); gap: 8px; }
+  .tdy-slot { grid-template-columns: 70px 1fr auto; column-gap: 10px; row-gap: 6px; }
+  .tdy-slot .actions { grid-column: 1 / -1; justify-self: end; }
+  .tdy-close-bar { padding: 10px var(--ac-space-4); }
+  .tdy-close-bar-inner { flex-wrap: wrap; gap: 10px; }
+
+  /* Centre the "Close My Day" hero action (was left-aligned when the hero
+     collapsed to a single column). */
+  .tdy-hero .right { display: flex; justify-content: center; }
+
+  /* Centre the Range / Duration toggle inside the Time field. */
+  .tdy-time-mode { align-self: center; }
+
+  /* Slot top-line: keep "SiteOne PIMCore" and "PIM-3066" each on one line —
+     they were wrapping mid-word at narrow widths. Let the two chips drop to
+     a new row if they don't both fit horizontally. */
+  .tdy-slot .top-line { flex-wrap: wrap; row-gap: 4px; }
+  .tdy-slot .proj, .tdy-slot .ticket { white-space: nowrap; }
 }
