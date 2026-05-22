@@ -64,7 +64,20 @@ router.post('/close', employees, async (req, res, next) => {
       });
     }
 
-    res.json(buildResult(req.user.id, work_date));
+    const result = buildResult(req.user.id, work_date);
+
+    // Record EOD report row (TB-07) after each sync attempt (partial or full).
+    const gmailWrite = Q.getExternalWritesForDay(req.user.id, work_date).find(w => w.system === 'gmail');
+    const sheetWrite = Q.getExternalWritesForDay(req.user.id, work_date).find(w => w.system === 'sheet');
+    Q.upsertEodReport({
+      user_id:       req.user.id,
+      work_date,
+      gmail_draft_id: gmailWrite?.external_id || null,
+      sheet_appended: sheetWrite?.status === 'synced' ? 1 : 0,
+      status:         result.overall,
+    });
+
+    res.json(result);
   } catch (e) {
     next(e);
   }
