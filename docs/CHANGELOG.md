@@ -14,10 +14,17 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
   - `tidy` — adds `qa`, `pr` shorthand; trims trailing `, ; :` while keeping `. ! ?`.
   - `validateEntry` — adds `HH:MM` regex (00–23:00–59), 1000-char description cap, friendly null-entry handling.
   - `validateDay` — adds `duration_mismatch` and `large_gap` (>4h) warnings. Warnings never block Confirm — only `total > 24h` and per-entry errors do (PRD §9).
-- 41-test suite in `backend/test/parser.test.js` covering every duration format, all tidy rules, group ordering, every validation branch, and each day-level edge case.
+- 44-test suite in `backend/test/parser.test.js` covering every duration format, all tidy rules, group ordering, every validation branch, and each day-level edge case.
 
 ### Changed
 - `groupByTicket` uses a `Map` internally to preserve first-seen ordering deterministically.
+- `groupByTicket` standardised on `Number.isInteger` for `duration_minutes` (was `Number.isFinite`), matching `validateEntry` (PR #1 review M1).
+
+### Fixed
+- **PR #1 review blocker:** `groupByTicket` no longer throws on `null`/`undefined` elements or entries missing `jira_key`; they're silently skipped so EP-12 preview can't crash on a half-saved draft or sparse array. Test covers the mixed-junk case.
+
+### Docs
+- `docs/parser-spec.md` updated to document the `validateEntry` null-entry defensive path and `groupByTicket`'s skip-on-junk behaviour (PR #1 review M4).
 
 - Initial repository scaffold per DevDoc §1.
 - Monorepo layout: `backend/`, `web/`, `extension/`, `docs/`, `.claude/`.

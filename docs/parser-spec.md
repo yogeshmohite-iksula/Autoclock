@@ -40,7 +40,9 @@ Group = { jira_key: string, minutes: number, lines: string[] }
 ```
 - Stable ordering: groups appear in first-seen order.
 - Each line is `tidy`-ed once on insertion.
-- Empty input → `[]`.
+- `null` or `undefined` elements, and entries missing `jira_key` (or with a falsy one), are silently skipped — never crashes EP-12 preview.
+- A non-integer `duration_minutes` contributes `0` (matches `validateEntry`).
+- Empty input (`[]`, `null`, `undefined`) → `[]`.
 
 ### `validateEntry(entry: Entry): string[]`
 Returns an array of human-readable errors. Empty array = valid. Checks:
@@ -49,6 +51,8 @@ Returns an array of human-readable errors. Empty array = valid. Checks:
 - `duration_minutes` is a positive integer
 - `slot_start` and `slot_end` match `^\d{2}:\d{2}$` (HH 00–23, MM 00–59)
 - `slot_end > slot_start`
+
+**Defensive:** if `entry` itself is `null` or `undefined`, returns the single-element array `['entry is null/undefined']` rather than throwing. The normal flow never hits this — but a malformed payload from EP-09/10 or a sparse-array preview should produce a clear error, not a `TypeError`.
 
 ### `validateDay(entries: Entry[]): DayReport`
 ```ts
