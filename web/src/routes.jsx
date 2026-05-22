@@ -1,0 +1,66 @@
+// routes.jsx — route table + guards.
+// New screens: /sign-in, /onboarding, /today.
+// Legacy /log /preview /dashboard kept under the same Layout so other swimlanes don't break.
+
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { useAuth } from './auth/AuthContext';
+
+import SignInPage from './pages/SignInPage';
+import OnboardingPage from './pages/OnboardingPage';
+import TodayPage from './pages/TodayPage';
+
+// Legacy stubs (kept so /log, /preview, /dashboard work for Yogesh / Keval / Ali).
+import App from './App';
+import LogPage from './pages/LogPage';
+import PreviewPage from './pages/PreviewPage';
+import DashboardPage from './pages/DashboardPage';
+
+function RequireAuth({ children }) {
+  const { isAuthed, loading } = useAuth();
+  if (loading) return null;
+  if (!isAuthed) return <Navigate to="/sign-in" replace />;
+  return children;
+}
+
+function RequireOnboarded({ children }) {
+  const { onboardingComplete, loading } = useAuth();
+  if (loading) return null;
+  if (!onboardingComplete) return <Navigate to="/onboarding" replace />;
+  return children;
+}
+
+function RootIndex() {
+  const { isAuthed, onboardingComplete, loading } = useAuth();
+  if (loading) return null;
+  if (!isAuthed) return <Navigate to="/sign-in" replace />;
+  if (!onboardingComplete) return <Navigate to="/onboarding" replace />;
+  return <Navigate to="/today" replace />;
+}
+
+export default function AppRoutes() {
+  return (
+    <Routes>
+      <Route path="/" element={<RootIndex />} />
+
+      {/* New screens */}
+      <Route path="/sign-in" element={<SignInPage />} />
+      <Route
+        path="/onboarding"
+        element={<RequireAuth><OnboardingPage /></RequireAuth>}
+      />
+      <Route
+        path="/today"
+        element={<RequireAuth><RequireOnboarded><TodayPage /></RequireOnboarded></RequireAuth>}
+      />
+
+      {/* Legacy stubs under the original shell */}
+      <Route element={<App />}>
+        <Route path="/log" element={<LogPage />} />
+        <Route path="/preview" element={<PreviewPage />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
+      </Route>
+
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+}
