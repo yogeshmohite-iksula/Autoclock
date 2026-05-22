@@ -47,11 +47,14 @@ router.post('/close', employees, async (req, res, next) => {
       const anchor = entries.find(e => e.jira_key === group.jira_key);
       if (!anchor) continue;
       await syncOne(anchor, 'sheet', async () => {
-        return await sheetsSvc.appendRow(req.user, [
-          `${anchor.slot_start}-${anchor.slot_end}`,
-          `${Math.floor(group.minutes / 60)}h ${group.minutes % 60}m`,
-          `${group.jira_key}: ${group.lines.join('; ')}`,
-        ]);
+        return await sheetsSvc.appendRow(req.user, {
+          date:        work_date,
+          project:     anchor.project_name || '',
+          slot:        `${anchor.slot_start}-${anchor.slot_end}`,
+          duration:    `${Math.floor(group.minutes / 60)}h ${group.minutes % 60}m`,
+          ticket:      group.jira_key,
+          description: group.lines.join('; '),
+        });
       });
     }
 
@@ -59,7 +62,7 @@ router.post('/close', employees, async (req, res, next) => {
     if (entries.length > 0) {
       const anchor = entries[0];
       await syncOne(anchor, 'gmail', async () => {
-        const subject = `EOD ${work_date} — ${req.user.email}`;
+        const subject = `EOD Report - ${work_date} - ${req.user.name || req.user.email}`;
         return await gmailSvc.createDraftFromGroups(req.user, subject, groups);
       });
     }

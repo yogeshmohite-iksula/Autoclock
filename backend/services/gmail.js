@@ -14,9 +14,14 @@ function makeAuth() {
   return oauth2;
 }
 
+function encodeSubject(subject) {
+  // RFC 2047 UTF-8 base64 word — handles em dashes and any non-ASCII safely.
+  return `=?UTF-8?B?${Buffer.from(subject).toString('base64')}?=`;
+}
+
 function buildMime(to, subject, html) {
   const msg =
-    `To: ${to}\r\nSubject: ${subject}\r\nMIME-Version: 1.0\r\n` +
+    `To: ${to}\r\nSubject: ${encodeSubject(subject)}\r\nMIME-Version: 1.0\r\n` +
     `Content-Type: text/html; charset=UTF-8\r\n\r\n${html}`;
   return Buffer.from(msg).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
