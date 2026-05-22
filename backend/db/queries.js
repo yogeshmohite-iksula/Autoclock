@@ -368,6 +368,124 @@ function getTeamMembersWithMinutesToday(teamId, workDate) {
   return _teamMembersMinutes.all(workDate, teamId);
 }
 
+// ── weekly hours (compliance) ──────────────────────────────────────────────
+
+const _weeklyMinutesPerUser = db.prepare(`
+  SELECT user_id, SUM(duration_minutes) AS minutes
+  FROM worklog_entries
+  WHERE work_date >= ? AND work_date <= ?
+  GROUP BY user_id
+`);
+function getWeeklyMinutesPerUser(weekStart, weekEnd) {
+  return _weeklyMinutesPerUser.all(weekStart, weekEnd);
+}
+
+const _leaveDaysForWeek = db.prepare(`
+  SELECT COALESCE(SUM(hours), 0) AS leave_hours
+  FROM leave_days
+  WHERE user_id = ? AND leave_date >= ? AND leave_date <= ?
+`);
+function getLeaveDaysForWeek(userId, weekStart, weekEnd) {
+  return _leaveDaysForWeek.get(userId, weekStart, weekEnd);
+}
+
+// ── reminder_recipients (TB-09) ────────────────────────────────────────────
+
+const _insertRecipient = db.prepare(`
+  INSERT INTO reminder_recipients (reminder_run_id, user_id, week_hours, hours_short, email_status)
+  VALUES (@reminder_run_id, @user_id, @week_hours, @hours_short, @email_status)
+`);
+function insertReminderRecipient({ reminder_run_id, user_id, week_hours, hours_short, email_status }) {
+  const info = _insertRecipient.run({ reminder_run_id, user_id, week_hours, hours_short, email_status });
+  return info.lastInsertRowid;
+}
+
+const _recipientsForRun = db.prepare(`
+  SELECT rr.*, u.name, u.email
+  FROM reminder_recipients rr
+  JOIN users u ON u.id = rr.user_id
+  WHERE rr.reminder_run_id = ?
+`);
+function getRecipientsForRun(runId) { return _recipientsForRun.all(runId); }
+
+const _updateRunCount = db.prepare(
+  'UPDATE reminder_runs SET recipients_count = ? WHERE id = ?'
+);
+function updateReminderRunCount(runId, count) { _updateRunCount.run(count, runId); }
+
+const _updateRecipientResult = db.prepare(
+  'UPDATE reminder_recipients SET result = ? WHERE id = ?'
+);
+function updateRecipientResult(recipientId, result) { _updateRecipientResult.run(result, recipientId); }
+
+const _pendingFromLastFriday = db.prepare(`
+  SELECT rr.id, rr.user_id
+  FROM reminder_recipients rr
+  WHERE rr.reminder_run_id = (
+    SELECT id FROM reminder_runs WHERE run_type = 'friday' ORDER BY run_at DESC LIMIT 1
+  ) AND rr.result = 'pending'
+`);
+function getPendingRecipientsFromLastFridayRun() { return _pendingFromLastFriday.all(); }
+
+// ── org dashboard (EP-15) ──────────────────────────────────────────────────
+
+const _orgLoggedToday = db.prepare(
+  'SELECT COUNT(DISTINCT user_id) AS n FROM worklog_entries WHERE work_date = ?'
+);
+function getOrgLoggedTodayCount(workDate) { return _orgLoggedToday.get(workDate).n; }
+
+const _byProjectForWeek = db.prepare(`
+  SELECT p.name, p.jira_project_key, SUM(e.duration_minutes) AS minutes
+  FROM worklog_entries e
+  JOIN projects p ON p.id = e.project_id
+  WHERE e.work_date >= ? AND e.work_date <= ?
+  GROUP BY p.id
+  ORDER BY minutes DESC
+`);
+function getByProjectForWeek(weekStart, weekEnd) {
+  return _byProjectForWeek.all(weekStart, weekEnd);
+}
+
+const _teamComparisonForWeek = db.prepare(`
+  SELECT t.name AS team_name, t.id AS team_id,
+    COALESCE(SUM(e.duration_minutes), 0) AS total_minutes,
+    COUNT(DISTINCT e.user_id) AS active_members
+  FROM teams t
+  LEFT JOIN users u ON u.team_id = t.id AND u.is_active = 1
+  LEFT JOIN worklog_entries e ON e.user_id = u.id AND e.work_date >= ? AND e.work_date <= ?
+  GROUP BY t.id
+  ORDER BY total_minutes DESC
+`);
+function getTeamComparisonForWeek(weekStart, weekEnd) {
+  return _teamComparisonForWeek.all(weekStart, weekEnd);
+}
+
+const _weekTrendHelper = db.prepare(`
+  SELECT COALESCE(SUM(duration_minutes), 0) AS total_minutes,
+         COUNT(DISTINCT user_id) AS users_logged
+  FROM worklog_entries
+  WHERE work_date >= ? AND work_date <= ?
+`);
+function getWeeklyTrend(numWeeks) {
+  const result = [];
+  const now = new Date();
+  // Walk backwards from current week
+  for (let i = numWeeks - 1; i >= 0; i--) {
+    const pivot = new Date(now);
+    pivot.setUTCDate(now.getUTCDate() - i * 7);
+    const day = pivot.getUTCDay();
+    const mon = new Date(pivot);
+    mon.setUTCDate(pivot.getUTCDate() - ((day + 6) % 7));
+    const sun = new Date(mon);
+    sun.setUTCDate(mon.getUTCDate() + 6);
+    const weekStart = mon.toISOString().slice(0, 10);
+    const weekEnd   = sun.toISOString().slice(0, 10);
+    const row = _weekTrendHelper.get(weekStart, weekEnd);
+    result.push({ week_start: weekStart, total_minutes: row.total_minutes, users_logged: row.users_logged });
+  }
+  return result;
+}
+
 // ── exports ────────────────────────────────────────────────────────────────
 
 module.exports = {
@@ -397,4 +515,11 @@ module.exports = {
   appendAuditLog,
   // dashboard
   getTeamLoggedTodayCount, getByTicketForTeamToday, getUsersNotLoggedToday, getTeamMembersWithMinutesToday,
+  // weekly hours + compliance
+  getWeeklyMinutesPerUser, getLeaveDaysForWeek,
+  // reminder_recipients
+  insertReminderRecipient, getRecipientsForRun, updateReminderRunCount, updateRecipientResult,
+  getPendingRecipientsFromLastFridayRun,
+  // org dashboard
+  getOrgLoggedTodayCount, getByProjectForWeek, getTeamComparisonForWeek, getWeeklyTrend,
 };
