@@ -12,7 +12,10 @@ const MOCK_USER = {
   email: 'yogesh@iksula.com',
   role: 'employee',
   team_id: 1,
-  onboarding_status: 'connected',  // 'invited' | 'active' | 'connected'
+  // 'active' on first boot so the demo flow walks through onboarding.
+  // OnboardingPage flips this to 'connected' on Finish; the route guard
+  // (RequireOnboarded) then admits the user to /today.
+  onboarding_status: 'active',
 };
 
 // ---- mock catalogue --------------------------------------------------------
