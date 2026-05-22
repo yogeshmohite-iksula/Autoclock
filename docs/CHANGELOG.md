@@ -7,6 +7,34 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 
 ## [Unreleased]
 
+### Added — Frontend (feat/frontend)
+- **Three new screens** ported from `docs/FrontEnd Design/` prototypes as production React under `web/`:
+  - `/sign-in` (P01) — Google OIDC sign-in with G keyboard shortcut, IST clock, real `default/loading/error` state machine (FR-23).
+  - `/onboarding` (P02) — 3-step stepper + 2× ConnectionRow (Jira + Google) with `idle/connecting/connected/expired` states; Finish enables only when both providers are connected (EP-02 / EP-04 OAuth redirect flow).
+  - `/today` (P05) — full Today shell: TopBar with IST date pill, collapsible Sidebar, Hero greeting + `Close My Day` button, ReminderBanner for >1h untracked, LogSlotForm with searchable Project + Jira-task dropdowns, range↔duration toggle, overlap detection, SlotList + GapRow + CloseDayBar.
+- **Canonical theme** `web/src/styles/autoclock-theme.css` — "Tech Professional" (Ink Charcoal `#0F172A` + Signal Red `#DC2626`) with full token set + base components (`.ac-btn` / `.ac-card` / `.ac-banner` / `.ac-table` / `.ac-bar` / `.ac-badge` / `.ac-input`) + dark mode via `data-theme="dark"`.
+- **`web/src/api/`** — split per endpoint behind a single `client.js` fetch wrapper. Mocks live in `api/mocks.js` behind `VITE_USE_MOCKS` (default ON). Surface: `api.auth`, `api.connections`, `api.projects`, `api.entries`, `api.day`, `api.dashboard`. Shapes match `docs/Project Docs/AutoClock_ERD.md` §6.
+- **`AuthContext`** with `RequireAuth` + `RequireOnboarded` route guards.
+- **`web/src/lib/format.js`** — pure helpers (initials, fmtTime, fmtDur, minsBetween, addMinsToClock, parseDurText, greeting, todayIso).
+- **`web/src/components/today/Dropdown.jsx`** — searchable project/task dropdown extracted from the prototype.
+- **`web/src/hooks/useISTClock.js`** — 1 s IST ticker reused across P01/P02.
+- Smoke test suite extended to cover `/sign-in`, `/onboarding`, `/today`, and the legacy routes (`/log`, `/preview`, `/dashboard`).
+
+### Changed — Frontend
+- `web/src/api.js` removed; replaced by `web/src/api/` folder. Existing pages refactored to use the namespaced surface (`api.projects.list()`, `api.entries.create()` etc.).
+- `web/src/assets/tokens.css` removed; subsumed by the canonical theme.
+- Legacy `LogPage`/`PreviewPage`/`DashboardPage` switched to canonical `.ac-*` component classes.
+
+### Docs
+- `docs/AutoClock_*` source docs moved into `docs/Project Docs/` (no content changes).
+- New: `docs/FrontEnd Design/` — the 4 exported design prototypes.
+- New: `docs/frontend-plan.md` — the approved rebuild plan for this PR.
+
+### Known follow-ups (flagged in PR description)
+- **OQ-F3:** no ERD endpoint for onboarding connection status — currently mocked via `GET /api/auth/connections`. Backend should either add this EP or extend `GET /api/auth/me` with per-provider booleans.
+- `bg-soft.png` absent — auth screens fall back to `bg-mesh` (OQ-F4).
+- `autoclock-theme.css` source-of-truth lives in the Cowork workspace; the copy in `web/src/styles/` should be kept in sync.
+
 ### Added
 - Initial repository scaffold per DevDoc §1.
 - Monorepo layout: `backend/`, `web/`, `extension/`, `docs/`, `.claude/`.
