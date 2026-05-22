@@ -1,0 +1,205 @@
+/* SignInPage (P01) — ported from docs/FrontEnd Design /Sign In.html.
+   Tweak-panel selectors, data-comment-anchor attrs and prototype scenarios
+   stripped. Visual fidelity preserved 1:1 with the canonical theme. */
+
+.signin-shell { position: relative; height: 100vh; width: 100vw; overflow: hidden; background: var(--ac-bg); color: var(--ac-text); }
+
+/* ---------- center stack ---------- */
+.signin-center {
+  position: absolute; inset: 0;
+  display: grid; place-items: center;
+  z-index: 1;
+  padding: 32px;
+}
+.signin-stack {
+  width: 100%;
+  max-width: 440px;
+  display: flex; flex-direction: column;
+  gap: var(--ac-space-5);
+}
+
+/* ---------- card ---------- */
+.signin-card {
+  background: var(--ac-surface);
+  border: 1px solid var(--ac-border);
+  border-radius: 20px;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,.6) inset,
+    0 1px 2px rgba(15,23,42,.04),
+    0 24px 60px -28px rgba(15,23,42,.25);
+  padding: 36px 36px 30px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.signin-card::before {
+  content: ""; position: absolute; left: 28px; right: 28px; top: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(15,23,42,.18), transparent);
+}
+
+.signin-brand {
+  margin-top: 18px;
+  font-size: 26px;
+  font-weight: var(--ac-weight-black);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+.signin-tagline {
+  margin-top: 8px;
+  font-size: var(--ac-text-base);
+  color: var(--ac-text-muted);
+  line-height: 1.45;
+}
+
+/* ---------- Google button ---------- */
+.gbtn {
+  margin-top: 26px;
+  width: 100%;
+  height: 48px;
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 12px;
+  background: var(--ac-primary);          /* Ink Charcoal */
+  color: var(--ac-primary-contrast);
+  border: 1px solid var(--ac-primary);
+  border-radius: 12px;
+  font-family: var(--ac-font-sans);
+  font-size: 15px;
+  font-weight: var(--ac-weight-semibold);
+  cursor: pointer;
+  transition: background var(--ac-transition), transform var(--ac-transition);
+  box-shadow: 0 6px 18px -10px rgba(15,23,42,.6);
+  position: relative;
+}
+.gbtn:hover:not(:disabled) { background: var(--ac-primary-hover); }
+.gbtn:active:not(:disabled) { transform: translateY(1px); }
+.gbtn:disabled { cursor: progress; opacity: .92; }
+
+.gbtn .g-disc {
+  width: 22px; height: 22px;
+  background: #fff;
+  border-radius: 999px;
+  display: grid; place-items: center;
+  flex: none;
+}
+.gbtn .g-glyph {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  background: linear-gradient(135deg, #4285F4 0%, #34A853 35%, #FBBC05 65%, #EA4335 100%);
+  -webkit-background-clip: text;
+          background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1;
+}
+.gbtn .gbtn-label { line-height: 1; }
+.gbtn .gbtn-shortcut {
+  position: absolute; right: 14px; top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--ac-font-mono);
+  font-size: 11px;
+  color: rgba(255,255,255,.55);
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 5px;
+  padding: 2px 6px;
+  line-height: 1;
+}
+
+.gbtn-spinner {
+  width: 18px; height: 18px;
+  border-radius: 999px;
+  border: 2px solid rgba(255,255,255,.25);
+  border-top-color: #fff;
+  animation: gbtn-spin 0.8s linear infinite;
+}
+@keyframes gbtn-spin { to { transform: rotate(360deg); } }
+
+.signin-helper {
+  margin-top: 14px;
+  font-family: var(--ac-font-mono);
+  font-size: var(--ac-text-sm);
+  color: var(--ac-text-subtle);
+}
+.signin-helper .at { color: var(--ac-text-muted); }
+
+/* ---------- connect pills ---------- */
+.signin-connects {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px dashed var(--ac-border-strong);
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  flex-wrap: nowrap;
+}
+.signin-connects .label {
+  font-size: var(--ac-text-xs);
+  font-weight: var(--ac-weight-bold);
+  letter-spacing: var(--ac-tracking-wide);
+  text-transform: uppercase;
+  color: var(--ac-text-subtle);
+  margin-right: 4px;
+}
+.signin-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: var(--ac-n-100);
+  color: var(--ac-text-muted);
+  font-size: var(--ac-text-xs);
+  font-weight: var(--ac-weight-semibold);
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--ac-border);
+  white-space: nowrap;
+}
+.signin-pill .swatch {
+  width: 6px; height: 6px; border-radius: 999px;
+  background: var(--ac-text-subtle);
+}
+.signin-pill .swatch--jira  { background: #2684FF; }
+.signin-pill .swatch--sheet { background: #0F9D58; }
+.signin-pill .swatch--gmail { background: #EA4335; }
+
+/* ---------- error banner ---------- */
+.signin-err {
+  margin-top: 14px;
+  display: flex; align-items: flex-start; gap: 10px;
+  text-align: left;
+  padding: 11px 13px;
+  background: var(--ac-danger-soft);
+  border: 1px solid #FECACA;
+  color: var(--ac-danger-text);
+  border-radius: 12px;
+  font-size: 13px;
+}
+.signin-err .ico {
+  width: 18px; height: 18px; border-radius: 999px;
+  background: var(--ac-danger); color: #fff;
+  display: grid; place-items: center;
+  font-family: var(--ac-font-mono); font-weight: 700; font-size: 12px;
+  flex: none;
+}
+.signin-err strong { font-weight: var(--ac-weight-bold); }
+.signin-err .domain { font-family: var(--ac-font-mono); }
+
+/* ---------- entry animation ---------- */
+.signin-card { animation: ac-rise 600ms ease both; }
+
+/* ---------- responsive ---------- */
+@media (max-height: 720px), (max-width: 720px) {
+  .signin-card { padding: 30px 24px 24px; }
+}
+@media (max-width: 640px) {
+  .signin-center { padding: 20px; }
+  .signin-card { padding: 30px 24px 24px; border-radius: 18px; }
+  .signin-brand { font-size: 24px; margin-top: 16px; }
+  .signin-tagline { font-size: 13.5px; }
+  .gbtn { margin-top: 22px; height: 46px; font-size: 14.5px; }
+  .signin-connects { flex-wrap: wrap; padding-top: 14px; margin-top: 18px; }
+}
+@media (max-width: 480px) {
+  .signin-card { padding: 26px 20px 22px; border-radius: 16px; }
+  .signin-brand { font-size: 22px; margin-top: 14px; }
+  .signin-tagline { font-size: 13px; margin-top: 6px; }
+  .gbtn { height: 44px; font-size: 14px; gap: 10px; }
+  .gbtn .gbtn-shortcut { display: none; }
+  .signin-helper { font-size: 12px; margin-top: 12px; }
+  .signin-err { font-size: 12.5px; padding: 10px 12px; }
+  .signin-connects .label { width: 100%; text-align: center; margin: 0 0 4px; }
+}
