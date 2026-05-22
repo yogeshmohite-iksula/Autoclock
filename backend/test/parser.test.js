@@ -97,6 +97,30 @@ describe('parseDuration', () => {
     assert.equal(parseDuration('1:60'), 0);
     assert.equal(parseDuration('2:99'), 0);
   });
+
+  test('digit-attached units stay supported (PR #1 review M2)', () => {
+    // Locks the regex grammar: unit suffix may directly follow a digit.
+    // This is the same trick that lets "2.25hr" work — keep it explicit
+    // so a future tightening doesn't silently break either form.
+    assert.equal(parseDuration('30hour'), 1800);    // 30 hours
+    assert.equal(parseDuration('30hours'), 1800);
+    assert.equal(parseDuration('1minute'), 1);
+    assert.equal(parseDuration('45minutes'), 45);
+    // Adversarial: stray letters after the unit must still reject.
+    assert.equal(parseDuration('30hourx'), 0);
+    assert.equal(parseDuration('1minutex'), 0);
+  });
+
+  test('numeric argument supported per spec (PR #1 review M3)', () => {
+    // The spec says raw: string | number. parseDuration(90) must work.
+    assert.equal(parseDuration(90), 90);
+    assert.equal(parseDuration(0), 0);
+    assert.equal(parseDuration(1), 1);
+    assert.equal(parseDuration(-30), 0);       // negative → 0
+    assert.equal(parseDuration(1.5), 0);       // bare decimal is ambiguous → 0
+    assert.equal(parseDuration(NaN), 0);
+    assert.equal(parseDuration(Infinity), 0);
+  });
 });
 
 // ===========================================================================
