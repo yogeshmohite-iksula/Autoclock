@@ -53,6 +53,9 @@ export default function OnboardingPage() {
     // Locally mark the user fully onboarded so the route guards advance.
     // Real backend: server-driven on the next /api/auth/me call.
     setUser({ ...user, onboarding_status: 'connected' });
+    // In mocks: keep the in-memory SESSION_USER in sync so a refresh on
+    // /today doesn't bounce the user back to /onboarding.
+    if (USE_MOCKS) api.connections._setMockOnboardingComplete?.();
     navigate('/today', { replace: true });
   }, [bothReady, user, setUser, navigate]);
 

@@ -4,7 +4,7 @@
 // per-provider booleans), this file is the one place to update.
 
 import { request } from './client';
-import { setConnectionStatus as setMockStatus } from './mocks';
+import { setConnectionStatus as setMockStatus, setMockOnboardingComplete } from './mocks';
 
 export const connectionsApi = {
   /**
@@ -15,4 +15,8 @@ export const connectionsApi = {
 
   /** Mock-only helper used by OnboardingPage demo controls. */
   _setMockStatus: setMockStatus,
+
+  /** Mock-only helper used by OnboardingPage.onFinish so a /today refresh
+   *  in mock mode keeps the onboarded user signed in. No-op in real mode. */
+  _setMockOnboardingComplete: setMockOnboardingComplete,
 };

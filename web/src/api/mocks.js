@@ -18,6 +18,18 @@ const MOCK_USER = {
   onboarding_status: 'active',
 };
 
+// In-memory "session" — null until a real /api/auth/login. Mirrors the real
+// backend: GET /api/auth/me returns 401 when there's no session. This makes
+// SignInPage the first screen on boot (was broken when /me unconditionally
+// returned MOCK_USER and the route guards bounced straight to /onboarding).
+let SESSION_USER = null;
+
+/** Mock-only helper used by OnboardingPage.onFinish so a /today refresh
+ *  in mock mode keeps the onboarded user signed in. */
+export function setMockOnboardingComplete() {
+  if (SESSION_USER) SESSION_USER = { ...SESSION_USER, onboarding_status: 'connected' };
+}
+
 // ---- mock catalogue --------------------------------------------------------
 // `color` + `tag` are mock-only UI affordances. The ERD `projects` table
 // doesn't define them today — flagged in the PR as a potential future addition.
@@ -73,7 +85,9 @@ let nextEntryId = 100;
 
 // ---- onboarding mock state ------------------------------------------------
 // No EP for this yet; flagged as OQ-F3 in docs/frontend-plan.md.
-let CONNECTIONS = { jira: 'connected', google: 'idle' };  // changeable at runtime via setConnectionStatus
+// Both providers start 'idle' so the demo flow walks the full Connect-Jira →
+// Connect-Google → Finish path (was 'connected'/'idle' which skipped the Jira step).
+let CONNECTIONS = { jira: 'idle', google: 'idle' };
 
 export function setConnectionStatus(provider, status) {
   CONNECTIONS = { ...CONNECTIONS, [provider]: status };
@@ -105,10 +119,14 @@ const ROUTES = [
       const e = new Error('That account isn’t eligible. Use your @iksula.com account.');
       e.status = 401; throw e;
     }
-    return ok({ user: { ...MOCK_USER, email: body.email, name: humanise(body.email) } });
+    SESSION_USER = { ...MOCK_USER, email: body.email, name: humanise(body.email) };
+    return ok({ user: SESSION_USER });
   }],
-  ['GET',  '/api/auth/me',     () => ok({ user: MOCK_USER })],
-  ['POST', '/api/auth/logout', () => ok({ ok: true })],
+  ['GET',  '/api/auth/me', () => {
+    if (!SESSION_USER) { const e = new Error('Not signed in'); e.status = 401; throw e; }
+    return ok({ user: SESSION_USER });
+  }],
+  ['POST', '/api/auth/logout', () => { SESSION_USER = null; return ok({ ok: true }); }],
 
   // EP-06
   ['GET',  '/api/projects', () => ok({ projects: PROJECTS })],
