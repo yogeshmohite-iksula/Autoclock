@@ -1,0 +1,57 @@
+/* AutoClock design tokens — extract real values from docs/AutoClock_Designs.html. */
+:root {
+  --ac-bg: #f6f7fb;
+  --ac-surface: #ffffff;
+  --ac-text: #0e1a2b;
+  --ac-muted: #5b6b7e;
+  --ac-border: #d9def0;
+  --ac-primary: #2f6df4;
+  --ac-primary-hover: #2256c6;
+  --ac-success: #1f9d55;
+  --ac-warning: #d97706;
+  --ac-danger: #c1272d;
+  --ac-radius: 8px;
+  --ac-shadow: 0 2px 12px rgba(15, 23, 42, .06);
+  --ac-font: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  background: var(--ac-bg);
+  color: var(--ac-text);
+  font-family: var(--ac-font);
+  -webkit-font-smoothing: antialiased;
+}
+
+.app-shell { display: grid; grid-template-rows: auto 1fr auto; min-height: 100%; }
+
+.app-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 24px; background: var(--ac-surface);
+  border-bottom: 1px solid var(--ac-border); box-shadow: var(--ac-shadow);
+}
+.brand { margin: 0; font-size: 18px; font-weight: 700; color: var(--ac-primary); letter-spacing: .2px; }
+.app-nav a { margin-left: 16px; color: var(--ac-muted); text-decoration: none; padding: 6px 10px; border-radius: var(--ac-radius); }
+.app-nav a.active { background: rgba(47, 109, 244, .1); color: var(--ac-primary); font-weight: 600; }
+
+.app-main { padding: 24px; max-width: 1100px; margin: 0 auto; width: 100%; }
+.app-footer { padding: 12px 24px; color: var(--ac-muted); text-align: center; }
+
+.card { background: var(--ac-surface); border: 1px solid var(--ac-border); border-radius: var(--ac-radius); padding: 16px; box-shadow: var(--ac-shadow); }
+
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: var(--ac-radius); border: 1px solid var(--ac-border); background: var(--ac-surface); color: var(--ac-text); cursor: pointer; font-weight: 600; }
+.btn:hover { background: #f0f3fb; }
+.btn-primary { background: var(--ac-primary); color: #fff; border-color: var(--ac-primary); }
+.btn-primary:hover { background: var(--ac-primary-hover); }
+.btn:focus-visible { outline: 3px solid rgba(47, 109, 244, .35); outline-offset: 2px; }
+
+label { display: block; font-size: 13px; color: var(--ac-muted); margin-bottom: 4px; }
+input, select, textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--ac-border); border-radius: var(--ac-radius); font: inherit; background: var(--ac-surface); }
+input:focus, select:focus, textarea:focus { outline: 3px solid rgba(47, 109, 244, .35); outline-offset: 0; border-color: var(--ac-primary); }
+
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--ac-border); }
+th { font-size: 12px; text-transform: uppercase; letter-spacing: .5px; color: var(--ac-muted); }

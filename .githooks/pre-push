@@ -1,0 +1,20 @@
+#!/bin/bash
+# Pre-push git hook — blocks pushing src changes without a CHANGELOG bump.
+# Enable: git config core.hooksPath .githooks
+set -euo pipefail
+
+# Skip on the initial push (no upstream yet).
+if ! git rev-parse --abbrev-ref --symbolic-full-name @{u} >/dev/null 2>&1; then
+  exit 0
+fi
+
+DIFF=$(git diff --name-only @{u}..HEAD 2>/dev/null || git diff --name-only HEAD~1 HEAD 2>/dev/null || echo "")
+SRC=$(echo "$DIFF" | grep -E '^(backend|web|extension)/' || true)
+CL=$(echo "$DIFF"  | grep -E '^docs/CHANGELOG\.md$' || true)
+
+if [ -n "$SRC" ] && [ -z "$CL" ]; then
+  echo "🚫 Blocked push: src/ changed but docs/CHANGELOG.md was not bumped." >&2
+  echo "   Add an entry under [Unreleased] in docs/CHANGELOG.md, commit, and try again." >&2
+  exit 1
+fi
+exit 0

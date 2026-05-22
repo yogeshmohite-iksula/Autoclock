@@ -1,0 +1,30 @@
+:root {
+  --ac-primary: #2f6df4;
+  --ac-text: #0e1a2b;
+  --ac-muted: #5b6b7e;
+  --ac-border: #d9def0;
+  --ac-bg: #f6f7fb;
+  --ac-danger: #c1272d;
+}
+html, body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--ac-text); margin: 0; }
+body { width: 340px; padding: 12px; background: #fff; }
+header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+header h1 { font-size: 16px; color: var(--ac-primary); margin: 0; }
+button { font: inherit; }
+#settings-toggle { background: transparent; border: 0; font-size: 18px; cursor: pointer; }
+
+.tabs { display: flex; gap: 6px; margin-bottom: 10px; }
+.tabs button { flex: 1; padding: 8px; border: 1px solid var(--ac-border); border-radius: 6px; background: var(--ac-bg); color: var(--ac-muted); cursor: pointer; }
+.tabs button[aria-selected="true"] { background: var(--ac-primary); color: #fff; border-color: var(--ac-primary); font-weight: 600; }
+
+form label { display: block; font-size: 12px; color: var(--ac-muted); margin-bottom: 8px; }
+form input, form select { width: 100%; padding: 6px 8px; margin-top: 3px; font: inherit; border: 1px solid var(--ac-border); border-radius: 6px; background: #fff; }
+form .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+button.primary { width: 100%; padding: 8px 10px; margin-top: 8px; background: var(--ac-primary); color: #fff; border: 1px solid var(--ac-primary); border-radius: 6px; cursor: pointer; font-weight: 600; }
+button.primary:hover { background: #2256c6; }
+
+#today-list { list-style: none; padding: 0; margin: 0 0 12px; max-height: 240px; overflow: auto; }
+#today-list li { padding: 8px; border-bottom: 1px solid var(--ac-border); font-size: 13px; }
+
+.error { color: var(--ac-danger); font-size: 12px; margin-top: 8px; }

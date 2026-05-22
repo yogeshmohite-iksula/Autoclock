@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 800" width="1120" height="800" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">
+  <defs>
+    <g id="mark">
+      <path d="M78.85 21.35A43 43 0 1 1 41.15 21.35" fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round"/>
+      <line x1="60" y1="60" x2="41" y2="49" stroke="currentColor" stroke-width="9" stroke-linecap="round"/>
+      <line x1="60" y1="60" x2="71" y2="31" stroke="#dc2626" stroke-width="9" stroke-linecap="round"/>
+      <circle cx="60" cy="60" r="7" fill="currentColor"/>
+      <circle cx="60" cy="60" r="2.6" fill="#dc2626"/>
+    </g>
+  </defs>
+
+  <rect width="1120" height="800" fill="#ffffff"/>
+
+  <!-- header -->
+  <g color="#0f172a"><use href="#mark" transform="translate(48,30) scale(0.42)"/></g>
+  <text x="112" y="56" font-size="27" font-weight="800" letter-spacing="-0.5" fill="#0f172a">AutoClock — Brand Mark</text>
+  <text x="112" y="78" font-size="12.5" font-weight="600" letter-spacing="1.5" fill="#64748b">ZEN-STYLE LOGO SYSTEM · IKSULA HACKFEST 2026</text>
+  <line x1="48" y1="100" x2="1072" y2="100" stroke="#e2e8f0" stroke-width="1.5"/>
+
+  <!-- Card A: primary logo on light -->
+  <rect x="48" y="118" width="1024" height="158" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="68" y="144" font-size="11" font-weight="700" letter-spacing="1.6" fill="#94a3b8">PRIMARY LOGO  ·  LIGHT BACKGROUND</text>
+  <g color="#0f172a"><use href="#mark" transform="translate(360,150) scale(0.95)"/></g>
+  <text x="510" y="206" font-size="44" font-weight="800" letter-spacing="-1.2" fill="#0f172a">Auto<tspan fill="#dc2626">Clock</tspan></text>
+  <text x="512" y="228" font-size="11.5" font-weight="700" letter-spacing="2.2" fill="#64748b">ONE-CLICK DAILY WORKLOG</text>
+
+  <!-- Card B: reversed on dark -->
+  <rect x="48" y="292" width="1024" height="158" rx="14" fill="#0f172a"/>
+  <text x="68" y="318" font-size="11" font-weight="700" letter-spacing="1.6" fill="#64748b">REVERSED  ·  DARK BACKGROUND</text>
+  <g color="#ffffff"><use href="#mark" transform="translate(360,324) scale(0.95)"/></g>
+  <text x="510" y="380" font-size="44" font-weight="800" letter-spacing="-1.2" fill="#ffffff">Auto<tspan fill="#f87171">Clock</tspan></text>
+  <text x="512" y="402" font-size="11.5" font-weight="700" letter-spacing="2.2" fill="#94a3b8">ONE-CLICK DAILY WORKLOG</text>
+
+  <!-- Card C: icon mark -->
+  <rect x="48" y="466" width="330" height="210" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="68" y="492" font-size="11" font-weight="700" letter-spacing="1.6" fill="#94a3b8">ICON MARK</text>
+  <g color="#0f172a"><use href="#mark" transform="translate(143,508) scale(1.18)"/></g>
+
+  <!-- Card D: app icon -->
+  <rect x="395" y="466" width="330" height="210" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="415" y="492" font-size="11" font-weight="700" letter-spacing="1.6" fill="#94a3b8">APP ICON / FAVICON</text>
+  <g transform="translate(490,508) scale(1.18)">
+    <rect width="120" height="120" rx="27" fill="#0f172a"/>
+    <g color="#ffffff"><use href="#mark"/></g>
+  </g>
+
+  <!-- Card E: palette -->
+  <rect x="742" y="466" width="330" height="210" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="762" y="492" font-size="11" font-weight="700" letter-spacing="1.6" fill="#94a3b8">COLOUR PALETTE</text>
+  <rect x="762" y="504" width="58" height="58" rx="10" fill="#0f172a"/>
+  <text x="791" y="582" font-size="10" font-weight="700" fill="#0f172a" text-anchor="middle">Ink</text>
+  <text x="791" y="596" font-size="8.5" font-weight="600" fill="#94a3b8" text-anchor="middle">#0F172A</text>
+  <rect x="834" y="504" width="58" height="58" rx="10" fill="#dc2626"/>
+  <text x="863" y="582" font-size="10" font-weight="700" fill="#0f172a" text-anchor="middle">Red</text>
+  <text x="863" y="596" font-size="8.5" font-weight="600" fill="#94a3b8" text-anchor="middle">#DC2626</text>
+  <rect x="906" y="504" width="58" height="58" rx="10" fill="#64748b"/>
+  <text x="935" y="582" font-size="10" font-weight="700" fill="#0f172a" text-anchor="middle">Slate</text>
+  <text x="935" y="596" font-size="8.5" font-weight="600" fill="#94a3b8" text-anchor="middle">#64748B</text>
+  <rect x="978" y="504" width="58" height="58" rx="10" fill="#f1f5f9" stroke="#e2e8f0"/>
+  <text x="1007" y="582" font-size="10" font-weight="700" fill="#0f172a" text-anchor="middle">Cloud</text>
+  <text x="1007" y="596" font-size="8.5" font-weight="600" fill="#94a3b8" text-anchor="middle">#F1F5F9</text>
+  <text x="762" y="632" font-size="10.5" font-weight="600" fill="#64748b">Charcoal ink for calm and structure.</text>
+  <text x="762" y="649" font-size="10.5" font-weight="600" fill="#64748b">One red accent, used sparingly —</text>
+  <text x="762" y="666" font-size="10.5" font-weight="600" fill="#64748b">zen restraint.</text>
+
+  <!-- concept -->
+  <line x1="48" y1="704" x2="1072" y2="704" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="48" y="732" font-size="13" font-weight="800" letter-spacing="0.3" fill="#0f172a">THE IDEA</text>
+  <text x="48" y="756" font-size="13" font-weight="500" fill="#334155">The mark is an <tspan font-weight="800">ensō</tspan> — the zen circle, drawn in one calm breath and left open — here doubling as a clock face.</text>
+  <text x="48" y="776" font-size="13" font-weight="500" fill="#334155">Two hands keep the hours; the red hand reaches the opening, where the day's work is logged and released — automatically.</text>
+</svg>

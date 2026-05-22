@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AutoClock — Design Mockups v2 · Iksula HackFest 2026</title>
+<link rel="icon" type="image/svg+xml" href="AutoClock_AppIcon.svg">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --red: #dc2626; --red-dark: #991b1b; --red-soft: #fef2f2;
+    --ink: #0f172a; --ink-2: #1e293b;
+    --g1: #f8fafc; --g2: #f1f5f9; --g3: #e2e8f0; --g4: #cbd5e1; --g5: #64748b; --g6: #334155;
+    --green: #10b981; --green-soft: #ecfdf5;
+    --amber: #f59e0b; --amber-soft:#fffbeb;
+    --blue: #3b82f6; --blue-soft:#eff6ff;
+    --purple:#8b5cf6; --purple-soft:#f5f3ff;
+    --teal:#0d9488; --teal-soft:#f0fdfa;
+    --sh-sm: 0 1px 2px rgba(15,23,42,.06);
+    --sh: 0 4px 14px rgba(15,23,42,.09);
+    --sh-lg: 0 16px 40px rgba(15,23,42,.16);
+    --r: 12px;
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif; background: var(--g1); color: var(--ink); line-height: 1.5; }
+  .ac-ico { width: 100%; height: 100%; display: block; }
+
+  /* ===== NAV ===== */
+  .nav { background: var(--ink); color: white; padding: 0 22px; display: flex; align-items: center; gap: 16px; position: sticky; top: 0; z-index: 100; box-shadow: var(--sh); flex-wrap: wrap; }
+  .brand { display: flex; align-items: center; gap: 10px; padding: 12px 0; }
+  .brand-ic { width: 32px; height: 32px; background: transparent; color: #fff; border-radius: 9px; display: flex; align-items: center; justify-content: center; }
+  .brand-tx { font-weight: 800; font-size: 16px; letter-spacing: -.01em; }
+  .brand-sub { font-size: 9px; opacity: .55; letter-spacing: .12em; }
+  .tabs { display: flex; gap: 2px; flex: 1; flex-wrap: wrap; }
+  .tab { background: none; border: 0; color: rgba(255,255,255,.6); padding: 18px 11px; font-size: 12px; font-weight: 600; cursor: pointer; border-bottom: 3px solid transparent; transition: all .15s; font-family: inherit; white-space: nowrap; }
+  .tab:hover { color: rgba(255,255,255,.9); }
+  .tab.active { color: white; border-bottom-color: var(--red); }
+  .nav-badge { background: var(--red); padding: 5px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; letter-spacing: .04em; }
+
+  /* ===== SCREEN ===== */
+  .screen { display: none; max-width: 1200px; margin: 0 auto; padding: 28px 22px 70px; }
+  .screen.active { display: block; animation: fade .3s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .screen-head { margin-bottom: 22px; }
+  .screen-head h2 { font-size: 23px; font-weight: 800; letter-spacing: -.02em; }
+  .screen-head p { color: var(--g5); font-size: 13.5px; margin-top: 4px; max-width: 760px; }
+  .screen-tag { display: inline-block; background: var(--red-soft); color: var(--red); font-size: 10.5px; font-weight: 700; padding: 4px 10px; border-radius: 6px; letter-spacing: .05em; margin-bottom: 8px; }
+
+  /* ===== CARD ===== */
+  .card { background: white; border: 1px solid var(--g3); border-radius: var(--r); box-shadow: var(--sh-sm); }
+  .card-h { padding: 14px 17px; border-bottom: 1px solid var(--g3); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .card-t { font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+  .card-t .ic { width: 22px; height: 22px; background: var(--red-soft); color: var(--red); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+  .card-b { padding: 17px; }
+  .muted { color: var(--g5); font-size: 11px; }
+
+  .callout { background: var(--blue-soft); border-left: 4px solid var(--blue); padding: 12px 16px; border-radius: 8px; font-size: 12.5px; color: var(--g6); margin-top: 18px; }
+  .callout b { color: var(--ink); }
+  .callout.green { background: var(--green-soft); border-left-color: var(--green); }
+  .callout.amber { background: var(--amber-soft); border-left-color: var(--amber); }
+
+  /* ===== FLOW (S1) ===== */
+  .flow-legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; font-size: 11.5px; }
+  .flow-legend span { display: flex; align-items: center; gap: 6px; color: var(--g6); }
+  .dot { width: 11px; height: 11px; border-radius: 3px; display:inline-block; }
+  .flow-row { display: flex; gap: 16px; justify-content: center; align-items: stretch; flex-wrap: wrap; }
+  .flow-box { background: white; border: 2px solid var(--g3); border-radius: 12px; padding: 14px 16px; min-width: 195px; position: relative; box-shadow: var(--sh-sm); }
+  .flow-box .step { position: absolute; top: -11px; left: -11px; width: 24px; height: 24px; border-radius: 50%; background: var(--red); color: white; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; box-shadow: var(--sh); }
+  .flow-box h4 { font-size: 12.5px; font-weight: 700; display: flex; align-items: center; gap: 7px; margin-bottom: 5px; }
+  .flow-box p { font-size: 11px; color: var(--g5); line-height: 1.45; }
+  .fb-emoji { font-size: 15px; }
+  .flow-box.input { border-color: var(--blue); background: var(--blue-soft); }
+  .flow-box.brain { border-color: var(--red); background: var(--red-soft); }
+  .flow-box.dest { border-color: var(--green); background: var(--green-soft); }
+  .flow-box.dash { border-color: var(--purple); background: var(--purple-soft); }
+  .flow-box.db { border-color: var(--amber); background: var(--amber-soft); }
+  .flow-box.admin { border-color: var(--teal); background: var(--teal-soft); }
+  .flow-arrow { display: flex; justify-content: center; padding: 3px 0; }
+  .flow-arrow .pipe { width: 2px; height: 20px; background: linear-gradient(to bottom, var(--g4) 50%, transparent 50%); background-size: 2px 8px; }
+  .flow-caption { text-align: center; font-size: 10.5px; color: var(--red); font-weight: 600; margin: 1px 0; }
+
+  /* ===== APP FRAME ===== */
+  .app-frame { border: 1px solid var(--g3); border-radius: 14px; overflow: hidden; box-shadow: var(--sh-lg); background: white; }
+  .app-bar { background: var(--ink); color: white; padding: 10px 17px; display: flex; align-items: center; justify-content: space-between; }
+  .app-bar .l { display: flex; align-items: center; gap: 9px; font-weight: 700; font-size: 13.5px; }
+  .app-bar .l .ic { width: 25px; height: 25px; background: transparent; color: #fff; border-radius: 7px; display: flex; align-items: center; justify-content: center; }
+  .app-bar .r { display: flex; align-items: center; gap: 13px; font-size: 11.5px; opacity: .82; }
+  .app-bar .avatar { width: 25px; height: 25px; border-radius: 50%; background: var(--green); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; opacity: 1; }
+
+  /* ===== EMPLOYEE (S2) ===== */
+  .emp-body { display: grid; grid-template-columns: 300px 1fr; }
+  @media (max-width: 820px) { .emp-body { grid-template-columns: 1fr; } }
+  .emp-left { border-right: 1px solid var(--g3); padding: 16px; background: var(--g1); }
+  .emp-right { padding: 20px; }
+  .day-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 13px; }
+  .day-head .date { font-size: 13.5px; font-weight: 700; }
+  .day-head .total { font-size: 10.5px; color: white; background: var(--green); padding: 3px 8px; border-radius: 10px; font-weight: 700; }
+  .timeline { position: relative; padding-left: 19px; }
+  .timeline::before { content: ''; position: absolute; left: 5px; top: 6px; bottom: 6px; width: 2px; background: var(--g3); }
+  .slot { position: relative; margin-bottom: 11px; }
+  .slot::before { content: ''; position: absolute; left: -17px; top: 4px; width: 12px; height: 12px; border-radius: 50%; background: white; border: 2px solid var(--g4); }
+  .slot.done::before { background: var(--green); border-color: var(--green); }
+  .slot.now::before { background: var(--red); border-color: var(--red); box-shadow: 0 0 0 4px var(--red-soft); }
+  .slot-time { font-size: 10.5px; color: var(--g5); font-family: 'SF Mono', monospace; }
+  .slot-card { background: white; border: 1px solid var(--g3); border-radius: 8px; padding: 7px 9px; margin-top: 3px; font-size: 11.5px; }
+  .slot.now .slot-card { border-color: var(--red); background: var(--red-soft); }
+  .slot.empty .slot-card { border-style: dashed; color: var(--g5); background: var(--g1); }
+  .slot-card .tk { font-family: 'SF Mono', monospace; font-weight: 700; font-size: 10px; color: var(--ink); }
+  .slot-card .tk.meet { color: var(--amber); }
+  .slot-proj { font-size: 9.5px; color: var(--g5); margin-top: 1px; }
+
+  .field-label { font-size: 10.5px; font-weight: 700; color: var(--g6); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 5px; display: block; }
+  .reminder-banner { background: var(--amber-soft); border: 1px solid #fde68a; border-radius: 10px; padding: 11px 13px; display: flex; align-items: center; gap: 11px; margin-bottom: 16px; }
+  .reminder-banner .bell { font-size: 20px; }
+  .reminder-banner .tx { font-size: 12px; }
+  .reminder-banner .tx b { color: var(--amber); }
+
+  .sel-wrap { position: relative; }
+  .sel-wrap::after { content: '▾'; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--g5); font-size: 11px; pointer-events: none; }
+  .sel, .input-sm, .ta { width: 100%; border: 1px solid var(--g3); border-radius: 8px; font-family: inherit; background: var(--g1); }
+  .sel { padding: 10px 30px 10px 11px; font-size: 12.5px; appearance: none; cursor: pointer; }
+  .input-sm { padding: 9px 11px; font-size: 12.5px; }
+  .ta { min-height: 70px; padding: 11px; font-size: 12.5px; resize: vertical; }
+  .sel:focus, .input-sm:focus, .ta:focus { outline: none; border-color: var(--red); background: white; box-shadow: 0 0 0 3px rgba(220,38,38,.1); }
+  .fld { margin-bottom: 13px; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+
+  .btn { border: 1px solid var(--g3); background: white; padding: 10px 15px; border-radius: 8px; font-size: 12.5px; font-weight: 600; color: var(--g6); cursor: pointer; font-family: inherit; transition: all .15s; display: inline-flex; align-items: center; gap: 7px; }
+  .btn:hover { background: var(--g1); }
+  .btn-primary { background: var(--red); color: white; border-color: var(--red); }
+  .btn-primary:hover { background: var(--red-dark); }
+  .btn-green { background: var(--green); color: white; border-color: var(--green); }
+  .btn-dark { background: var(--ink); color: white; border-color: var(--ink); }
+  .btn-block { width: 100%; justify-content: center; }
+  .btn-lg { padding: 13px; font-size: 13.5px; }
+  .btn-sm { padding: 6px 11px; font-size: 11.5px; }
+
+  .eod-card { margin-top: 18px; border: 2px solid var(--green); border-radius: 12px; padding: 16px; background: var(--green-soft); }
+  .mini-table { width: 100%; border-collapse: collapse; font-size: 11px; margin: 9px 0; }
+  .mini-table th { background: var(--g2); padding: 6px 8px; text-align: left; font-size: 9.5px; text-transform: uppercase; color: var(--g6); }
+  .mini-table td { padding: 6px 8px; border-bottom: 1px solid var(--g2); background:white; }
+  .tk-chip { display: inline-block; background: var(--ink); color: white; padding: 1px 7px; border-radius: 4px; font-family: 'SF Mono', monospace; font-size: 9.5px; font-weight: 700; }
+  .tk-chip.meet { background: var(--amber); }
+
+  /* ===== EXTENSION (S3) ===== */
+  .browser { border-radius: 14px; overflow: hidden; box-shadow: var(--sh-lg); background: #dee1e6; border: 1px solid var(--g4); max-width: 1000px; margin: 0 auto; }
+  .browser-top { background: #dee1e6; padding: 9px 14px 0; }
+  .browser-tabs { display: flex; gap: 6px; align-items: flex-end; }
+  .lights { display: flex; gap: 7px; padding: 0 12px 8px 4px; }
+  .lights span { width: 12px; height: 12px; border-radius: 50%; }
+  .lights .r1 { background: #ff5f57; } .lights .r2 { background: #febc2e; } .lights .r3 { background: #28c840; }
+  .b-tab { background: #f1f3f4; padding: 8px 14px; border-radius: 9px 9px 0 0; font-size: 11.5px; color: var(--g6); display: flex; align-items: center; gap: 7px; }
+  .b-tab.active { background: white; font-weight: 600; }
+  .b-tab .fav { width: 13px; height: 13px; background: var(--blue); border-radius: 3px; display:flex;align-items:center;justify-content:center;color:white;font-size:7px;font-weight:700; }
+  .browser-url { background: white; padding: 8px 14px; display: flex; align-items: center; gap: 12px; }
+  .url-btns { display: flex; gap: 13px; color: var(--g5); font-size: 14px; }
+  .url-bar { flex: 1; background: var(--g2); border-radius: 16px; padding: 7px 14px; font-size: 11.5px; color: var(--g6); }
+  .ext-tray { display: flex; gap: 6px; align-items: center; }
+  .ext-ic { width: 28px; height: 28px; border-radius: 7px; background: var(--g2); display: flex; align-items: center; justify-content: center; font-size: 13px; position: relative; }
+  .ext-ic.active { background: transparent; color: var(--ink); box-shadow: 0 0 0 2px var(--red); }
+  .ext-ic .ping { position: absolute; top: -3px; right: -3px; width: 14px; height: 14px; background: var(--red); color: white; border-radius: 50%; font-size: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; border: 2px solid white; }
+  .browser-page { background: white; min-height: 700px; position: relative; padding: 26px; background-image: linear-gradient(var(--g1) 1px, transparent 1px), linear-gradient(90deg, var(--g1) 1px, transparent 1px); background-size: 26px 26px; }
+  .page-ghost { color: var(--g4); font-size: 12.5px; text-align: center; padding-top: 50px; }
+  .page-ghost .big { font-size: 38px; margin-bottom: 8px; }
+
+  .ext-popup { position: absolute; top: 8px; right: 14px; width: 350px; max-height: calc(100% - 16px); display: flex; flex-direction: column; background: white; border-radius: 12px; box-shadow: var(--sh-lg); border: 1px solid var(--g3); overflow: hidden; z-index: 5; }
+  .ext-pop-head { background: var(--ink); color: white; padding: 11px 14px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+  .ext-pop-head .l { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 12.5px; }
+  .ext-pop-head .l .ic { width: 21px; height: 21px; background: transparent; color: #fff; border-radius: 6px; display:flex;align-items:center;justify-content:center; }
+  .ext-pop-head .gear { opacity: .6; font-size: 12px; }
+  .ext-tabs { display: flex; background: var(--g1); border-bottom: 1px solid var(--g3); flex-shrink: 0; }
+  .ext-tab { flex: 1; text-align: center; padding: 8px; font-size: 11px; font-weight: 700; color: var(--g5); cursor: pointer; border-bottom: 2px solid transparent; }
+  .ext-tab.on { color: var(--red); border-bottom-color: var(--red); background: white; }
+  .ext-pop-body { padding: 13px; overflow-y: auto; flex: 1; }
+  .ext-nudge { background: var(--red-soft); border: 1px solid #fecaca; border-radius: 9px; padding: 9px 11px; display: flex; gap: 9px; align-items: center; margin-bottom: 12px; }
+  .ext-nudge .clk { font-size: 21px; }
+  .ext-nudge .tx { font-size: 11.5px; }
+  .ext-nudge .tx b { display: block; font-size: 12px; color: var(--red); margin-bottom: 1px; }
+  .ext-fld { margin-bottom: 10px; }
+  .ext-lbl { font-size: 9.5px; font-weight: 700; color: var(--g6); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 4px; display: block; }
+  .ext-sel { width: 100%; padding: 8px 26px 8px 9px; font-size: 11.5px; border: 1px solid var(--g3); border-radius: 7px; background: var(--g1); appearance: none; font-family: inherit; cursor: pointer; }
+  .ext-ta { width: 100%; min-height: 52px; border: 1px solid var(--g3); border-radius: 7px; padding: 8px; font-size: 11.5px; font-family: inherit; resize: none; background: var(--g1); }
+  .ext-ta:focus, .ext-sel:focus { outline: none; border-color: var(--red); background: white; }
+  .ext-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .ext-actions { display: flex; gap: 7px; margin-top: 11px; }
+  .ext-btn { flex: 1; padding: 9px; border-radius: 8px; font-size: 11.5px; font-weight: 700; border: 1px solid var(--g3); background: white; cursor: pointer; font-family: inherit; }
+  .ext-btn.primary { background: var(--red); color: white; border-color: var(--red); }
+  .ext-today { margin-top: 12px; border-top: 1px solid var(--g2); padding-top: 10px; }
+  .ext-today .lbl { font-size: 9.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--g5); font-weight: 700; margin-bottom: 6px; display: flex; justify-content: space-between; }
+  .ext-log-row { display: flex; align-items: center; gap: 7px; font-size: 10.5px; padding: 3px 0; }
+  .ext-log-row .tick { width: 14px; height: 14px; background: var(--green); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 8px; flex-shrink: 0; }
+  .ext-log-row .tm { font-family: 'SF Mono', monospace; color: var(--g5); font-size: 9.5px; }
+  .ext-log-row .ds { flex: 1; color: var(--g6); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ext-eod { margin-top: 11px; width: 100%; padding: 10px; border-radius: 9px; background: var(--ink); color: white; border: 0; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .ext-hint { font-size: 10px; color: var(--g5); margin-top: 10px; text-align: center; line-height: 1.45; }
+  .ext-hint b { color: var(--g6); }
+  .ext-day-sum { display: flex; align-items: center; justify-content: space-between; background: var(--g1); border: 1px solid var(--g3); border-radius: 8px; padding: 9px 11px; margin-bottom: 10px; }
+  .ext-day-sum b { font-size: 12px; }
+  .ext-day-sum span { font-size: 9.5px; color: var(--g5); }
+  .ext-day-total { font-size: 15px; font-weight: 800; color: var(--green); }
+  .ext-entry-list { display: flex; flex-direction: column; gap: 7px; }
+  .ext-entry { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; border: 1px solid var(--g3); border-radius: 8px; padding: 8px 9px; }
+  .ext-entry-l { flex: 1; min-width: 0; }
+  .ext-entry-row1 { display: flex; align-items: center; gap: 7px; }
+  .etm { font-family: 'SF Mono', monospace; font-size: 10px; color: var(--g5); }
+  .ext-entry-dur { background: var(--red-soft); color: var(--red); font-size: 9.5px; font-weight: 700; padding: 1px 7px; border-radius: 9px; }
+  .ext-entry-desc { font-size: 11.5px; color: var(--ink); margin: 3px 0; }
+  .ext-tk { display: inline-block; background: var(--ink); color: white; font-family: 'SF Mono', monospace; font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 4px; }
+  .ext-tk.meet { background: var(--amber); }
+  .ext-entry-act { display: flex; flex-direction: column; gap: 7px; color: var(--g4); font-size: 12px; flex-shrink: 0; }
+  .ext-entry-act span { cursor: pointer; }
+  .ext-entry-act span:hover { color: var(--red); }
+  .ext-group { margin-top: 11px; background: var(--green-soft); border: 1px solid #a7f3d0; border-radius: 8px; padding: 9px 11px; }
+  .ext-group-lbl { font-size: 9.5px; font-weight: 700; color: #065f46; text-transform: uppercase; letter-spacing: .03em; margin-bottom: 6px; }
+  .ext-group-row { display: flex; justify-content: space-between; align-items: center; font-size: 11px; padding: 2.5px 0; }
+  .ext-group-row .g-dur { font-weight: 700; color: var(--g6); }
+  .os-notif { position: absolute; bottom: 16px; left: 16px; width: 312px; background: rgba(30,41,59,.97); color: white; border-radius: 12px; padding: 12px 13px; box-shadow: var(--sh-lg); display: flex; gap: 10px; z-index: 6; }
+  .os-notif .app-ic { width: 36px; height: 36px; background: transparent; color: #fff; border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .os-notif .n-title { font-size: 12px; font-weight: 700; }
+  .os-notif .n-app { font-size: 9px; opacity: .55; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 2px; }
+  .os-notif .n-body { font-size: 11px; opacity: .85; line-height: 1.4; }
+  .os-notif .n-actions { display: flex; gap: 6px; margin-top: 8px; }
+  .os-notif .n-btn { font-size: 10px; padding: 5px 9px; border-radius: 6px; background: rgba(255,255,255,.13); cursor: pointer; }
+  .os-notif .n-btn.go { background: var(--red); }
+
+  /* ===== DASHBOARDS ===== */
+  .scope-bar { display: flex; align-items: center; justify-content: space-between; background: white; border: 1px solid var(--g3); border-radius: 11px; padding: 12px 16px; margin-bottom: 16px; box-shadow: var(--sh-sm); flex-wrap: wrap; gap: 10px; }
+  .scope-bar .who-role { display: flex; align-items: center; gap: 10px; }
+  .scope-ic { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .scope-bar .role-name { font-size: 14px; font-weight: 800; }
+  .scope-bar .role-scope { font-size: 11.5px; color: var(--g5); }
+
+  .kpi-row { display: grid; gap: 13px; margin-bottom: 16px; }
+  .kpi-row.k4 { grid-template-columns: repeat(4,1fr); }
+  .kpi-row.k5 { grid-template-columns: repeat(5,1fr); }
+  @media (max-width: 860px) { .kpi-row.k4, .kpi-row.k5 { grid-template-columns: repeat(2,1fr); } }
+  .kpi { background: white; border: 1px solid var(--g3); border-radius: 11px; padding: 14px; box-shadow: var(--sh-sm); }
+  .kpi .k-top { display: flex; align-items: center; justify-content: space-between; }
+  .kpi .k-ic { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .kpi .k-val { font-size: 23px; font-weight: 800; margin-top: 7px; letter-spacing: -.02em; }
+  .kpi .k-lbl { font-size: 10.5px; color: var(--g5); text-transform: uppercase; letter-spacing: .03em; }
+  .kpi .k-trend { font-size: 10.5px; font-weight: 700; }
+  .trend-up { color: var(--green); } .trend-dn { color: var(--red); } .trend-flat { color: var(--g5); }
+
+  .dash-grid { display: grid; grid-template-columns: 1.45fr 1fr; gap: 15px; margin-bottom: 15px; }
+  .dash-grid.even { grid-template-columns: 1fr 1fr; }
+  @media (max-width: 820px) { .dash-grid, .dash-grid.even { grid-template-columns: 1fr; } }
+
+  .bar-chart { display: flex; flex-direction: column; gap: 10px; }
+  .bar-item { display: flex; align-items: center; gap: 9px; font-size: 11.5px; }
+  .bar-name { width: 96px; font-weight: 600; color: var(--g6); flex-shrink: 0; }
+  .bar-name.mono { font-family:'SF Mono',monospace; font-size:10.5px; }
+  .bar-track { flex: 1; background: var(--g2); border-radius: 6px; height: 21px; position: relative; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 6px; display: flex; align-items: center; justify-content: flex-end; padding-right: 7px; color: white; font-size: 10px; font-weight: 700; }
+  .bar-fill.full { background: linear-gradient(90deg,#10b981,#059669); }
+  .bar-fill.mid { background: linear-gradient(90deg,#f59e0b,#d97706); }
+  .bar-fill.low { background: linear-gradient(90deg,#dc2626,#991b1b); }
+  .bar-fill.blu { background: linear-gradient(90deg,#3b82f6,#2563eb); }
+  .bar-fill.pur { background: linear-gradient(90deg,#8b5cf6,#7c3aed); }
+  .bar-target { position: absolute; top: -2px; bottom: -2px; width: 2px; background: var(--ink); }
+
+  .donut-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 6px; padding: 6px 0; }
+  .donut { width: 138px; height: 138px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; }
+  .donut::before { content: ''; position: absolute; width: 88px; height: 88px; background: white; border-radius: 50%; }
+  .donut .d-num { position: relative; font-size: 24px; font-weight: 800; }
+  .donut .d-sub { position: relative; font-size: 8.5px; color: var(--g5); text-transform: uppercase; margin-top: -2px; }
+  .donut-legend { display: flex; gap: 11px; font-size: 10.5px; flex-wrap:wrap; justify-content:center; }
+  .donut-legend span { display: flex; align-items: center; gap: 5px; color: var(--g6); }
+
+  table.tbl { width: 100%; border-collapse: collapse; font-size: 12px; }
+  table.tbl th { background: var(--g2); padding: 9px 11px; text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: .04em; color: var(--g6); font-weight: 700; }
+  table.tbl td { padding: 9px 11px; border-bottom: 1px solid var(--g2); }
+  table.tbl tr:hover td { background: var(--g1); }
+  .who { display: flex; align-items: center; gap: 8px; }
+  .who .av { width: 27px; height: 27px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: white; flex-shrink:0; }
+  .who .nm { font-weight: 600; }
+  .who .rl { font-size: 9.5px; color: var(--g5); }
+  .pill { padding: 3px 8px; border-radius: 11px; font-size: 10px; font-weight: 700; white-space:nowrap; }
+  .pill.ok { background: var(--green-soft); color: #065f46; }
+  .pill.warn { background: var(--amber-soft); color: #b45309; }
+  .pill.bad { background: var(--red-soft); color: var(--red); }
+  .pill.info { background: var(--blue-soft); color: #1d4ed8; }
+  .pill.neutral { background: var(--g2); color: var(--g6); }
+  .hbar { width: 74px; height: 6px; background: var(--g2); border-radius: 3px; display: inline-block; overflow: hidden; vertical-align: middle; }
+  .hbar i { display: block; height: 100%; border-radius: 3px; }
+
+  /* portfolio cards */
+  .pf-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+  @media (max-width:760px){ .pf-grid{ grid-template-columns:1fr; } }
+  .pf-card { border: 1px solid var(--g3); border-radius: 10px; padding: 13px; }
+  .pf-card .pf-name { font-weight: 700; font-size: 12.5px; display:flex; align-items:center; gap:7px; }
+  .pf-card .pf-key { font-family:'SF Mono',monospace; font-size: 9.5px; color: var(--g5); }
+  .pf-stat { display: flex; justify-content: space-between; font-size: 11px; margin-top: 7px; }
+  .pf-stat .v { font-weight: 700; }
+
+  /* trend mini */
+  .trend-bars { display: flex; align-items: flex-end; gap: 8px; height: 110px; padding-top: 10px; }
+  .trend-bars .tb { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+  .trend-bars .tb .tv { width: 100%; background: linear-gradient(180deg,#8b5cf6,#6d28d9); border-radius: 5px 5px 0 0; }
+  .trend-bars .tb .tl { font-size: 9px; color: var(--g5); }
+
+  /* ops workflow stepper */
+  .stepper { display: flex; align-items: center; gap: 0; margin: 4px 0 16px; flex-wrap: wrap; }
+  .step-node { display: flex; align-items: center; gap: 9px; }
+  .step-circle { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 800; flex-shrink:0; }
+  .step-tx { font-size: 11px; }
+  .step-tx b { display: block; font-size: 12px; }
+  .step-line { width: 38px; height: 2px; background: var(--g3); margin: 0 10px; }
+  @media (max-width:760px){ .step-line{ width:18px; } }
+
+  /* config rows */
+  .cfg-row { display: flex; align-items: center; justify-content: space-between; padding: 11px 0; border-bottom: 1px solid var(--g2); font-size: 12.5px; }
+  .cfg-row:last-child { border-bottom: 0; }
+  .cfg-row .cfg-l b { display:block; }
+  .cfg-row .cfg-l span { font-size: 11px; color: var(--g5); }
+  .conn { display: flex; align-items: center; gap: 8px; }
+  .conn .led { width: 9px; height: 9px; border-radius: 50%; }
+  .conn .led.on { background: var(--green); box-shadow: 0 0 0 3px var(--green-soft); }
+  .conn .led.off { background: var(--g4); }
+  .toggle { width: 38px; height: 21px; border-radius: 11px; background: var(--green); position: relative; }
+  .toggle::after { content:''; position:absolute; width:16px; height:16px; background:white; border-radius:50%; top:2.5px; right:2.5px; }
+  .toggle.off { background: var(--g4); }
+  .toggle.off::after { left: 2.5px; right: auto; }
+
+  .foot { background: var(--ink); color: white; text-align: center; padding: 18px; font-size: 12px; opacity: .92; }
+  .foot b { color: var(--red); } .foot em { opacity: .7; }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="ac-logo" viewBox="0 0 120 120">
+    <path d="M78.85 21.35A43 43 0 1 1 41.15 21.35" fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round"/>
+    <line x1="60" y1="60" x2="41" y2="49" stroke="currentColor" stroke-width="9" stroke-linecap="round"/>
+    <line x1="60" y1="60" x2="71" y2="31" stroke="#dc2626" stroke-width="9" stroke-linecap="round"/>
+    <circle cx="60" cy="60" r="7" fill="currentColor"/>
+    <circle cx="60" cy="60" r="2.6" fill="#dc2626"/>
+  </symbol>
+</svg>
+
+<nav class="nav">
+  <div class="brand">
+    <div class="brand-ic"><svg class="ac-ico"><use href="#ac-logo"/></svg></div>
+    <div><div class="brand-tx">Auto<span style="color:#f87171">Clock</span></div><div class="brand-sub">DESIGN MOCKUPS v2</div></div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="show(0,this)">① Data Flow</button>
+    <button class="tab" onclick="show(1,this)">② Employee Log</button>
+    <button class="tab" onclick="show(2,this)">③ Chrome Extension</button>
+    <button class="tab" onclick="show(3,this)">④ PM / Lead</button>
+    <button class="tab" onclick="show(4,this)">⑤ Management</button>
+    <button class="tab" onclick="show(5,this)">⑥ Operations</button>
+    <button class="tab" onclick="show(6,this)">⑦ Admin</button>
+  </div>
+  <span class="nav-badge">HACKFEST 2026</span>
+</nav>
+
+<!-- ============ S1 DATA FLOW ============ -->
+<section class="screen active" id="s0">
+  <div class="screen-head">
+    <span class="screen-tag">HOW THE SYSTEM WORKS</span>
+    <h2>Data Flow — One Backend, Five Roles</h2>
+    <p>An employee logs work (with project + Jira task picked). It flows to one backend, gets tidied by a free deterministic parser, fans out to Jira / Sheet / Gmail, and feeds five role-based views.</p>
+  </div>
+  <div class="flow-legend">
+    <span><span class="dot" style="background:#3b82f6"></span> Input surfaces</span>
+    <span><span class="dot" style="background:#dc2626"></span> Backend + AI</span>
+    <span><span class="dot" style="background:#f59e0b"></span> Database</span>
+    <span><span class="dot" style="background:#10b981"></span> Auto-synced outputs</span>
+    <span><span class="dot" style="background:#8b5cf6"></span> Role dashboards</span>
+    <span><span class="dot" style="background:#0d9488"></span> Admin config</span>
+  </div>
+
+  <div class="flow-row">
+    <div class="flow-box input"><div class="step">1</div><h4><span class="fb-emoji">🧩</span> Chrome Extension</h4><p>Hourly nudge → full entry: pick project + Jira task, describe, save. EOD close — all in the popup.</p></div>
+    <div class="flow-box input"><div class="step">1</div><h4><span class="fb-emoji">💻</span> Web App</h4><p>Same entry on a bigger screen, with the day timeline. Optional — extension can do it all.</p></div>
+  </div>
+  <div class="flow-arrow"><div class="pipe"></div></div>
+  <div class="flow-caption">▼ HTTPS / REST — both surfaces hit the same API ▼</div>
+  <div class="flow-arrow"><div class="pipe"></div></div>
+
+  <div class="flow-row">
+    <div class="flow-box brain" style="min-width:520px;"><div class="step">2</div><h4><span class="fb-emoji">⚙️</span> AutoClock Backend &nbsp;+&nbsp; Free Parser</h4><p>A free deterministic parser tidies the description and totals durations (the employee already picked the ticket) → employee confirms a preview → backend writes everywhere at once. No paid AI.</p></div>
+  </div>
+  <div class="flow-arrow"><div class="pipe"></div></div>
+  <div class="flow-caption">▼ on "Confirm" ▼</div>
+  <div class="flow-arrow"><div class="pipe"></div></div>
+
+  <div class="flow-row">
+    <div class="flow-box dest"><div class="step">3</div><h4><span class="fb-emoji">🎯</span> Jira Worklogs</h4><p>Posted to the exact ticket the employee picked — Clockwork displays them.</p></div>
+    <div class="flow-box dest"><div class="step">3</div><h4><span class="fb-emoji">📊</span> Google Sheet</h4><p>Row appended to the existing timesheet.</p></div>
+    <div class="flow-box dest"><div class="step">3</div><h4><span class="fb-emoji">📧</span> Gmail Draft</h4><p>EOD email drafted, ready to send.</p></div>
+    <div class="flow-box db"><div class="step">4</div><h4><span class="fb-emoji">🗄️</span> AutoClock DB</h4><p>Every entry stored — powers all dashboards.</p></div>
+  </div>
+  <div class="flow-arrow"><div class="pipe"></div></div>
+  <div class="flow-caption">▼ stored data → role-based views ▼</div>
+  <div class="flow-arrow"><div class="pipe"></div></div>
+
+  <div class="flow-row">
+    <div class="flow-box dash"><div class="step">5</div><h4><span class="fb-emoji">👔</span> PM / Lead</h4><p>Their team &amp; project only — delivery metrics.</p></div>
+    <div class="flow-box dash"><div class="step">5</div><h4><span class="fb-emoji">🏢</span> Management</h4><p>All 60–70 people — utilization &amp; cost.</p></div>
+    <div class="flow-box dash"><div class="step">5</div><h4><span class="fb-emoji">📋</span> Operations</h4><p>Weekly 40h compliance chase.</p></div>
+  </div>
+  <div class="flow-arrow"><div class="pipe"></div></div>
+  <div class="flow-row">
+    <div class="flow-box admin" style="min-width:520px;"><div class="step">⚙</div><h4><span class="fb-emoji">🛠️</span> Admin Console — sits across the whole system</h4><p>Creates users &amp; assigns roles, configures projects ↔ Jira mapping, manages integrations &amp; global settings. Everything above runs on what Admin sets up.</p></div>
+  </div>
+
+  <div class="callout"><b>Five roles, one source of truth:</b> Employee logs · PM/Lead, Management &amp; Operations read tailored dashboards · Admin configures it all. The extension and web app stay in sync because both read/write the same backend database.</div>
+</section>
+
+<!-- ============ S2 EMPLOYEE LOG ============ -->
+<section class="screen" id="s1">
+  <div class="screen-head">
+    <span class="screen-tag">ROLE 1 · EMPLOYEE</span>
+    <h2>Employee — Log a Slot</h2>
+    <p>Now with a <b>Project dropdown</b> and a dependent <b>Jira task selector</b> — so every micro-log lands on the exact right Jira ticket. Try changing the project; the task list updates.</p>
+  </div>
+  <div class="app-frame">
+    <div class="app-bar">
+      <div class="l"><div class="ic"><svg class="ac-ico"><use href="#ac-logo"/></svg></div> AutoClock</div>
+      <div class="r"><span>Log</span><span>History</span><span>Settings</span><div class="avatar">YM</div></div>
+    </div>
+    <div class="emp-body">
+      <div class="emp-left">
+        <div class="day-head"><div class="date">📅 Tue, 19 May</div><div class="total">6h 30m</div></div>
+        <div class="timeline">
+          <div class="slot done"><div class="slot-time">11:00–11:30 · 30m</div><div class="slot-card"><span class="tk meet">INTERNAL-1</span> SiteOne Scrum<div class="slot-proj">SiteOne PIMCore</div></div></div>
+          <div class="slot done"><div class="slot-time">12:30–13:30 · 1h</div><div class="slot-card"><span class="tk">PIM-3162</span> Mass update tests<div class="slot-proj">SiteOne PIMCore</div></div></div>
+          <div class="slot done"><div class="slot-time">14:30–16:30 · 2h</div><div class="slot-card"><span class="tk">PIM-3073</span> UOM test cases<div class="slot-proj">SiteOne PIMCore</div></div></div>
+          <div class="slot done"><div class="slot-time">16:30–17:30 · 1h</div><div class="slot-card"><span class="tk">PIM-3073</span> Testing<div class="slot-proj">SiteOne PIMCore</div></div></div>
+          <div class="slot now"><div class="slot-time">17:30–18:00 · now</div><div class="slot-card"><b>⏰ Logging this slot →</b></div></div>
+          <div class="slot empty"><div class="slot-time">18:00–19:00</div><div class="slot-card">Not logged yet</div></div>
+        </div>
+      </div>
+      <div class="emp-right">
+        <div class="reminder-banner"><div class="bell">⏰</div><div class="tx"><b>Reminder.</b> What did you work on between <b>17:30 and 18:00</b>?</div></div>
+
+        <div class="fld">
+          <label class="field-label">① Project</label>
+          <div class="sel-wrap">
+            <select class="sel" id="empProject" onchange="syncTasks('empProject','empTask')">
+              <option>SiteOne PIMCore</option>
+              <option>Modern Electronics Lego</option>
+              <option>CUMI Pimcore Implementation</option>
+              <option>Internal / Meetings</option>
+              <option>Bench</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="fld">
+          <label class="field-label">② Jira Task</label>
+          <div class="sel-wrap">
+            <select class="sel" id="empTask"></select>
+          </div>
+          <div class="muted" style="margin-top:4px;">Worklog is posted to this exact Jira ticket — Clockwork displays it.</div>
+        </div>
+
+        <div class="fld">
+          <label class="field-label">③ What did you do?</label>
+          <textarea class="ta">Attended SiteOne PIM Daily Scrum Meeting</textarea>
+        </div>
+
+        <div class="row2">
+          <div class="fld"><label class="field-label">④ Duration</label><input class="input-sm" value="30m" /></div>
+          <div class="fld"><label class="field-label">Time slot</label><input class="input-sm" value="17:30 – 18:00" /></div>
+        </div>
+
+        <div style="display:flex;gap:9px;">
+          <button class="btn btn-primary">✓ Save slot</button>
+          <button class="btn">Snooze 15 min</button>
+        </div>
+
+        <div class="eod-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;"><b style="font-size:12.5px;">🌙 End of Day Preview</b><span style="font-size:10.5px;color:#065f46;font-weight:700;">7 slots · 7h 30m</span></div>
+          <table class="mini-table">
+            <thead><tr><th>Project</th><th>Ticket</th><th>Time</th></tr></thead>
+            <tbody>
+              <tr><td>SiteOne PIMCore</td><td><span class="tk-chip">PIM-3162</span></td><td>1h</td></tr>
+              <tr><td>SiteOne PIMCore</td><td><span class="tk-chip">PIM-3073</span></td><td>3h</td></tr>
+              <tr><td>Modern Electronics Lego</td><td><span class="tk-chip">ML-1045</span></td><td>1h</td></tr>
+              <tr><td>Internal / Meetings</td><td><span class="tk-chip meet">INTERNAL-1</span></td><td>2h 30m</td></tr>
+            </tbody>
+          </table>
+          <button class="btn btn-green btn-block btn-lg">🚀 Close My Day → Sync to Jira + Sheet + Gmail</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="callout green"><b>Why project + task pickers matter:</b> the old pain was the AI guessing the wrong ticket. By having the employee pick the project then the exact Jira task per slot, the worklog <b>always</b> lands correctly — and the dropdown only shows tickets actually assigned to them on that project.</div>
+</section>
+
+<!-- ============ S3 CHROME EXTENSION ============ -->
+<section class="screen" id="s2">
+  <div class="screen-head">
+    <span class="screen-tag">FULL ENTRY — NO NEED TO LEAVE THE BROWSER</span>
+    <h2>Chrome Extension — Complete Logging Tool</h2>
+    <p>Upgraded per your request: the extension now does the <b>entire entry</b> — project, Jira task, description, duration, and the EOD close — right inside the popup. The employee never has to open the web app to log.</p>
+  </div>
+  <div class="browser">
+    <div class="browser-top">
+      <div class="browser-tabs">
+        <div class="lights"><span class="r1"></span><span class="r2"></span><span class="r3"></span></div>
+        <div class="b-tab active"><span class="fav">J</span> ML-1045 · Jira</div>
+        <div class="b-tab"><span class="fav" style="background:#0f9d58">S</span> Time sheet</div>
+        <div class="b-tab"><span class="fav" style="background:#ea4335">M</span> Gmail</div>
+      </div>
+    </div>
+    <div class="browser-url">
+      <div class="url-btns"><span>‹</span><span>›</span><span>⟳</span></div>
+      <div class="url-bar">🔒 iksula.atlassian.net/browse/ML-1045</div>
+      <div class="ext-tray"><div class="ext-ic">🧩</div><div class="ext-ic active"><svg class="ac-ico"><use href="#ac-logo"/></svg><span class="ping">1</span></div></div>
+    </div>
+    <div class="browser-page">
+      <div class="page-ghost"><div class="big">📋</div>Employee keeps working — they log without leaving this page</div>
+
+      <div class="ext-popup">
+        <div class="ext-pop-head">
+          <div class="l"><div class="ic"><svg class="ac-ico"><use href="#ac-logo"/></svg></div> AutoClock</div>
+          <span class="gear">⚙</span>
+        </div>
+        <div class="ext-tabs">
+          <div class="ext-tab on" id="extTabAdd" onclick="extTab('add')">＋ Add Entry</div>
+          <div class="ext-tab" id="extTabToday" onclick="extTab('today')">Today (6)</div>
+        </div>
+
+        <!-- ADD ENTRY TAB -->
+        <div class="ext-pop-body" id="extBodyAdd">
+          <div class="ext-nudge"><div class="clk">⏰</div><div class="tx"><b>Time to log!</b> 5:00 – 6:00 PM — add it below.</div></div>
+
+          <div class="ext-fld">
+            <label class="ext-lbl">Project</label>
+            <select class="ext-sel" id="extProject" onchange="syncTasks('extProject','extTask')">
+              <option>Modern Electronics Lego</option>
+              <option>SiteOne PIMCore</option>
+              <option>CUMI Pimcore Implementation</option>
+              <option>Internal / Meetings</option>
+              <option>Bench</option>
+            </select>
+          </div>
+          <div class="ext-fld">
+            <label class="ext-lbl">Jira Task</label>
+            <select class="ext-sel" id="extTask"></select>
+          </div>
+          <div class="ext-fld">
+            <label class="ext-lbl">What did you do?</label>
+            <textarea class="ext-ta">Testing ML-1045 giftwrap inventory fix on UAT</textarea>
+          </div>
+          <div class="ext-row2">
+            <div class="ext-fld" style="margin:0;"><label class="ext-lbl">Duration</label><input class="ext-sel" style="appearance:auto;cursor:text;" value="1h 00m" /></div>
+            <div class="ext-fld" style="margin:0;"><label class="ext-lbl">Slot</label><input class="ext-sel" style="appearance:auto;cursor:text;" value="17:00–18:00" /></div>
+          </div>
+
+          <div class="ext-actions">
+            <button class="ext-btn primary">✓ Save Entry</button>
+            <button class="ext-btn">Snooze</button>
+          </div>
+
+          <div class="ext-hint">Saved entries collect in the <b>Today</b> tab → review &amp; sync them at end of day. ↑</div>
+        </div>
+
+        <!-- TODAY TAB -->
+        <div class="ext-pop-body" id="extBodyToday" style="display:none;">
+          <div class="ext-day-sum">
+            <div><b>📅 Tue, 19 May</b><br><span>6 entries logged so far</span></div>
+            <div class="ext-day-total">6h 30m</div>
+          </div>
+
+          <div class="ext-entry-list">
+            <div class="ext-entry">
+              <div class="ext-entry-l">
+                <div class="ext-entry-row1"><span class="etm">11:00–11:30</span><span class="ext-entry-dur">30m</span></div>
+                <div class="ext-entry-desc">SiteOne Scrum</div>
+                <div><span class="ext-tk meet">INTERNAL-1</span></div>
+              </div>
+              <div class="ext-entry-act"><span title="Edit">✎</span><span title="Delete">×</span></div>
+            </div>
+            <div class="ext-entry">
+              <div class="ext-entry-l">
+                <div class="ext-entry-row1"><span class="etm">11:30–12:30</span><span class="ext-entry-dur">1h</span></div>
+                <div class="ext-entry-desc">Leo project Daily Scrum</div>
+                <div><span class="ext-tk meet">INTERNAL-1</span></div>
+              </div>
+              <div class="ext-entry-act"><span title="Edit">✎</span><span title="Delete">×</span></div>
+            </div>
+            <div class="ext-entry">
+              <div class="ext-entry-l">
+                <div class="ext-entry-row1"><span class="etm">12:30–14:00</span><span class="ext-entry-dur">1h 30m</span></div>
+                <div class="ext-entry-desc">Mass update test cases</div>
+                <div><span class="ext-tk">PIM-3162</span></div>
+              </div>
+              <div class="ext-entry-act"><span title="Edit">✎</span><span title="Delete">×</span></div>
+            </div>
+            <div class="ext-entry">
+              <div class="ext-entry-l">
+                <div class="ext-entry-row1"><span class="etm">14:30–16:30</span><span class="ext-entry-dur">2h</span></div>
+                <div class="ext-entry-desc">UOM test cases + uploaded in Jira</div>
+                <div><span class="ext-tk">PIM-3073</span></div>
+              </div>
+              <div class="ext-entry-act"><span title="Edit">✎</span><span title="Delete">×</span></div>
+            </div>
+            <div class="ext-entry">
+              <div class="ext-entry-l">
+                <div class="ext-entry-row1"><span class="etm">16:30–17:30</span><span class="ext-entry-dur">1h</span></div>
+                <div class="ext-entry-desc">Testing UOM rules</div>
+                <div><span class="ext-tk">PIM-3073</span></div>
+              </div>
+              <div class="ext-entry-act"><span title="Edit">✎</span><span title="Delete">×</span></div>
+            </div>
+            <div class="ext-entry">
+              <div class="ext-entry-l">
+                <div class="ext-entry-row1"><span class="etm">17:30–18:00</span><span class="ext-entry-dur">30m</span></div>
+                <div class="ext-entry-desc">SiteOne PIM Daily Scrum</div>
+                <div><span class="ext-tk meet">INTERNAL-1</span></div>
+              </div>
+              <div class="ext-entry-act"><span title="Edit">✎</span><span title="Delete">×</span></div>
+            </div>
+          </div>
+
+          <div class="ext-group">
+            <div class="ext-group-lbl">⊙ Will post to Clockwork — 3 tickets</div>
+            <div class="ext-group-row"><span class="ext-tk">PIM-3073</span><span class="g-dur">3h 00m</span></div>
+            <div class="ext-group-row"><span class="ext-tk">PIM-3162</span><span class="g-dur">1h 30m</span></div>
+            <div class="ext-group-row"><span class="ext-tk meet">INTERNAL-1</span><span class="g-dur">2h 00m</span></div>
+          </div>
+
+          <button class="ext-eod">🌙 Close My Day &amp; Sync All →</button>
+        </div>
+      </div>
+
+      <div class="os-notif">
+        <div class="app-ic"><svg class="ac-ico"><use href="#ac-logo"/></svg></div>
+        <div>
+          <div class="n-app">AutoClock</div>
+          <div class="n-title">⏰ Hourly check-in</div>
+          <div class="n-body">What did you work on this past hour? Tap to log it in 20 seconds.</div>
+          <div class="n-actions"><div class="n-btn go">Log now</div><div class="n-btn">Snooze 15m</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="callout green"><b>Yes — full entry from the extension is the right call.</b> Click the two tabs in the popup to switch: <b>＋ Add Entry</b> (project → task → describe → save) and <b>Today</b> (the full list of the day's entries, each editable/deletable, a grouped "will post to Jira" summary, and the Close My Day button). Reminders come from <code>chrome.alarms</code> — a gentle cadence by default; the gear ⚙ lets each user adjust it or switch to end-of-day-only. The web app is then only needed for dashboards.</div>
+</section>
+
+<!-- ============ S4 PM / LEAD ============ -->
+<section class="screen" id="s3">
+  <div class="screen-head">
+    <span class="screen-tag">ROLE 2 · QA LEAD / PROJECT MANAGER</span>
+    <h2>PM / Lead Dashboard — Team &amp; Delivery</h2>
+    <p>Scoped to <b>only their own team / project</b>. Metrics a lead actually needs: where the team's hours went per ticket, who hasn't logged, and team-level compliance.</p>
+  </div>
+  <div class="scope-bar">
+    <div class="who-role">
+      <div class="scope-ic" style="background:var(--purple-soft);color:var(--purple)">👔</div>
+      <div><div class="role-name">Priya Kulkarni — QA Lead</div><div class="role-scope">Scope: SiteOne PIM team · 8 members · 1 project</div></div>
+    </div>
+    <span class="pill info">🔒 Sees own team only</span>
+  </div>
+
+  <div class="kpi-row k4">
+    <div class="kpi"><div class="k-top"><div class="k-ic" style="background:var(--blue-soft);color:var(--blue)">⏱</div><div class="k-trend trend-up">▲ 4%</div></div><div class="k-val">58h 30m</div><div class="k-lbl">Team Logged Today</div></div>
+    <div class="kpi"><div class="k-top"><div class="k-ic" style="background:var(--green-soft);color:var(--green)">📊</div><div class="k-trend trend-up">▲ 2%</div></div><div class="k-val">7h 18m</div><div class="k-lbl">Avg / Person</div></div>
+    <div class="kpi"><div class="k-top"><div class="k-ic" style="background:var(--amber-soft);color:var(--amber)">🎫</div><div class="k-trend trend-flat">— 12</div></div><div class="k-val">12</div><div class="k-lbl">Tickets In Progress</div></div>
+    <div class="kpi"><div class="k-top"><div class="k-ic" style="background:var(--green-soft);color:var(--green)">✓</div><div class="k-trend trend-up">▲ 11%</div></div><div class="k-val">94%</div><div class="k-lbl">Team Compliance</div></div>
+  </div>
+
+  <div class="dash-grid">
+    <div class="card">
+      <div class="card-h"><div class="card-t"><span class="ic">🎫</span> Effort by Jira Ticket — This Week</div><span class="muted">where the team's hours went</span></div>
+      <div class="card-b">
+        <div class="bar-chart">
+          <div class="bar-item"><span class="bar-name mono">PIM-3073</span><div class="bar-track"><div class="bar-fill blu" style="width:90%;">36h</div></div></div>
+          <div class="bar-item"><span class="bar-name mono">PIM-3162</span><div class="bar-track"><div class="bar-fill blu" style="width:60%;">24h</div></div></div>
+          <div class="bar-item"><span class="bar-name mono">PIM-2753</span><div class="bar-track"><div class="bar-fill blu" style="width:42%;">17h</div></div></div>
+          <div class="bar-item"><span class="bar-name mono">PIM-3201</span><div class="bar-track"><div class="bar-fill blu" style="width:30%;">12h</div></div></div>
+          <div class="bar-item"><span class="bar-name mono">INTERNAL-1</span><div class="bar-track"><div class="bar-fill mid" style="width:48%;">19h</div></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-h"><div class="card-t"><span class="ic">⚠️</span> Not Logged Today</div></div>
+      <div class="card-b">
+        <div style="display:flex;flex-direction:column;gap:9px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;background:var(--red-soft);border:1px solid #fecaca;border-radius:9px;padding:9px 11px;">
+            <div class="who"><div class="av" style="background:#dc2626">AS</div><div><div class="nm" style="font-size:12px;">Aamir Shaikh</div><div class="rl">last log: yesterday</div></div></div>
+            <button class="btn btn-sm">🔔 Nudge</button>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;background:var(--amber-soft);border:1px solid #fde68a;border-radius:9px;padding:9px 11px;">
+            <div class="who"><div class="av" style="background:#8b5cf6">RD</div><div><div class="nm" style="font-size:12px;">Rahul Desai</div><div class="rl">last log: 1h ago — partial</div></div></div>
+            <button class="btn btn-sm">🔔 Nudge</button>
+          </div>
+          <div style="text-align:center;font-size:11px;color:var(--green);font-weight:700;padding-top:4px;">✓ 6 of 8 fully logged today</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><div class="card-t"><span class="ic">👥</span> My Team — This Week</div><button class="btn btn-sm">⬇ Export team report</button></div>
+    <div class="card-b" style="padding:0;">
+      <table class="tbl">
+        <thead><tr><th>Member</th><th>Today</th><th>Week</th><th>Top Ticket</th><th>40h Progress</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td><div class="who"><div class="av" style="background:#10b981">YM</div><div><div class="nm">Yogesh Mohite</div><div class="rl">Sr. QA</div></div></div></td><td>7h 30m</td><td><b>38h 30m</b></td><td><span class="tk-chip">PIM-3073</span></td><td><span class="hbar"><i class="bar-fill full" style="width:96%"></i></span></td><td><span class="pill warn">Close</span></td></tr>
+          <tr><td><div class="who"><div class="av" style="background:#3b82f6">SN</div><div><div class="nm">Shabnam Nagar</div><div class="rl">QA Engineer</div></div></div></td><td>8h 00m</td><td><b>41h 00m</b></td><td><span class="tk-chip">PIM-3162</span></td><td><span class="hbar"><i class="bar-fill full" style="width:100%"></i></span></td><td><span class="pill ok">On track</span></td></tr>
+          <tr><td><div class="who"><div class="av" style="background:#8b5cf6">RD</div><div><div class="nm">Rahul Desai</div><div class="rl">QA Engineer</div></div></div></td><td>6h 30m</td><td><b>34h 00m</b></td><td><span class="tk-chip">PIM-2753</span></td><td><span class="hbar"><i class="bar-fill mid" style="width:85%"></i></span></td><td><span class="pill warn">Close</span></td></tr>
+          <tr><td><div class="who"><div class="av" style="background:#dc2626">AS</div><div><div class="nm">Aamir Shaikh</div><div class="rl">QA Engineer</div></div></div></td><td>3h 30m</td><td><b>22h 00m</b></td><td><span class="tk-chip">PIM-3073</span></td><td><span class="hbar"><i class="bar-fill low" style="width:55%"></i></span></td><td><span class="pill bad">Behind</span></td></tr>
+          <tr><td><div class="who"><div class="av" style="background:#0f9d58">NT</div><div><div class="nm">Neha Tiwari</div><div class="rl">QA Engineer</div></div></div></td><td>8h 00m</td><td><b>40h 00m</b></td><td><span class="tk-chip">PIM-3201</span></td><td><span class="hbar"><i class="bar-fill full" style="width:100%"></i></span></td><td><span class="pill ok">On track</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="callout"><b>PM / Lead view = delivery focus.</b> Ticket-level effort, who's behind today, exportable team report for client status calls. A lead <b>cannot</b> see other teams — strict team-scoped access.</div>
+</section>
+
+<!-- ============ S5 MANAGEMENT ============ -->
+<section class="screen" id="s4">
+  <div class="screen-head">
+    <span class="screen-tag">ROLE 3 · MANAGEMENT</span>
+    <h2>Management Dashboard — Whole Branch</h2>
+    <p>Sees <b>all 60–70 people across every team</b>. Different metrics on purpose: utilization, project portfolio, team-vs-team, and multi-week trends — the strategic picture, not ticket detail.</p>
+  </div>
+  <div class="scope-bar">
+    <div class="who-role">
+      <div class="scope-ic" style="background:var(--red-soft);color:var(--red)">🏢</div>
+      <div><div class="role-name">Management — QA Department</div><div class="role-scope">Scope: ~60 employees · 6 teams · 9 projects · figures are sample data</div></div>
+    </div>
+    <span class="pill bad">🌐 Full-branch visibility</span>
+  </div>
+
+  <div class="kpi-row k5">
+    <div class="kpi"><div class="k-top"><div class="k-ic" style="background:var(--blue-soft);color:var(--blue)">👥</div><div class="k-trend trend-up">▲ 3</div></div><div class="k-val">61/67</div><div class="k-lbl">Logged Today</div></div>
+    <div class="kpi"><div class="k-top"><div class="k-ic" style="background:var(--green-soft);color:var(--green)">⚡</div><div class="k-trend trend-up">▲ 2%</div></div><div class="k-val">86%</div><div class="k-lbl">Org Utilization</div></div>
+    <div class="kpi"><div class="k-top"><div class="k-ic" style="background:var(--green-soft);color:var(--green)">✓</div><div class="k-trend trend-up">▲ 5%</div></div><div class="k-val">89%</div><div class="k-lbl">Org Compliance</div></div>
+    <div class="kpi"><div class="k-top"><div class="k-ic" style="background:var(--amber-soft);color:var(--amber)">💰</div><div class="k-trend trend-up">▲ 60h</div></div><div class="k-val">1,840h</div><div class="k-lbl">Billable / Week</div></div>
+    <div class="kpi"><div class="k-top"><div class="k-ic" style="background:var(--purple-soft);color:var(--purple)">📁</div><div class="k-trend trend-flat">— 9</div></div><div class="k-val">9</div><div class="k-lbl">Active Projects</div></div>
+  </div>
+
+  <div class="card" style="margin-bottom:15px;">
+    <div class="card-h"><div class="card-t"><span class="ic">📁</span> Project Portfolio — Hours &amp; Utilization This Week</div></div>
+    <div class="card-b">
+      <div class="pf-grid">
+        <div class="pf-card"><div class="pf-name">🟦 SiteOne PIMCore <span class="pf-key">PIM</span></div><div class="pf-stat"><span>Headcount</span><span class="v">18</span></div><div class="pf-stat"><span>Hours / week</span><span class="v">682h</span></div><div class="pf-stat"><span>Utilization</span><span class="v" style="color:var(--green)">91%</span></div></div>
+        <div class="pf-card"><div class="pf-name">🟩 Modern Electronics Lego <span class="pf-key">ML</span></div><div class="pf-stat"><span>Headcount</span><span class="v">14</span></div><div class="pf-stat"><span>Hours / week</span><span class="v">520h</span></div><div class="pf-stat"><span>Utilization</span><span class="v" style="color:var(--green)">88%</span></div></div>
+        <div class="pf-card"><div class="pf-name">🟧 CUMI Pimcore <span class="pf-key">CUMI</span></div><div class="pf-stat"><span>Headcount</span><span class="v">11</span></div><div class="pf-stat"><span>Hours / week</span><span class="v">388h</span></div><div class="pf-stat"><span>Utilization</span><span class="v" style="color:var(--amber)">79%</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dash-grid even">
+    <div class="card">
+      <div class="card-h"><div class="card-t"><span class="ic">⚖️</span> Team vs Team — Avg Hours / Person</div></div>
+      <div class="card-b">
+        <div class="bar-chart">
+          <div class="bar-item"><span class="bar-name">SiteOne PIM</span><div class="bar-track"><div class="bar-fill full" style="width:95%;">7.6h</div><div class="bar-target" style="left:100%;"></div></div></div>
+          <div class="bar-item"><span class="bar-name">Lego QA</span><div class="bar-track"><div class="bar-fill full" style="width:91%;">7.3h</div><div class="bar-target" style="left:100%;"></div></div></div>
+          <div class="bar-item"><span class="bar-name">CUMI QA</span><div class="bar-track"><div class="bar-fill mid" style="width:79%;">6.3h</div><div class="bar-target" style="left:100%;"></div></div></div>
+          <div class="bar-item"><span class="bar-name">Automation</span><div class="bar-track"><div class="bar-fill full" style="width:96%;">7.7h</div><div class="bar-target" style="left:100%;"></div></div></div>
+          <div class="bar-item"><span class="bar-name">Mobile QA</span><div class="bar-track"><div class="bar-fill mid" style="width:74%;">5.9h</div><div class="bar-target" style="left:100%;"></div></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-h"><div class="card-t"><span class="ic">📈</span> Org Utilization — Last 6 Weeks</div></div>
+      <div class="card-b">
+        <div class="trend-bars">
+          <div class="tb"><div class="tv" style="height:62%;"></div><div class="tl">W14</div></div>
+          <div class="tb"><div class="tv" style="height:70%;"></div><div class="tl">W15</div></div>
+          <div class="tb"><div class="tv" style="height:66%;"></div><div class="tl">W16</div></div>
+          <div class="tb"><div class="tv" style="height:78%;"></div><div class="tl">W17</div></div>
+          <div class="tb"><div class="tv" style="height:84%;"></div><div class="tl">W18</div></div>
+          <div class="tb"><div class="tv" style="height:90%;"></div><div class="tl">W19</div></div>
+        </div>
+        <div style="text-align:center;font-size:11px;color:var(--g5);margin-top:8px;">Steady climb since AutoClock pilot started — 62% → 86%</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><div class="card-t"><span class="ic">🏢</span> Department Rollup — by Team</div><button class="btn btn-sm">⬇ Board report (PDF)</button></div>
+    <div class="card-b" style="padding:0;">
+      <table class="tbl">
+        <thead><tr><th>Team</th><th>Lead</th><th>Headcount</th><th>Avg Hrs/Person</th><th>Compliance</th><th>Utilization</th></tr></thead>
+        <tbody>
+          <tr><td><b>SiteOne PIM</b></td><td>Priya Kulkarni</td><td>8</td><td>7.6h</td><td><span class="pill ok">94%</span></td><td>91%</td></tr>
+          <tr><td><b>Lego QA</b></td><td>Vikram Rao</td><td>14</td><td>7.3h</td><td><span class="pill ok">90%</span></td><td>88%</td></tr>
+          <tr><td><b>CUMI QA</b></td><td>Sana Mirza</td><td>11</td><td>6.3h</td><td><span class="pill warn">81%</span></td><td>79%</td></tr>
+          <tr><td><b>Automation</b></td><td>Karthik N.</td><td>9</td><td>7.7h</td><td><span class="pill ok">96%</span></td><td>93%</td></tr>
+          <tr><td><b>Mobile QA</b></td><td>Deepa Iyer</td><td>13</td><td>5.9h</td><td><span class="pill bad">72%</span></td><td>74%</td></tr>
+          <tr><td><b>Bench / Misc</b></td><td>—</td><td>12</td><td>4.1h</td><td><span class="pill neutral">n/a</span></td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="callout amber"><b>Management view = strategic, not tactical.</b> No per-ticket detail — instead utilization, billable hours, project portfolio, team-vs-team and multi-week trends. This is what feeds board reviews and project-costing. Compare with the PM view (tab ④): same data, completely different lens.</div>
+</section>
+
+<!-- ============ S6 OPERATIONS ============ -->
+<section class="screen" id="s5">
+  <div class="screen-head">
+    <span class="screen-tag">ROLE 4 · OPERATIONS</span>
+    <h2>Operations — Weekly Compliance Console</h2>
+    <p>Built around what the ops person actually does: chase the weekly 40-hour fill. Friday 1 PM reminder, Monday 1 PM re-check, drop whoever complied, re-chase the rest — with a full email history page.</p>
+  </div>
+  <div class="scope-bar">
+    <div class="who-role">
+      <div class="scope-ic" style="background:var(--teal-soft);color:var(--teal)">📋</div>
+      <div><div class="role-name">Operations — Hours Compliance</div><div class="role-scope">Week 19 · 16–22 May 2026 · ~60 employees · figures are sample data</div></div>
+    </div>
+    <span class="pill info">⏱ Target: 40h / person / week</span>
+  </div>
+
+  <!-- workflow stepper -->
+  <div class="card" style="margin-bottom:16px;">
+    <div class="card-h"><div class="card-t"><span class="ic">🔄</span> The Weekly Chase — Where We Are Now</div></div>
+    <div class="card-b">
+      <div class="stepper">
+        <div class="step-node"><div class="step-circle" style="background:var(--green);color:white;">✓</div><div class="step-tx"><b>Mon–Thu</b>Employees log daily</div></div>
+        <div class="step-line" style="background:var(--green);"></div>
+        <div class="step-node"><div class="step-circle" style="background:var(--red);color:white;">●</div><div class="step-tx"><b>Fri 1 PM</b>Remind everyone &lt; 40h <span class="pill bad" style="margin-left:4px;">NOW</span></div></div>
+        <div class="step-line"></div>
+        <div class="step-node"><div class="step-circle" style="background:var(--g3);color:var(--g5);">3</div><div class="step-tx"><b>Mon 1 PM</b>Re-check &amp; re-chase</div></div>
+        <div class="step-line"></div>
+        <div class="step-node"><div class="step-circle" style="background:var(--g3);color:var(--g5);">4</div><div class="step-tx"><b>Escalate</b>Still short → notify lead</div></div>
+      </div>
+      <div style="display:flex;gap:9px;flex-wrap:wrap;">
+        <button class="btn btn-primary">📧 Run Friday Check Now (email 15 people)</button>
+        <button class="btn">📧 Run Monday Re-check</button>
+        <button class="btn">⚙ Edit reminder template</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="kpi-row k4">
+    <div class="kpi"><div class="k-top"><div class="k-ic" style="background:var(--blue-soft);color:var(--blue)">👥</div></div><div class="k-val">67</div><div class="k-lbl">Employees Tracked</div></div>
+    <div class="kpi"><div class="k-top"><div class="k-ic" style="background:var(--green-soft);color:var(--green)">✓</div></div><div class="k-val">52</div><div class="k-lbl">Met 40h This Week</div></div>
+    <div class="kpi"><div class="k-top"><div class="k-ic" style="background:var(--red-soft);color:var(--red)">⚠️</div></div><div class="k-val">15</div><div class="k-lbl">Short — Need Reminder</div></div>
+    <div class="kpi"><div class="k-top"><div class="k-ic" style="background:var(--amber-soft);color:var(--amber)">📨</div></div><div class="k-val">31</div><div class="k-lbl">Reminders Sent This Week</div></div>
+  </div>
+
+  <div class="dash-grid">
+    <!-- compliance tracker -->
+    <div class="card">
+      <div class="card-h"><div class="card-t"><span class="ic">📊</span> Week 19 Compliance Tracker</div><span class="muted">15 of 67 short</span></div>
+      <div class="card-b" style="padding:0;">
+        <table class="tbl">
+          <thead><tr><th>Employee</th><th>Team</th><th>Week Hrs</th><th>40h</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr><td><div class="who"><div class="av" style="background:#dc2626">AS</div><span class="nm">Aamir Shaikh</span></div></td><td>SiteOne PIM</td><td><b>22h</b></td><td><span class="hbar"><i class="bar-fill low" style="width:55%"></i></span></td><td><span class="pill bad">Short 18h</span></td><td><button class="btn btn-sm">📧 Remind</button></td></tr>
+            <tr><td><div class="who"><div class="av" style="background:#f59e0b">MK</div><span class="nm">Manoj Kale</span></div></td><td>Mobile QA</td><td><b>28h</b></td><td><span class="hbar"><i class="bar-fill low" style="width:70%"></i></span></td><td><span class="pill bad">Short 12h</span></td><td><button class="btn btn-sm">📧 Remind</button></td></tr>
+            <tr><td><div class="who"><div class="av" style="background:#8b5cf6">RD</div><span class="nm">Rahul Desai</span></div></td><td>SiteOne PIM</td><td><b>34h</b></td><td><span class="hbar"><i class="bar-fill mid" style="width:85%"></i></span></td><td><span class="pill warn">Short 6h</span></td><td><button class="btn btn-sm">📧 Remind</button></td></tr>
+            <tr><td><div class="who"><div class="av" style="background:#0d9488">DI</div><span class="nm">Deepa Iyer</span></div></td><td>Mobile QA</td><td><b>31h</b></td><td><span class="hbar"><i class="bar-fill mid" style="width:78%"></i></span></td><td><span class="pill warn">Short 9h</span></td><td><button class="btn btn-sm">📧 Remind</button></td></tr>
+            <tr><td><div class="who"><div class="av" style="background:#10b981">NT</div><span class="nm">Neha Tiwari</span></div></td><td>SiteOne PIM</td><td><b>40h</b></td><td><span class="hbar"><i class="bar-fill full" style="width:100%"></i></span></td><td><span class="pill ok">Complete</span></td><td><span class="muted">—</span></td></tr>
+            <tr><td><div class="who"><div class="av" style="background:#3b82f6">SN</div><span class="nm">Shabnam Nagar</span></div></td><td>SiteOne PIM</td><td><b>41h</b></td><td><span class="hbar"><i class="bar-fill full" style="width:100%"></i></span></td><td><span class="pill ok">Complete</span></td><td><span class="muted">—</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <!-- reminder queue -->
+    <div class="card">
+      <div class="card-h"><div class="card-t"><span class="ic">📨</span> Reminder Queue</div></div>
+      <div class="card-b">
+        <div style="font-size:10.5px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px;">Friday 1 PM — 15 to remind</div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px;">
+          <div class="ext-log-row" style="font-size:11px;"><span class="tick" style="background:var(--red);">!</span><span class="ds">Aamir Shaikh — short 18h</span></div>
+          <div class="ext-log-row" style="font-size:11px;"><span class="tick" style="background:var(--red);">!</span><span class="ds">Manoj Kale — short 12h</span></div>
+          <div class="ext-log-row" style="font-size:11px;"><span class="tick" style="background:var(--amber);">!</span><span class="ds">Rahul Desai — short 6h</span></div>
+          <div class="ext-log-row" style="font-size:11px;"><span class="tick" style="background:var(--amber);">!</span><span class="ds">Deepa Iyer — short 9h</span></div>
+          <div class="muted" style="padding-left:21px;">+ 11 more…</div>
+        </div>
+        <div style="font-size:10.5px;font-weight:700;color:var(--g5);text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px;">Monday 1 PM — auto re-check</div>
+        <div class="muted" style="line-height:1.5;">On Monday the system re-reads everyone's hours, removes whoever filled up over the weekend, and re-emails only the still-short list. Compliant people are dropped automatically.</div>
+        <button class="btn btn-dark btn-block" style="margin-top:12px;">📧 Send all Friday reminders</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- additional page: reminder history -->
+  <div class="card">
+    <div class="card-h"><div class="card-t"><span class="ic">🗂️</span> Reminder History &amp; Email Log <span class="pill neutral" style="margin-left:6px;">extra page</span></div><button class="btn btn-sm">⬇ Export weekly report</button></div>
+    <div class="card-b" style="padding:0;">
+      <table class="tbl">
+        <thead><tr><th>Sent</th><th>Type</th><th>Recipients</th><th>Trigger</th><th>Result</th></tr></thead>
+        <tbody>
+          <tr><td>Fri 16 May · 13:00</td><td><span class="pill bad">Friday chase</span></td><td>17 employees</td><td>Auto-cron</td><td><span class="pill ok">12 complied by Mon</span></td></tr>
+          <tr><td>Mon 19 May · 13:00</td><td><span class="pill warn">Monday re-check</span></td><td>5 employees</td><td>Auto-cron</td><td><span class="pill ok">4 complied</span></td></tr>
+          <tr><td>Mon 19 May · 13:05</td><td><span class="pill info">Escalation</span></td><td>1 lead (Mobile QA)</td><td>Still short</td><td><span class="pill neutral">Acknowledged</span></td></tr>
+          <tr><td>Fri 09 May · 13:00</td><td><span class="pill bad">Friday chase</span></td><td>21 employees</td><td>Auto-cron</td><td><span class="pill ok">19 complied</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="callout"><b>Operations gets its own workflow, not a generic dashboard.</b> The stepper mirrors the real Friday→Monday chase; the queue shows exactly who to email; the <b>Reminder History page</b> (the extra page you asked for) is the audit trail. In production the Friday/Monday sends run on a cron — the buttons let ops trigger or preview them any time.</div>
+</section>
+
+<!-- ============ S7 ADMIN ============ -->
+<section class="screen" id="s6">
+  <div class="screen-head">
+    <span class="screen-tag">ROLE 5 · ADMIN</span>
+    <h2>Admin Console — System Setup &amp; Control</h2>
+    <p>The role you almost forgot. Admin sets up everything the other four roles depend on: people, roles, project ↔ Jira mapping, the integrations, and global rules.</p>
+  </div>
+  <div class="scope-bar">
+    <div class="who-role">
+      <div class="scope-ic" style="background:var(--ink);color:white;">🛠️</div>
+      <div><div class="role-name">Admin Console</div><div class="role-scope">Iksula · ~60 users · 9 projects · figures are sample data</div></div>
+    </div>
+    <span class="pill neutral">🔐 Full configuration access</span>
+  </div>
+
+  <div class="dash-grid even" style="margin-bottom:15px;">
+    <!-- user management -->
+    <div class="card">
+      <div class="card-h"><div class="card-t"><span class="ic">👤</span> User Management</div><button class="btn btn-sm btn-primary">＋ Add User</button></div>
+      <div class="card-b" style="padding:0;">
+        <table class="tbl">
+          <thead><tr><th>User</th><th>Role</th><th>Team</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td><div class="who"><div class="av" style="background:#10b981">YM</div><span class="nm">Yogesh Mohite</span></div></td><td><span class="pill info">Employee</span></td><td>SiteOne PIM</td><td><span class="pill ok">Active</span></td></tr>
+            <tr><td><div class="who"><div class="av" style="background:#f59e0b">PK</div><span class="nm">Priya Kulkarni</span></div></td><td><span class="pill info">PM / Lead</span></td><td>SiteOne PIM</td><td><span class="pill ok">Active</span></td></tr>
+            <tr><td><div class="who"><div class="av" style="background:#dc2626">RM</div><span class="nm">Ravi Menon</span></div></td><td><span class="pill bad">Management</span></td><td>QA Dept</td><td><span class="pill ok">Active</span></td></tr>
+            <tr><td><div class="who"><div class="av" style="background:#0d9488">OP</div><span class="nm">Omkar Patil</span></div></td><td><span class="pill neutral">Operations</span></td><td>Ops</td><td><span class="pill ok">Active</span></td></tr>
+            <tr><td><div class="who"><div class="av" style="background:#64748b">SK</div><span class="nm">Sneha Kapoor</span></div></td><td><span class="pill info">Employee</span></td><td>Mobile QA</td><td><span class="pill warn">Invited</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <!-- projects & teams -->
+    <div class="card">
+      <div class="card-h"><div class="card-t"><span class="ic">📁</span> Projects ↔ Jira Mapping</div><button class="btn btn-sm">＋ Add Project</button></div>
+      <div class="card-b" style="padding:0;">
+        <table class="tbl">
+          <thead><tr><th>Project</th><th>Jira Key</th><th>Lead</th><th>Members</th></tr></thead>
+          <tbody>
+            <tr><td><b>SiteOne PIMCore</b></td><td><span class="tk-chip">PIM</span></td><td>Priya K.</td><td>18</td></tr>
+            <tr><td><b>Modern Electronics Lego</b></td><td><span class="tk-chip">ML</span></td><td>Vikram R.</td><td>14</td></tr>
+            <tr><td><b>CUMI Pimcore</b></td><td><span class="tk-chip">CUMI</span></td><td>Sana M.</td><td>11</td></tr>
+            <tr><td><b>Internal / Meetings</b></td><td><span class="tk-chip meet">INTERNAL</span></td><td>—</td><td>All</td></tr>
+            <tr><td><b>Bench</b></td><td><span class="tk-chip meet">BENCH</span></td><td>—</td><td>12</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="dash-grid even">
+    <!-- integrations -->
+    <div class="card">
+      <div class="card-h"><div class="card-t"><span class="ic">🔌</span> Integrations</div></div>
+      <div class="card-b">
+        <div class="cfg-row"><div class="conn"><span class="led on"></span><div class="cfg-l"><b>Jira Cloud</b><span>iksula.atlassian.net · worklog API</span></div></div><span class="pill ok">Connected</span></div>
+        <div class="cfg-row"><div class="conn"><span class="led off"></span><div class="cfg-l"><b>Clockwork Lite</b><span>displays Jira worklogs — AutoClock uses no Clockwork API</span></div></div><span class="pill neutral">No API needed</span></div>
+        <div class="cfg-row"><div class="conn"><span class="led on"></span><div class="cfg-l"><b>Google Workspace</b><span>Gmail draft + Sheets append</span></div></div><span class="pill ok">Connected</span></div>
+        <div class="cfg-row"><div class="conn"><span class="led on"></span><div class="cfg-l"><b>Free Parser</b><span>deterministic · no paid AI</span></div></div><span class="pill ok">Built-in</span></div>
+        <div class="cfg-row"><div class="conn"><span class="led off"></span><div class="cfg-l"><b>HrMantra</b><span>leave / attendance sync</span></div></div><span class="pill neutral">Phase 4</span></div>
+      </div>
+    </div>
+    <!-- global settings -->
+    <div class="card">
+      <div class="card-h"><div class="card-t"><span class="ic">⚙️</span> Global Settings</div></div>
+      <div class="card-b">
+        <div class="cfg-row"><div class="cfg-l"><b>Default reminder cadence</b><span>gentle by default · employees can override</span></div><div class="sel-wrap" style="width:130px;"><select class="sel" style="padding:7px 26px 7px 10px;font-size:11.5px;"><option>Every 2 hours</option><option>Every 1 hour</option><option>End of day only</option></select></div></div>
+        <div class="cfg-row"><div class="cfg-l"><b>Weekly hours target</b><span>used by Operations</span></div><input class="input-sm" style="width:80px;padding:7px;" value="40h" /></div>
+        <div class="cfg-row"><div class="cfg-l"><b>Default meeting ticket</b><span>for un-ticketed slots</span></div><input class="input-sm" style="width:130px;padding:7px;font-family:monospace;font-size:11px;" value="INTERNAL-1" /></div>
+        <div class="cfg-row"><div class="cfg-l"><b>Auto-draft EOD email</b><span>to each user's lead</span></div><div class="toggle"></div></div>
+        <div class="cfg-row"><div class="cfg-l"><b>Friday / Monday auto-reminders</b><span>Operations cron</span></div><div class="toggle"></div></div>
+        <div class="cfg-row"><div class="cfg-l"><b>Self-host mode</b><span>keep all data on Iksula infra</span></div><div class="toggle"></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="callout green"><b>Admin is the foundation.</b> Roles, the project ↔ Jira-key mapping (which powers the employee's task dropdown), the integration keys, and global rules all live here. Build a minimal version for the hackathon — even just a seeded users table — and present the full console as the Phase-2 vision.</div>
+</section>
+
+<div class="foot">
+  <b>AutoClock</b> — Design Mockups v2 · 5 roles · Iksula HackFest 2026 · Yogesh Mohite (Sr. QA) &amp; team · <em>"Log it once. We'll handle the rest."</em>
+</div>
+
+<script>
+const TASKS = {
+  'SiteOne PIMCore': ['PIM-3073 — UOM rules test cases','PIM-3162 — Mass update test cases','PIM-2753 — Mass upload','PIM-3201 — SiteOne internal / scrum'],
+  'Modern Electronics Lego': ['ML-1045 — BE Support · giftwrap fix','ML-1044 — Inventory hopping','ML-70 — Backend epic','ML-1010 — App release 05/29'],
+  'CUMI Pimcore Implementation': ['CUMI-410 — Implementation','CUMI-388 — Data migration QA'],
+  'Internal / Meetings': ['INTERNAL-1 — Scrums & stand-ups','INTERNAL-2 — Backlog grooming','INTERNAL-3 — Training / L&D'],
+  'Bench': ['BENCH-1 — Bench time']
+};
+function syncTasks(projId, taskId) {
+  const proj = document.getElementById(projId).value;
+  const sel = document.getElementById(taskId);
+  sel.innerHTML = (TASKS[proj] || []).map(t => `<option>${t}</option>`).join('');
+}
+function show(i, btn) {
+  document.querySelectorAll('.screen').forEach((s,idx) => s.classList.toggle('active', idx===i));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function extTab(which) {
+  var add = which === 'add';
+  document.getElementById('extBodyAdd').style.display = add ? 'block' : 'none';
+  document.getElementById('extBodyToday').style.display = add ? 'none' : 'block';
+  document.getElementById('extTabAdd').classList.toggle('on', add);
+  document.getElementById('extTabToday').classList.toggle('on', !add);
+}
+// init dependent dropdowns
+syncTasks('empProject','empTask');
+syncTasks('extProject','extTask');
+</script>
+
+</body>
+</html>

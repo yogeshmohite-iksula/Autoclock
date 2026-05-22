@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>AutoClock</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header>
+      <h1>AutoClock</h1>
+      <button id="settings-toggle" aria-label="Settings">⚙</button>
+    </header>
+
+    <nav class="tabs" role="tablist">
+      <button id="tab-add" role="tab" aria-selected="true">＋ Add</button>
+      <button id="tab-today" role="tab" aria-selected="false">Today</button>
+    </nav>
+
+    <section id="panel-add" role="tabpanel">
+      <form id="entry-form">
+        <label>Project
+          <select id="project" required></select>
+        </label>
+        <label>Jira task
+          <select id="task" required disabled><option>— pick a project first —</option></select>
+        </label>
+        <label>Duration (e.g. 30m, 1h 30m)
+          <input id="duration_raw" required />
+        </label>
+        <div class="row">
+          <label>Start
+            <input id="slot_start" placeholder="HH:MM" pattern="\d{2}:\d{2}" required />
+          </label>
+          <label>End
+            <input id="slot_end" placeholder="HH:MM" pattern="\d{2}:\d{2}" required />
+          </label>
+        </div>
+        <label>What you did
+          <input id="description" required />
+        </label>
+        <button type="submit" class="primary">Save</button>
+        <p id="error" class="error" hidden></p>
+      </form>
+    </section>
+
+    <section id="panel-today" role="tabpanel" hidden>
+      <ul id="today-list"></ul>
+      <button id="close-day" class="primary">Close My Day</button>
+    </section>
+
+    <section id="panel-settings" hidden>
+      <label>Reminder cadence (minutes)
+        <input id="cadence" type="number" min="15" max="480" />
+      </label>
+      <button id="cadence-save">Save</button>
+    </section>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
