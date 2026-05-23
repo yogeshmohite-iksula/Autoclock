@@ -36,7 +36,7 @@ function seedIfEmpty() {
     // ── Users — 10 across all 5 roles, 2 teams (ERD §5.2 + plan) ───────────
     const insUser = db.prepare(`
       INSERT INTO users (name, email, role, team_id, onboarding_status, is_active)
-      VALUES (?, ?, ?, ?, 'active', 1)
+      VALUES (?, ?, ?, ?, 'connected', 1)
     `);
     // team 1 — SiteOne QA
     insUser.run('Yogesh Mohite',  'yogesh@iksula.com',  'employee',    1);
