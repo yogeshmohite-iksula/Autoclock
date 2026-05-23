@@ -36,10 +36,10 @@ function seedIfEmpty() {
     // ── Users — 10 across all 5 roles, 2 teams (ERD §5.2 + plan) ───────────
     const insUser = db.prepare(`
       INSERT INTO users (name, email, role, team_id, onboarding_status, is_active)
-      VALUES (?, ?, ?, ?, 'active', 1)
+      VALUES (?, ?, ?, ?, 'connected', 1)
     `);
     // team 1 — SiteOne QA
-    insUser.run('Yogesh Mohite',  'yogesh@iksula.com',  'employee',    1);
+    insUser.run('Yogesh Mohite',  'yogesh.mohite@iksula.com',  'employee',    1);
     insUser.run('Keval Parikh',   'keval@iksula.com',   'employee',    1);
     insUser.run('Anjali Nair',    'anjali@iksula.com',  'employee',    1);
     insUser.run('Priya Kulkarni', 'priya@iksula.com',   'pm_lead',     1);
@@ -106,7 +106,7 @@ function seedIfEmpty() {
     `);
 
     // Yogesh — 3 entries (Close My Day demo data)
-    const yogeshId = userId('yogesh@iksula.com');
+    const yogeshId = userId('yogesh.mohite@iksula.com');
     insEntry.run(yogeshId, projId('PIM'), taskId('PIM-3073'), 'UOM rules — test cases written and reviewed', 90,  '09:00', '10:30', today);
     insEntry.run(yogeshId, projId('PIM'), taskId('PIM-3162'), 'Product attributes validation — edge cases',  60,  '10:30', '11:30', today);
     insEntry.run(yogeshId, projId('INTERNAL'), taskId('INTERNAL-1'), 'Daily Scrum',                         30,  '11:30', '12:00', today);

@@ -3,7 +3,7 @@
 
 const express = require('express');
 const Q = require('../db/queries');
-const { setSession, clearSession } = require('../auth/session');
+const { setSession, clearSession, requireSession } = require('../auth/session');
 const jiraOAuth = require('../auth/jiraOAuth');
 const googleOAuth = require('../auth/googleOAuth');
 
@@ -30,6 +30,21 @@ router.get('/me', (req, res) => {
 router.post('/logout', (_req, res) => {
   clearSession(res);
   res.json({ ok: true });
+});
+
+// GET /api/auth/connections — onboarding page polls this to know which providers are linked.
+// Returns { jira: 'idle'|'connected'|'expired', google: 'idle'|'connected'|'expired' }.
+router.get('/connections', requireSession, (req, res) => {
+  const jiraConn   = Q.getConnection(req.user.id, 'jira');
+  const googleConn = Q.getConnection(req.user.id, 'google');
+
+  function status(conn) {
+    if (!conn) return 'idle';
+    if (conn.expires_at && new Date(conn.expires_at) < new Date()) return 'expired';
+    return 'connected';
+  }
+
+  res.json({ jira: status(jiraConn), google: status(googleConn) });
 });
 
 // EP-02 GET /api/auth/jira/connect — M1

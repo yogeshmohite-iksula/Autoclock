@@ -15,7 +15,7 @@ import Logomark from '../components/Logomark';
 
 import '../styles/sign-in.css';
 
-const DEMO_EMAIL = 'yogesh@iksula.com';  // mock-only — real prod uses Google OIDC redirect
+const DEMO_EMAIL = 'yogesh.mohite@iksula.com';  // mock-only — real prod uses Google OIDC redirect
 
 export default function SignInPage() {
   const navigate = useNavigate();
