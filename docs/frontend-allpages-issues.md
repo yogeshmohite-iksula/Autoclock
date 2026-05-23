@@ -17,6 +17,18 @@ Format: one entry per issue, newest at the top.
 
 ---
 
+## 2026-05-23 — P15 Project Mapping — no PUT for projects yet (mock + ERD)
+- **Where:**  web/src/api/admin.js (`projects.update`), web/src/api/mocks.js (no `PUT /api/admin/projects/:id`), web/src/pages/ProjectMappingPage.jsx (`handleEdit`).
+- **What:**   `MappingFormModal` supports Edit mode and the page wires a `handleEdit` flow, but the mock catalogue only ships POST + the `/test` sub-EP. Frontend issues a best-effort PUT (swallowed if 404) and applies an optimistic in-memory update so UX testing of the Edit form is unblocked.
+- **Impact:** data-shape mismatch — edits are not persisted server-side. Refreshing the page returns the original payload from the GET mock.
+- **Next:**   Keval / backend swimlane — add `PUT /api/admin/projects/:id` server-side (and the matching mock row). Frontend already calls `api.admin.projects.update(id, payload)` so the swap is one-line on this end.
+
+## 2026-05-23 — P15 Project Mapping — Test endpoint never exercises real Jira (OQ-AP-12)
+- **Where:**  web/src/components/admin/TestConnectionButton.jsx; mock route `POST /api/admin/projects/test`.
+- **What:**   The "Test connection" button posts to `/api/admin/projects/test`; the mock returns `{ ok: !!body.jiraKey, message: … }` regardless of whether the key actually exists in Jira. Real implementation needs to issue a `GET /rest/api/3/project/{key}` against the saved Jira credential and gracefully return `ok:false` on 401/403/404.
+- **Impact:** UX-only — the button feels real but never hits Jira. Admins cannot use it to diagnose a bad key today.
+- **Next:**   Keval / backend swimlane — wire EP-20 test sub-EP to `services/jira.js` with admin-scoped auth. Confirm scope: should it use the admin's per-user token or a shared reader account?
+
 ## 2026-05-23 — P14 Users and Roles — "Edit user" dialog deferred
 - **Where:**  web/src/pages/UsersRolesPage.jsx (`handleEdit`).
 - **What:**   `UserTableRow` exposes an "Edit" button per row but the page-level handler currently `window.alert`s "not implemented yet". The full edit modal (re-using `InviteUserModal` shape — name + email + role + team + status select) needs a P14 follow-up.

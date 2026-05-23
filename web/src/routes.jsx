@@ -19,6 +19,7 @@ import ComplianceConsolePage from './pages/ComplianceConsolePage';
 import ReminderHistoryPage from './pages/ReminderHistoryPage';
 import LeaveCalendarPage from './pages/LeaveCalendarPage';
 import UsersRolesPage from './pages/UsersRolesPage';
+import ProjectMappingPage from './pages/ProjectMappingPage';
 
 // Legacy stubs (kept so /log, /preview, /dashboard work for Yogesh / Keval / Ali).
 import App from './App';
@@ -170,6 +171,18 @@ export default function AppRoutes() {
             <RequireOnboarded>
               <RequireRole roles={['admin']}>
                 <UsersRolesPage />
+              </RequireRole>
+            </RequireOnboarded>
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/admin/projects"
+        element={
+          <RequireAuth>
+            <RequireOnboarded>
+              <RequireRole roles={['admin']}>
+                <ProjectMappingPage />
               </RequireRole>
             </RequireOnboarded>
           </RequireAuth>

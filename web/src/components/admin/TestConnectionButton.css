@@ -1,0 +1,97 @@
+/* TestConnectionButton.css — global. The button is a small inline pill with
+   a glyph indicator that swaps colour per state. */
+
+.ac-testconn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.ac-testconn__btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 11px;
+  border-radius: 8px;
+  border: 1px solid var(--ac-border);
+  background: var(--ac-bg-elev, #fff);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ac-text, #0f172a);
+  cursor: pointer;
+}
+.ac-testconn__btn:hover:not(:disabled) {
+  background: var(--ac-bg-tint, #f4f6fa);
+}
+.ac-testconn__btn:disabled {
+  opacity: 0.65;
+  cursor: progress;
+}
+.ac-testconn__btn:focus-visible {
+  outline: 2px solid var(--ac-accent, #2563eb);
+  outline-offset: 1px;
+}
+
+.ac-testconn__btn-label {
+  white-space: nowrap;
+}
+
+.ac-testconn__pip {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(148, 163, 184, 0.18);
+  color: #475569;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  flex: 0 0 18px;
+}
+
+.ac-testconn__pip-glyph.is-spin {
+  display: inline-block;
+  animation: ac-testconn-spin 1.05s linear infinite;
+}
+
+@keyframes ac-testconn-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* State tones */
+.ac-testconn.is-idle .ac-testconn__pip {
+  background: rgba(148, 163, 184, 0.18);
+  color: #475569;
+}
+.ac-testconn.is-testing .ac-testconn__pip {
+  background: rgba(37, 99, 235, 0.14);
+  color: #1D4ED8;
+}
+.ac-testconn.is-ok .ac-testconn__pip {
+  background: rgba(22, 163, 74, 0.16);
+  color: #15803D;
+}
+.ac-testconn.is-fail .ac-testconn__pip {
+  background: rgba(220, 38, 38, 0.14);
+  color: #B91C1C;
+}
+
+/* The visually-hidden helper is in global.css already; defined here as a
+   guard so the announcement region is always screen-reader-only. */
+.ac-testconn .visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}

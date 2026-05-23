@@ -629,6 +629,84 @@ test.describe('P14 Users and Roles — invite a new user flow', () => {
   }
 });
 
+// ===========================================================================
+// P15 — Project Mapping (/admin/projects)
+// EP-20 (mocked). Role-gated to admin. The mock viewer is MOCK_USER.role='admin'
+// so the route is reachable. H1 matches "Project ↔ Jira Mapping" (relaxed to
+// /Project.*Mapping/i). Primary action is the always-visible "Add mapping" CTA.
+// ===========================================================================
+registerPageGate({
+  id: 'project-mapping',
+  title: 'P15 Project Mapping',
+  path: '/admin/projects',
+  heading: /Project.*Mapping/i,
+  primary: /Add mapping/i,
+});
+
+// Bespoke test — at desktop & mobile viewports, click "Add mapping", fill in
+// name + Jira key + description, click "Test connection" → assert the live
+// state transitions to testing → ok (the mock returns ok:true for any truthy
+// jiraKey). Then click Save → assert the modal closes and the new project
+// appears in the list (count goes up by 1).
+test.describe('P15 Project Mapping — add mapping flow w/ Test connection', () => {
+  for (const vp of VIEWPORTS) {
+    test(`viewport @ ${vp.name} (${vp.width}×${vp.height}) › add → test → save → mapping added`, async ({ page }) => {
+      const errors = trackErrors(page);
+      await page.setViewportSize({ width: vp.width, height: vp.height });
+      await gotoAuthed(page, '/admin/projects');
+      await page.waitForLoadState('networkidle');
+
+      // Capture the current row count.
+      const rows = page.locator('.page-mapping .ac-mapping-row');
+      const startCount = await rows.count();
+      expect(startCount).toBeGreaterThan(0);
+
+      // Click "Add mapping" — modal appears.
+      const addBtn = page.getByRole('button', { name: /^Add mapping$/i });
+      await expect(addBtn).toBeVisible();
+      await addBtn.click();
+      const dialog = page.getByRole('dialog');
+      await expect(dialog).toBeVisible();
+      await expect(dialog).toHaveAttribute('aria-modal', 'true');
+      await expect(dialog.getByRole('heading', { name: /^Add mapping$/i })).toBeVisible();
+
+      // Fill in the form.
+      await dialog.getByLabel('Project name').fill('Acme Storefront');
+      await dialog.getByLabel(/Jira project key/i).fill('ACME');
+      await dialog.getByLabel('Description').fill('Storefront + checkout');
+
+      // Click "Test connection" inside the modal — the live state transitions
+      // to "testing" then to "ok". The button's accessible name is built from
+      // its label + " Jira connection for <KEY>" (see TestConnectionButton.jsx).
+      const testBtn = dialog.getByRole('button', { name: /Jira connection for ACME/i });
+      await expect(testBtn).toBeVisible();
+      await testBtn.click();
+
+      // The button enters the testing state (the wrapper gets `is-testing`).
+      // We assert the OK state after the mock resolves — the mock returns
+      // ok:true for any truthy jiraKey.
+      const wrapper = dialog.locator('.ac-testconn');
+      await expect(wrapper).toHaveClass(/is-ok/, { timeout: 6_000 });
+
+      // Submit.
+      await dialog.getByRole('button', { name: /^Add mapping$/i }).last().click();
+
+      // Modal closes.
+      await expect(page.getByRole('dialog')).toHaveCount(0, { timeout: 6_000 });
+
+      // Row count goes up by 1 and the new project is in the list.
+      await expect(rows).toHaveCount(startCount + 1);
+      await expect(
+        page.locator('.page-mapping .ac-mapping-row__name', { hasText: 'Acme Storefront' }).first()
+      ).toBeVisible();
+
+      await assertNoHorizontalOverflow(page);
+      await screenshot(page, `project-mapping-add--${vp.name}`);
+      expect(errors, `console errors:\n${errors.join('\n')}`).toEqual([]);
+    });
+  }
+});
+
 // Bespoke test — full flow: sign-in → onboarding → Close My Day → confirm →
 // Sync Result. Asserts the "Your day is synced." hero is visible at both
 // viewports (mock EP-13 returns overall:'ok'). No overlap / no overflow /

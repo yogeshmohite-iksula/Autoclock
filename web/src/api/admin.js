@@ -34,6 +34,12 @@ export const adminApi = {
     create(payload) {
       return request('/api/admin/projects', { method: 'POST', body: payload });
     },
+    /** PUT /api/admin/projects/:id { name?, jiraKey?, kind?, desc? }
+     * NOTE: mock catalogue does not yet ship a PUT for projects — frontend
+     * falls back to an optimistic in-memory update (see P15 issues log). */
+    update(id, payload) {
+      return request(`/api/admin/projects/${encodeURIComponent(id)}`, { method: 'PUT', body: payload });
+    },
     /** POST /api/admin/projects/test { jiraKey } — OQ-AP-12. */
     test({ jiraKey } = {}) {
       return request('/api/admin/projects/test', { method: 'POST', body: { jiraKey } });
