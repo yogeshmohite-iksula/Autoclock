@@ -17,6 +17,24 @@ Format: one entry per issue, newest at the top.
 
 ---
 
+## 2026-05-23 — P14 Users and Roles — "Edit user" dialog deferred
+- **Where:**  web/src/pages/UsersRolesPage.jsx (`handleEdit`).
+- **What:**   `UserTableRow` exposes an "Edit" button per row but the page-level handler currently `window.alert`s "not implemented yet". The full edit modal (re-using `InviteUserModal` shape — name + email + role + team + status select) needs a P14 follow-up.
+- **Impact:** UX gap — viewing a user's row is fine, but admin cannot change role/team without a backend round-trip via the API directly.
+- **Next:**   me (P14 polish) — add `EditUserModal` re-using `InviteUserModal` styles. Wire to `api.admin.users.update(id, payload)`.
+
+## 2026-05-23 — P14 Users and Roles — server-side filter args ignored (M0)
+- **Where:**  web/src/pages/UsersRolesPage.jsx (initial fetch + filtering).
+- **What:**   `api.admin.users.list({ filter, status })` supports server-side filter args, but for M0 the page calls `api.admin.users.list()` once with no args and does the filtering client-side. This is fine while the mock returns all 8 seeded users, but won't scale past ~200.
+- **Impact:** scaling — pilot has 60 users so this is non-blocking. Backend should still implement the `filter` + `status` query args to match the ERD shape.
+- **Next:**   Keval / backend swimlane — implement `GET /api/admin/users?filter=&status=` server-side. Frontend then switches to refetching on filter change.
+
+## 2026-05-23 — P14 Users and Roles — Audit tab is a stub (OQ-AP-15)
+- **Where:**  web/src/pages/UsersRolesPage.jsx (`audit-stub` section).
+- **What:**   AdminTabs has an "Audit" entry that deep-links to `/admin/users?subtab=audit`. The page renders a "Coming soon" stub there. ERD has TB-12 `audit_log` but no EP exposes it.
+- **Impact:** OQ deferred — admin can't view the audit trail in the UI yet.
+- **Next:**   Yogesh / Keval — confirm OQ-AP-15 decision; if we want the tab, define `GET /api/admin/audit?from=&to=` returning TB-12 rows.
+
 ## 2026-05-23 — P13 Leave Calendar — holidays endpoint not separated (OQ-AP-11)
 - **Where:**  web/src/api/leave.js; web/src/api/mocks.js (`__buildLeave`).
 - **What:**   `GET /api/leave?month=YYYY-MM` returns `{ holidays, leave, summary }` in one shot. Real ERD says holidays are global (TB-11 `settings`), but per OQ-AP-11 we ship them in the same payload to avoid a sister endpoint for M0. The frontend treats them as month-scoped.
