@@ -1,0 +1,252 @@
+/* UserTableRow.css — global. Desktop: 7-col grid. Mobile: vertical card. */
+
+.ac-user-row {
+  display: grid;
+  grid-template-columns:
+    minmax(220px, 1.6fr)   /* person */
+    minmax(120px, 0.8fr)   /* role */
+    minmax(120px, 0.9fr)   /* team */
+    minmax(96px,  0.5fr)   /* conn */
+    minmax(96px,  0.7fr)   /* status */
+    minmax(110px, 0.7fr)   /* last-seen */
+    minmax(140px, 0.8fr);  /* actions */
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  background: var(--ac-bg-elev, #fff);
+  border: 1px solid var(--ac-border);
+  border-radius: 12px;
+  margin-bottom: 8px;
+}
+
+.ac-user-row.is-disabled {
+  background: rgba(148, 163, 184, 0.06);
+}
+
+.ac-user-row.is-disabled .ac-user-row__name,
+.ac-user-row.is-disabled .ac-user-row__email {
+  color: var(--ac-text-muted, #475569);
+}
+
+/* Person — avatar + name + email */
+.ac-user-row__person {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.ac-user-row__avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  flex: 0 0 36px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ac-user-row__id {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.ac-user-row__name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ac-text, #0f172a);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ac-user-row__me-tag {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--ac-accent, #2563eb);
+  color: #fff;
+}
+
+.ac-user-row__email {
+  font-size: 12.5px;
+  color: var(--ac-text-muted, #64748b);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ac-user-row__team {
+  font-size: 13px;
+  color: var(--ac-text, #0f172a);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ac-user-row__conn,
+.ac-user-row__role,
+.ac-user-row__status {
+  display: flex;
+  align-items: center;
+}
+
+.ac-user-row__last-seen {
+  font-size: 12.5px;
+  color: var(--ac-text-muted, #64748b);
+  white-space: nowrap;
+}
+
+.ac-user-row__status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  border: 1px solid transparent;
+}
+
+.ac-user-row__status-icon {
+  font-size: 9px;
+  line-height: 1;
+}
+
+.ac-user-row__status-pill--ok {
+  background: rgba(22, 163, 74, 0.12);
+  color: #15803D;
+  border-color: rgba(22, 163, 74, 0.25);
+}
+
+.ac-user-row__status-pill--warn {
+  background: rgba(245, 158, 11, 0.14);
+  color: #B45309;
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.ac-user-row__status-pill--bad {
+  background: rgba(148, 163, 184, 0.18);
+  color: #475569;
+  border-color: rgba(148, 163, 184, 0.4);
+}
+
+.ac-user-row__status-pill--info {
+  background: rgba(37, 99, 235, 0.10);
+  color: #1D4ED8;
+  border-color: rgba(37, 99, 235, 0.25);
+}
+
+/* Actions */
+.ac-user-row__actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.ac-user-row__btn {
+  appearance: none;
+  border: 1px solid var(--ac-border);
+  background: var(--ac-bg-elev, #fff);
+  padding: 6px 11px;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ac-text, #0f172a);
+  cursor: pointer;
+}
+
+.ac-user-row__btn:hover:not(:disabled) {
+  background: var(--ac-bg-tint, #f4f5f7);
+}
+
+.ac-user-row__btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.ac-user-row__btn:focus-visible {
+  outline: 2px solid var(--ac-accent, #2563eb);
+  outline-offset: 1px;
+}
+
+/* Mobile — vertical card. Stacks into 4 logical rows (per the brief):
+   row 1: avatar + name (email under name)
+   row 2: role + team   (paired horizontally, separated by middot)
+   row 3: conn + status + last-seen
+   row 4: actions (full-width, justified right)
+   Implementation: switch to flex column, then re-flow individual cells using
+   inline-flex + margin where needed. Order set via `order:` to keep JSX simple. */
+@media (max-width: 860px) {
+  .ac-user-row {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 14px;
+  }
+  .ac-user-row__person {
+    order: 1;
+  }
+  .ac-user-row__role {
+    order: 2;
+    display: inline-flex;
+    align-items: center;
+  }
+  .ac-user-row__team {
+    order: 3;
+    font-size: 13px;
+    color: var(--ac-text-muted, #64748b);
+    margin-top: -8px;
+    padding-left: 2px;
+  }
+  .ac-user-row__team::before {
+    content: "Team · ";
+    color: var(--ac-text-muted, #64748b);
+    font-weight: 600;
+  }
+  .ac-user-row__conn {
+    order: 4;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .ac-user-row__status {
+    order: 5;
+    display: inline-flex;
+    align-items: center;
+    margin-top: -8px;
+  }
+  .ac-user-row__last-seen {
+    order: 6;
+    font-size: 12.5px;
+    margin-top: -2px;
+  }
+  .ac-user-row__last-seen::before {
+    content: "Joined · ";
+    color: var(--ac-text-muted, #64748b);
+    font-weight: 600;
+  }
+  .ac-user-row__actions {
+    order: 7;
+    justify-content: flex-end;
+    margin-top: 4px;
+  }
+  .ac-user-row__btn {
+    flex: 1;
+    text-align: center;
+    max-width: 140px;
+  }
+}

@@ -563,6 +563,72 @@ test.describe('P13 Leave Calendar — modal + view toggle', () => {
   }
 });
 
+// ===========================================================================
+// P14 — Users and Roles (/admin/users)
+// EP-19 (mocked). Role-gated to admin. The mock viewer is MOCK_USER.role='admin'
+// so the route is reachable. H1 matches "Users & Roles" (matches /Users.*Roles/i).
+// Primary action is the always-visible "Invite a new user" CTA in the page-head.
+// ===========================================================================
+registerPageGate({
+  id: 'users-roles',
+  title: 'P14 Users and Roles',
+  path: '/admin/users',
+  heading: /Users.*Roles/i,
+  primary: /Invite/i,
+});
+
+// Bespoke test — at desktop & mobile viewports, click "Invite a new user",
+// fill the form (name + email + role + team), click "Send invite", assert the
+// modal closes and the new user appears at the top of the list (count goes up
+// by 1).
+test.describe('P14 Users and Roles — invite a new user flow', () => {
+  for (const vp of VIEWPORTS) {
+    test(`viewport @ ${vp.name} (${vp.width}×${vp.height}) › invite → modal closes → user added`, async ({ page }) => {
+      const errors = trackErrors(page);
+      await page.setViewportSize({ width: vp.width, height: vp.height });
+      await gotoAuthed(page, '/admin/users');
+      await page.waitForLoadState('networkidle');
+
+      // Capture the current row count.
+      const rows = page.locator('.page-users .ac-user-row');
+      const startCount = await rows.count();
+      expect(startCount).toBeGreaterThan(0);
+
+      // Click "Invite a new user" — modal appears.
+      const inviteBtn = page.getByRole('button', { name: /Invite a new user/i });
+      await expect(inviteBtn).toBeVisible();
+      await inviteBtn.click();
+      const dialog = page.getByRole('dialog');
+      await expect(dialog).toBeVisible();
+      await expect(dialog).toHaveAttribute('aria-modal', 'true');
+      await expect(dialog.getByRole('heading', { name: /Invite a new user/i })).toBeVisible();
+
+      // Fill in the form.
+      await dialog.getByLabel('Full name').fill('Test Newuser');
+      await dialog.getByLabel(/Iksula email/i).fill('test.newuser@iksula.com');
+      // Select the "PM Lead" role radio.
+      await dialog.getByRole('radio', { name: 'PM Lead' }).check();
+      // Pick a team via the select.
+      const teamSelect = dialog.getByLabel('Team');
+      await teamSelect.selectOption({ label: 'Modern Electronics' });
+
+      // Submit.
+      await dialog.getByRole('button', { name: /Send invite/i }).click();
+
+      // Modal closes.
+      await expect(page.getByRole('dialog')).toHaveCount(0, { timeout: 6_000 });
+
+      // Row count goes up by 1 and the new user is in the list.
+      await expect(rows).toHaveCount(startCount + 1);
+      await expect(page.locator('.page-users .ac-user-row__name', { hasText: 'Test Newuser' }).first()).toBeVisible();
+
+      await assertNoHorizontalOverflow(page);
+      await screenshot(page, `users-roles-invite--${vp.name}`);
+      expect(errors, `console errors:\n${errors.join('\n')}`).toEqual([]);
+    });
+  }
+});
+
 // Bespoke test — full flow: sign-in → onboarding → Close My Day → confirm →
 // Sync Result. Asserts the "Your day is synced." hero is visible at both
 // viewports (mock EP-13 returns overall:'ok'). No overlap / no overflow /

@@ -1,0 +1,33 @@
+/* ConnectionDotsInline.css — global. Two-dot pill for Jira/Google health. */
+
+.ac-conn-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px;
+  border-radius: 999px;
+  background: var(--ac-bg-tint, #f4f5f7);
+  border: 1px solid var(--ac-border);
+}
+
+.ac-conn-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  color: #fff;
+  position: relative;
+}
+
+.ac-conn-dot__letter {
+  line-height: 1;
+}
+
+.ac-conn-dot--ok      { background: #16A34A; }
+.ac-conn-dot--miss    { background: #94A3B8; }
+.ac-conn-dot--warn    { background: #F59E0B; }
+.ac-conn-dot--unknown { background: #CBD5E1; color: #475569; }

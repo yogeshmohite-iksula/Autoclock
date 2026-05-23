@@ -1,0 +1,264 @@
+/* users-roles.css — body-class scoped (`.page-users`). Every selector below
+   starts with `.page-users` so the design's unprefixed class names (`.row`,
+   `.stat`, `.modal-head`, `.actions`, `.dot`) never clash with sibling pages.
+   Source: docs/FrontEnd Design /Users and Roles.html (P14). */
+
+/* ============ PAGE-HEAD ============ */
+.page-users .page-head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  margin-bottom: 14px;
+  align-items: end;
+}
+
+.page-users .page-head__left { min-width: 0; }
+.page-users .page-head h1 {
+  font-size: 28px;
+  font-weight: var(--ac-weight-black, 900);
+  letter-spacing: -0.025em;
+  line-height: 1.12;
+  color: var(--ac-text);
+  margin: 0;
+}
+.page-users .page-head__sub {
+  margin-top: 6px;
+  color: var(--ac-text-muted);
+  font-size: 13.5px;
+  line-height: 1.5;
+  max-width: 60ch;
+}
+.page-users .page-head__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.page-users .page-head__badge {
+  font-family: var(--ac-font-mono, ui-monospace, monospace);
+  font-size: 11px;
+  color: var(--ac-text-muted);
+  background: var(--ac-bg-tint, #f4f6fa);
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--ac-border);
+}
+.page-users .page-head__badge b { color: var(--ac-text); margin-right: 4px; }
+
+.page-users .page-head__sub-tabs {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  background: var(--ac-bg-tint, #f4f6fa);
+  border: 1px solid var(--ac-border);
+  border-radius: 999px;
+}
+.page-users .page-head__sub-tab {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ac-text-muted, #64748b);
+  cursor: pointer;
+}
+.page-users .page-head__sub-tab:hover { color: var(--ac-text); }
+.page-users .page-head__sub-tab.is-active,
+.page-users .page-head__sub-tab[aria-selected="true"] {
+  background: var(--ac-bg-elev, #fff);
+  color: var(--ac-text);
+  box-shadow: 0 1px 2px rgba(15,23,42,0.06);
+}
+.page-users .page-head__sub-tab:focus-visible {
+  outline: 2px solid var(--ac-accent, #2563eb);
+  outline-offset: 2px;
+}
+
+.page-users .page-head__right {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.page-users .page-head__primary {
+  appearance: none;
+  border: 0;
+  background: var(--ac-accent, #2563eb);
+  color: #fff;
+  padding: 9px 16px;
+  border-radius: 9px;
+  font-weight: 700;
+  font-size: 13.5px;
+  cursor: pointer;
+}
+.page-users .page-head__primary:hover { filter: brightness(1.05); }
+.page-users .page-head__primary:focus-visible {
+  outline: 2px solid var(--ac-accent, #2563eb);
+  outline-offset: 2px;
+}
+
+/* ============ ERROR + LOADING ============ */
+.page-users .error {
+  background: rgba(220, 38, 38, 0.08);
+  border: 1px solid rgba(220, 38, 38, 0.4);
+  color: var(--ac-danger, #b91c1c);
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+.page-users .loading {
+  color: var(--ac-text-muted, #64748b);
+  padding: 22px 0;
+  font-size: 14px;
+  text-align: center;
+}
+.page-users .empty {
+  color: var(--ac-text-muted, #64748b);
+  padding: 22px 14px;
+  border: 1px dashed var(--ac-border);
+  border-radius: 12px;
+  text-align: center;
+  font-size: 14px;
+}
+
+/* ============ KPI ROW ============ */
+.page-users .users-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+/* ============ FILTER ROW ============ */
+.page-users .users-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+/* ============ USER LIST ============ */
+.page-users .users-list {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============ ROLES OVERVIEW SUBTAB ============ */
+.page-users .roles-overview {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.page-users .role-card {
+  background: var(--ac-bg-elev, #fff);
+  border: 1px solid var(--ac-border);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+.page-users .role-card[data-role="admin"]      { border-left: 4px solid #8B5CF6; }
+.page-users .role-card[data-role="management"] { border-left: 4px solid #DC2626; }
+.page-users .role-card[data-role="operations"] { border-left: 4px solid #0EA5E9; }
+.page-users .role-card[data-role="pm_lead"]    { border-left: 4px solid #10B981; }
+.page-users .role-card[data-role="employee"]   { border-left: 4px solid #64748B; }
+
+.page-users .role-card__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.page-users .role-card h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ac-text);
+}
+.page-users .role-card__count {
+  font-family: var(--ac-font-mono, ui-monospace, monospace);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ac-text-muted, #64748b);
+}
+.page-users .role-card p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ac-text-muted, #64748b);
+  line-height: 1.45;
+}
+
+/* ============ AUDIT STUB ============ */
+.page-users .audit-stub {
+  background: var(--ac-bg-elev, #fff);
+  border: 1px solid var(--ac-border);
+  border-radius: 14px;
+  padding: 36px;
+  text-align: center;
+  max-width: 640px;
+  margin: 8px auto 0;
+}
+.page-users .audit-stub__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--ac-bg-tint, #f4f6fa);
+  color: var(--ac-text-muted, #64748b);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: 14px;
+}
+.page-users .audit-stub h2 {
+  margin: 0 0 6px;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--ac-text);
+}
+.page-users .audit-stub p {
+  margin: 0 auto;
+  max-width: 50ch;
+  font-size: 13.5px;
+  color: var(--ac-text-muted, #64748b);
+  line-height: 1.6;
+}
+.page-users .audit-stub code {
+  font-family: var(--ac-font-mono, ui-monospace, monospace);
+  background: var(--ac-bg-tint, #f4f6fa);
+  border: 1px solid var(--ac-border);
+  border-radius: 6px;
+  padding: 1px 6px;
+  font-size: 12px;
+  color: var(--ac-text);
+}
+
+/* ============ MOBILE ============ */
+@media (max-width: 860px) {
+  .page-users .page-head {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+  .page-users .page-head__right {
+    justify-content: flex-start;
+  }
+  .page-users .page-head__primary {
+    width: 100%;
+  }
+  .page-users .users-kpis {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-users .page-head h1 {
+    font-size: 24px;
+  }
+}
