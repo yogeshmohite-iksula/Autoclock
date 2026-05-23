@@ -707,6 +707,79 @@ test.describe('P15 Project Mapping — add mapping flow w/ Test connection', () 
   }
 });
 
+// ===========================================================================
+// P16 — Integrations (/admin/integrations) — LAST PAGE
+// EP-22 (section-scoped, OQ-AP-13). Role-gated to admin. The mock viewer is
+// MOCK_USER.role='admin' so the route is reachable. H1 matches "Integrations"
+// (anchored under `<h1>Integrations & Settings`). Primary action target: the
+// first card's <h2>Jira</h2> heading — always present.
+// ===========================================================================
+registerPageGate({
+  id: 'integrations',
+  title: 'P16 Integrations',
+  path: '/admin/integrations',
+  heading: /Integrations/i,
+  // Each card ships a section-scoped "Save section" button (disabled until
+  // edits land). The button is always rendered, so it's a stable target —
+  // unlike the H2 card titles which aren't buttons/links/tabs.
+  primary: /^Save section$/,
+});
+
+// Bespoke test — at desktop & mobile viewports, edit the Jira workspaceUrl
+// input → the Jira card's SaveBar transitions to "Unsaved changes" while the
+// Google card's SaveBar stays "All saved" (section-scoped dirty per OQ-AP-13).
+// Click the Jira Save button → its SaveBar returns to "All saved" and the
+// Google card remains untouched.
+test.describe('P16 Integrations — per-card save independence', () => {
+  for (const vp of VIEWPORTS) {
+    test(`viewport @ ${vp.name} (${vp.width}×${vp.height}) › edit Jira → Jira dirty, Google stays clean → save Jira → All saved`, async ({ page }) => {
+      const errors = trackErrors(page);
+      await page.setViewportSize({ width: vp.width, height: vp.height });
+      await gotoAuthed(page, '/admin/integrations');
+      await page.waitForLoadState('networkidle');
+
+      // Cards arrive in order: Jira, Google, Email, Reader. Grab the first
+      // two save bars (Jira + Google) — both start in the "All saved" state.
+      const cards = page.locator('.page-integrations .ac-int-card');
+      await expect(cards).toHaveCount(4);
+
+      const jiraCard   = cards.nth(0);
+      const googleCard = cards.nth(1);
+
+      const jiraStatus   = jiraCard.locator('.ac-save-bar__status');
+      const googleStatus = googleCard.locator('.ac-save-bar__status');
+
+      await expect(jiraStatus).toContainText(/All saved/i);
+      await expect(googleStatus).toContainText(/All saved/i);
+
+      // Edit the Jira workspace URL input — appending a character is enough
+      // to flip the dirty derivation.
+      const jiraInput = page.locator('#jira-workspace-url');
+      await jiraInput.scrollIntoViewIfNeeded();
+      await jiraInput.focus();
+      await jiraInput.fill('https://iksula.atlassian.net/edited');
+
+      // Jira card flips to "Unsaved changes"; Google card stays "All saved".
+      await expect(jiraStatus).toContainText(/Unsaved changes/i);
+      await expect(googleStatus).toContainText(/All saved/i);
+
+      // Click the Jira card's Save button. There are multiple "Save section"
+      // buttons (one per card) — scope to the Jira card.
+      const jiraSaveBtn = jiraCard.getByRole('button', { name: /^Save section$/ });
+      await expect(jiraSaveBtn).toBeEnabled();
+      await jiraSaveBtn.click();
+
+      // Jira card returns to "All saved"; Google card still untouched.
+      await expect(jiraStatus).toContainText(/All saved/i, { timeout: 6_000 });
+      await expect(googleStatus).toContainText(/All saved/i);
+
+      await assertNoHorizontalOverflow(page);
+      await screenshot(page, `integrations-edit-flow--${vp.name}`);
+      expect(errors, `console errors:\n${errors.join('\n')}`).toEqual([]);
+    });
+  }
+});
+
 // Bespoke test — full flow: sign-in → onboarding → Close My Day → confirm →
 // Sync Result. Asserts the "Your day is synced." hero is visible at both
 // viewports (mock EP-13 returns overall:'ok'). No overlap / no overflow /

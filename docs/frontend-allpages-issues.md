@@ -17,6 +17,26 @@ Format: one entry per issue, newest at the top.
 
 ---
 
+## 2026-05-23 — P16 Integrations — Reader account (M1) is UI-only (EP-23 deferred)
+- **Where:**  web/src/pages/IntegrationsPage.jsx (reader card), web/src/api/mocks.js (`__INTEGRATIONS.reader`).
+- **What:**   The Reader account card persists `{ enabled, email }` via the section-scoped PUT, but EP-23 worklog read-sync is M1. Nothing consumes the reader settings yet — they're just stored.
+- **Impact:** UX gap — admins can configure the reader but it has no observable effect until M1 lands.
+- **Next:**   Keval / backend swimlane — wire `reader.enabled + reader.email` into `services/worklogSync.js` when EP-23 ships. Frontend changes required: zero (the card already PUTs to the same endpoint).
+
+## 2026-05-23 — P16 Integrations — section-scoped saves rely on optimistic mock merge (OQ-AP-13)
+- **Where:**  web/src/api/mocks.js (`PUT /api/admin/integrations` handler).
+- **What:**   The mock PUT merges `{ section, body }` into `__INTEGRATIONS[section]` and returns the full integrations payload. Backend EP-22 should match: accept `{ section, body }` payload, partial-update only the keys in `body`, and return the merged shape.
+- **Impact:** data-shape decision — frontend works on mocks today; backend implementation must mirror the section-scoped contract.
+- **Next:**   Keval / backend swimlane — implement EP-22 PUT with the section/body wire shape. Validate `section` against an enum (`jira|google|email|reader`) to keep input narrow.
+
+## 2026-05-23 — P16 Integrations — Google card has no live "Test connection"
+- **Where:**  web/src/pages/IntegrationsPage.jsx (google card).
+- **What:**   The Google card persists `spreadsheetId` + renders scope chips, but there's no Test connection button (unlike P15 Project Mapping rows). A future enhancement could call `GET /api/admin/integrations/google/test` to verify the sheet ID is reachable + appendable from the configured OAuth scope.
+- **Impact:** UX gap — admins can't validate the spreadsheet ID before saving. Cosmetic.
+- **Next:**   Optional / Yogesh — add a Test connection sub-EP for the Google card if observability is wanted; mirror TestConnectionButton from admin/.
+
+---
+
 ## 2026-05-23 — P15 Project Mapping — no PUT for projects yet (mock + ERD)
 - **Where:**  web/src/api/admin.js (`projects.update`), web/src/api/mocks.js (no `PUT /api/admin/projects/:id`), web/src/pages/ProjectMappingPage.jsx (`handleEdit`).
 - **What:**   `MappingFormModal` supports Edit mode and the page wires a `handleEdit` flow, but the mock catalogue only ships POST + the `/test` sub-EP. Frontend issues a best-effort PUT (swallowed if 404) and applies an optimistic in-memory update so UX testing of the Edit form is unblocked.
