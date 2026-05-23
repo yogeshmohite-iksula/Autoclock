@@ -82,7 +82,10 @@ app.use('/api', (_req, res) =>
 );
 
 // --- Static web app (production build) ---
-const WEB_DIST = path.join(__dirname, '..', 'web', 'dist');
+// Build output lives inside backend/public/ — see web/vite.config.js. This is
+// required for Hostinger's Node deploy: only the app root (backend/) is copied
+// to the runtime path, so a sibling web/dist/ is never present at runtime.
+const WEB_DIST = path.join(__dirname, 'public');
 app.use(express.static(WEB_DIST));
 app.get(/^\/(?!api).*/, (_req, res) => res.sendFile(path.join(WEB_DIST, 'index.html')));
 
