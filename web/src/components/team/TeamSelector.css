@@ -1,0 +1,83 @@
+/* TeamSelector — body-class-agnostic styles. */
+
+.ac-team-selector-wrap { position: relative; display: inline-block; }
+
+.ac-team-selector {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--ac-surface);
+  border: 1px solid var(--ac-border-strong, var(--ac-n-300));
+  border-radius: 10px;
+  padding: 0 12px;
+  height: 38px;
+  font-family: var(--ac-font-sans);
+  font-size: 13px;
+  font-weight: var(--ac-weight-bold);
+  color: var(--ac-text);
+  cursor: pointer;
+  transition: var(--ac-transition, all .18s ease);
+  min-width: 0;
+  max-width: 240px;
+}
+.ac-team-selector:hover { background: var(--ac-n-100); }
+.ac-team-selector:focus-visible {
+  outline: 2px solid var(--ac-secondary);
+  outline-offset: 2px;
+}
+
+.ac-team-selector--static {
+  cursor: default;
+}
+.ac-team-selector--static:hover {
+  background: var(--ac-surface);
+}
+
+.ac-team-selector__sw {
+  width: 8px; height: 8px; border-radius: 3px;
+  flex: none;
+}
+.ac-team-selector__name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+.ac-team-selector__caret {
+  color: var(--ac-text-subtle);
+  font-family: var(--ac-font-mono);
+  font-size: 12px;
+  flex: none;
+}
+
+.ac-team-selector__menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 100%;
+  list-style: none;
+  margin: 0; padding: 4px;
+  background: var(--ac-surface);
+  border: 1px solid var(--ac-border-strong, var(--ac-n-300));
+  border-radius: 10px;
+  box-shadow: 0 8px 28px -8px rgba(15,23,42,.16);
+  z-index: 30;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.ac-team-selector__item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: var(--ac-weight-semibold);
+  color: var(--ac-text);
+  white-space: nowrap;
+}
+.ac-team-selector__item:hover,
+.ac-team-selector__item:focus-visible {
+  background: var(--ac-n-100);
+  outline: none;
+}
+.ac-team-selector__item.is-selected {
+  background: var(--ac-n-100);
+  font-weight: var(--ac-weight-bold);
+}

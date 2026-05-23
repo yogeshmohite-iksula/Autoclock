@@ -1,0 +1,247 @@
+/* team-dashboard.css — body-class scoped (`.page-team-dashboard`). Every
+   selector is prefixed so the design's generic class names (`.kpis`, `.filters`,
+   `.members-list`, `.not-logged`) cannot clash with other pages.
+   All colours from var(--ac-*) tokens; per-data hues passed inline.
+   Lifted from docs/FrontEnd Design /Team Dashboard.html (extraction notes P08). */
+
+/* ============ PAGE-HEAD ============ */
+.page-team-dashboard .page-head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  align-items: end;
+  margin-bottom: 18px;
+}
+.page-team-dashboard .page-head__left { min-width: 0; }
+.page-team-dashboard .page-head h1 {
+  font-size: 28px;
+  font-weight: var(--ac-weight-black);
+  letter-spacing: -0.025em;
+  line-height: 1.12;
+  color: var(--ac-text);
+  margin: 0;
+}
+.page-team-dashboard .page-head__sub {
+  margin-top: 6px;
+  color: var(--ac-text-muted);
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+.page-team-dashboard .page-head__eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  margin-bottom: 10px;
+}
+.page-team-dashboard .page-head__badge {
+  display: inline-flex; align-items: center;
+  font-family: var(--ac-font-mono);
+  font-size: 10.5px;
+  color: var(--ac-text-subtle);
+  font-weight: var(--ac-weight-black);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: var(--ac-bg);
+  border: 1px solid var(--ac-border);
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+.page-team-dashboard .page-head__badge b {
+  color: var(--ac-secondary);
+  font-weight: var(--ac-weight-black);
+  margin-right: 6px;
+}
+
+.page-team-dashboard .filters {
+  display: flex; align-items: center; gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* ============ KPI ROW ============ */
+.page-team-dashboard .kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+/* ============ "NOT LOGGED" CALLOUT ============ */
+.page-team-dashboard .not-logged {
+  margin-bottom: 16px;
+  background: linear-gradient(180deg, rgba(245,158,11,.10), rgba(245,158,11,.04));
+  border: 1px solid rgba(245,158,11,.32);
+  border-radius: 14px;
+  padding: 16px 18px;
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
+  gap: 14px;
+  align-items: center;
+}
+.page-team-dashboard .not-logged[data-empty="true"] {
+  background: linear-gradient(180deg, rgba(16,185,129,.08), rgba(16,185,129,.03));
+  border-color: rgba(16,185,129,.32);
+}
+.page-team-dashboard .not-logged__ic {
+  width: 40px; height: 40px; border-radius: 10px;
+  background: var(--ac-warning); color: #fff;
+  display: grid; place-items: center;
+  font-weight: var(--ac-weight-black);
+  font-size: 18px;
+}
+.page-team-dashboard .not-logged[data-empty="true"] .not-logged__ic {
+  background: var(--ac-success);
+}
+.page-team-dashboard .not-logged__body { min-width: 0; }
+.page-team-dashboard .not-logged__title {
+  font-size: 14px;
+  font-weight: var(--ac-weight-black);
+  color: #78350F;
+}
+.page-team-dashboard .not-logged[data-empty="true"] .not-logged__title {
+  color: #065F46;
+}
+.page-team-dashboard .not-logged__chips {
+  margin-top: 6px;
+  display: flex; gap: 6px; flex-wrap: wrap; align-items: center;
+}
+.page-team-dashboard .member-chip {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 4px 10px 4px 4px;
+  border-radius: 999px;
+  background: var(--ac-surface);
+  border: 1px solid rgba(245,158,11,.30);
+}
+.page-team-dashboard .member-chip__av {
+  width: 22px; height: 22px; border-radius: 999px;
+  color: #fff;
+  display: grid; place-items: center;
+  font-size: 10px;
+  font-weight: var(--ac-weight-black);
+}
+.page-team-dashboard .member-chip__nm {
+  font-size: 12px;
+  font-weight: var(--ac-weight-bold);
+  color: var(--ac-text);
+}
+
+/* ============ MEMBERS LIST ============ */
+.page-team-dashboard .members {
+  background: var(--ac-surface);
+  border: 1px solid var(--ac-border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.page-team-dashboard .members__head {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 14px 18px 12px;
+  border-bottom: 1px solid var(--ac-border);
+  flex-wrap: wrap;
+}
+.page-team-dashboard .members__title {
+  font-size: 14px;
+  font-weight: var(--ac-weight-black);
+  color: var(--ac-text);
+  display: inline-flex; align-items: center; gap: 10px;
+}
+.page-team-dashboard .members__meta {
+  font-family: var(--ac-font-mono);
+  font-size: 11px;
+  color: var(--ac-text-subtle);
+  font-weight: var(--ac-weight-bold);
+}
+.page-team-dashboard .members__list {
+  display: flex; flex-direction: column;
+}
+
+/* Column header strip (desktop only) */
+.page-team-dashboard .members__colheader {
+  display: grid;
+  grid-template-columns:
+    32px
+    minmax(0, 1.6fr)
+    80px
+    90px
+    minmax(80px, 1fr)
+    auto
+    minmax(0, 120px);
+  gap: 12px;
+  padding: 8px 14px;
+  background: var(--ac-bg);
+  border-bottom: 1px solid var(--ac-border);
+  font-family: var(--ac-font-mono);
+  font-size: 10px;
+  color: var(--ac-text-subtle);
+  font-weight: var(--ac-weight-black);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.page-team-dashboard .members__colheader span:nth-child(3),
+.page-team-dashboard .members__colheader span:nth-child(4) { text-align: right; }
+.page-team-dashboard .members__colheader span:nth-child(7) { text-align: right; }
+
+.page-team-dashboard .ac-member-row:last-child { border-bottom: 0; }
+
+/* ============ EMPTY / LOADING / ERROR ============ */
+.page-team-dashboard .empty,
+.page-team-dashboard .loading,
+.page-team-dashboard .error {
+  background: var(--ac-surface);
+  border: 1px solid var(--ac-border);
+  border-radius: 14px;
+  padding: 32px 24px;
+  text-align: center;
+  color: var(--ac-text-muted);
+  font-size: 14px;
+}
+.page-team-dashboard .error { color: var(--ac-danger-text); border-color: rgba(220,38,38,.30); background: var(--ac-danger-soft); }
+
+/* ============ RESPONSIVE ============ */
+
+/* mid: keep desktop layout for 4 KPIs but allow filters to wrap */
+@media (max-width: 1100px) {
+  .page-team-dashboard .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 960px) {
+  .page-team-dashboard .page-head {
+    grid-template-columns: 1fr;
+  }
+  .page-team-dashboard .filters {
+    justify-content: flex-start;
+  }
+}
+
+/* mobile: 2x2 KPIs, members table becomes vertical card list */
+@media (max-width: 720px) {
+  .page-team-dashboard .page-head h1 { font-size: 22px; }
+  .page-team-dashboard .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .page-team-dashboard .not-logged { grid-template-columns: 40px 1fr; }
+  .page-team-dashboard .not-logged__actions { grid-column: 1 / -1; }
+
+  /* Hide the column header strip on mobile (rows become cards). */
+  .page-team-dashboard .members__colheader { display: none; }
+
+  /* Member rows: vertical card layout. */
+  .page-team-dashboard .ac-member-row {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 14px 14px;
+  }
+  .page-team-dashboard .ac-member-row__avatar {
+    width: 34px; height: 34px;
+  }
+  .page-team-dashboard .ac-member-row__today,
+  .page-team-dashboard .ac-member-row__week {
+    text-align: left;
+    display: flex; align-items: baseline; gap: 8px;
+  }
+  .page-team-dashboard .ac-member-row__today strong,
+  .page-team-dashboard .ac-member-row__week strong { display: inline; }
+  .page-team-dashboard .ac-member-row__of { display: inline; margin-top: 0; }
+  .page-team-dashboard .ac-member-row__last { text-align: left; }
+}
+
+@media (max-width: 480px) {
+  .page-team-dashboard .kpis { grid-template-columns: 1fr; }
+  .page-team-dashboard .ac-team-selector { max-width: 200px; }
+}

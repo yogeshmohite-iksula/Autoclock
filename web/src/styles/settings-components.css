@@ -1,0 +1,443 @@
+/* settings-components.css — body-class-agnostic styles for the four shared
+   settings components (SettingsSection, SegmentedRadio, ConnRow, SaveBar).
+   Reused by P06 Settings AND P16 Integrations — no .page-* prefix. */
+
+/* =========================================================================
+   SettingsSection
+   ========================================================================= */
+.ac-settings-section {
+  background: var(--ac-surface);
+  border: 1px solid var(--ac-border);
+  border-radius: 16px;
+  padding: 22px 24px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+}
+.ac-settings-section + .ac-settings-section { margin-top: 0; }
+
+.ac-settings-section__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+.ac-settings-section__title-block { min-width: 0; }
+.ac-settings-section__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: var(--ac-weight-black);
+  letter-spacing: -0.01em;
+  color: var(--ac-text);
+  line-height: 1.25;
+}
+.ac-settings-section__desc {
+  margin: 4px 0 0;
+  color: var(--ac-text-muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.ac-settings-section__badge {
+  font-family: var(--ac-font-mono);
+  font-size: 10px;
+  font-weight: var(--ac-weight-black);
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--ac-bg);
+  border: 1px solid var(--ac-border);
+  color: var(--ac-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  flex: none;
+}
+
+.ac-settings-section__body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* =========================================================================
+   Field row — label + control, two columns on desktop, stacked on mobile
+   ========================================================================= */
+.ac-field-row {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 16px;
+  padding: 14px 0;
+  border-top: 1px dashed var(--ac-border);
+}
+.ac-field-row:first-child { border-top: none; padding-top: 0; }
+.ac-field-row__label { padding-top: 4px; }
+.ac-field-row__lbl {
+  font-size: 13.5px;
+  font-weight: var(--ac-weight-bold);
+  color: var(--ac-text);
+}
+.ac-field-row__hint {
+  margin-top: 3px;
+  font-size: 12px;
+  color: var(--ac-text-muted);
+  line-height: 1.45;
+}
+
+/* =========================================================================
+   SegmentedRadio
+   ========================================================================= */
+.ac-seg-wrap { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.ac-seg-label {
+  font-size: 13px;
+  font-weight: var(--ac-weight-bold);
+  color: var(--ac-text);
+}
+.ac-seg-desc {
+  font-size: 12px;
+  color: var(--ac-text-muted);
+}
+.ac-seg {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  background: var(--ac-bg);
+  border: 1px solid var(--ac-border);
+  border-radius: 12px;
+  padding: 3px;
+  align-self: flex-start;
+  max-width: 100%;
+}
+.ac-seg__btn {
+  border: 0;
+  background: transparent;
+  padding: 8px 14px;
+  border-radius: 9px;
+  font-family: var(--ac-font-sans);
+  font-size: 13px;
+  font-weight: var(--ac-weight-semibold);
+  color: var(--ac-text-muted);
+  cursor: pointer;
+  transition: var(--ac-transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.ac-seg__btn:hover { color: var(--ac-text); }
+.ac-seg__btn.is-on {
+  background: var(--ac-primary);
+  color: #fff;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset,
+              0 4px 10px -6px rgba(15, 23, 42, 0.5);
+}
+.ac-seg__btn:focus-visible {
+  outline: 2px solid var(--ac-primary);
+  outline-offset: 2px;
+}
+.ac-seg__dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--ac-text-subtle);
+  flex: none;
+}
+.ac-seg__btn.is-on .ac-seg__dot { background: #fff; }
+
+/* =========================================================================
+   ConnRow
+   ========================================================================= */
+.ac-conn-row {
+  display: grid;
+  grid-template-columns: 42px 1fr auto;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0;
+  border-top: 1px dashed var(--ac-border);
+}
+.ac-conn-row:first-child { border-top: none; padding-top: 0; }
+
+.ac-conn-row__ico {
+  width: 42px; height: 42px;
+  border-radius: 11px;
+  display: grid; place-items: center;
+  font-weight: var(--ac-weight-black);
+  font-size: 17px;
+  color: #fff;
+  position: relative;
+  flex: none;
+}
+.ac-conn-row__ico--jira   { background: linear-gradient(135deg, #2684FF 0%, #0052CC 100%); }
+.ac-conn-row__ico--google { background: linear-gradient(135deg, #4285F4 0%, #34A853 35%, #FBBC05 65%, #EA4335 100%); }
+.ac-conn-row__glyph { line-height: 1; }
+.ac-conn-row__pip {
+  position: absolute; bottom: -3px; right: -3px;
+  width: 16px; height: 16px;
+  border-radius: 999px;
+  color: #fff;
+  border: 2px solid var(--ac-surface);
+  display: grid; place-items: center;
+  font-family: var(--ac-font-mono);
+  font-size: 9px;
+  font-weight: var(--ac-weight-black);
+}
+.ac-conn-row__pip--ok   { background: var(--ac-success); }
+.ac-conn-row__pip--warn { background: var(--ac-warning); }
+.ac-conn-row__pip--info { background: var(--ac-info); }
+.ac-conn-row__pip--off  { background: var(--ac-text-subtle); }
+
+.ac-conn-row__main { min-width: 0; }
+.ac-conn-row__title-line {
+  display: flex; align-items: center; gap: 8px;
+  flex-wrap: wrap;
+}
+.ac-conn-row__title {
+  font-size: 14.5px;
+  font-weight: var(--ac-weight-bold);
+  color: var(--ac-text);
+}
+.ac-conn-row__tag {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: var(--ac-font-mono);
+  font-size: 10.5px;
+  font-weight: var(--ac-weight-bold);
+  padding: 2px 7px;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.ac-conn-row__tag--ok   { color: var(--ac-success); background: rgba(16,185,129,.08); border-color: rgba(16,185,129,.25); }
+.ac-conn-row__tag--warn { color: var(--ac-warning); background: rgba(245,158,11,.10); border-color: rgba(245,158,11,.30); }
+.ac-conn-row__tag--info { color: var(--ac-info);    background: rgba(59,130,246,.08); border-color: rgba(59,130,246,.25); }
+.ac-conn-row__tag--off  { color: var(--ac-text-subtle); background: var(--ac-bg);     border-color: var(--ac-border); }
+
+.ac-conn-row__meta {
+  margin-top: 4px;
+  font-family: var(--ac-font-mono);
+  font-size: 12px;
+  color: var(--ac-text-muted);
+  font-weight: var(--ac-weight-semibold);
+}
+.ac-conn-row__age { color: var(--ac-text-subtle); }
+
+.ac-conn-row__actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.ac-conn-row__warn {
+  grid-column: 1 / -1;
+  margin-top: 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px 13px;
+  background: rgba(245,158,11,.08);
+  border: 1px solid rgba(245,158,11,.28);
+  border-radius: 12px;
+  font-size: 13px;
+  color: var(--ac-warning-text);
+  line-height: 1.45;
+}
+.ac-conn-row__warn-ico {
+  width: 18px; height: 18px;
+  border-radius: 999px;
+  background: var(--ac-warning);
+  color: #fff;
+  display: grid; place-items: center;
+  flex: none;
+  font-family: var(--ac-font-mono);
+  font-weight: 700;
+  font-size: 11px;
+}
+.ac-conn-row__warn strong {
+  color: var(--ac-warning-text);
+  font-weight: var(--ac-weight-black);
+}
+
+/* =========================================================================
+   Buttons used by these components (.ac-btn family) — neutral primitives.
+   Keep them small + opinion-less; pages can re-skin via their own .page-*.
+   ========================================================================= */
+.ac-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 9px;
+  font-family: var(--ac-font-sans);
+  font-size: 13px;
+  font-weight: var(--ac-weight-semibold);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: var(--ac-transition);
+  white-space: nowrap;
+  color: var(--ac-text);
+  background: var(--ac-surface);
+  text-decoration: none;
+}
+.ac-btn:focus-visible {
+  outline: 2px solid var(--ac-primary);
+  outline-offset: 2px;
+}
+.ac-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.ac-btn--primary {
+  background: var(--ac-primary);
+  color: #fff;
+  border-color: var(--ac-primary);
+  box-shadow: 0 4px 12px -8px rgba(15, 23, 42, 0.5);
+}
+.ac-btn--primary:hover:not(:disabled) { background: var(--ac-primary-hover); }
+.ac-btn--primary:disabled {
+  background: var(--ac-n-200);
+  color: var(--ac-text-subtle);
+  border-color: var(--ac-n-200);
+  box-shadow: none;
+  opacity: 1;
+}
+.ac-btn--ghost {
+  background: var(--ac-surface);
+  color: var(--ac-text);
+  border-color: var(--ac-border-strong);
+}
+.ac-btn--ghost:hover:not(:disabled) { background: var(--ac-n-100); }
+.ac-btn--danger {
+  background: var(--ac-surface);
+  color: var(--ac-danger);
+  border-color: rgba(220, 38, 38, 0.30);
+}
+.ac-btn--danger:hover:not(:disabled) {
+  background: rgba(220, 38, 38, 0.06);
+  border-color: rgba(220, 38, 38, 0.50);
+}
+.ac-btn--warn {
+  background: var(--ac-warning);
+  color: #fff;
+  border-color: var(--ac-warning);
+}
+.ac-btn--warn:hover:not(:disabled) { filter: brightness(0.95); }
+
+/* =========================================================================
+   SaveBar
+   ========================================================================= */
+.ac-save-bar {
+  position: sticky;
+  bottom: 0;
+  padding: 14px 8px 18px;
+  background: linear-gradient(
+    180deg,
+    rgba(241, 245, 249, 0) 0%,
+    rgba(241, 245, 249, 0.92) 40%,
+    var(--ac-bg) 70%
+  );
+  z-index: 4;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  width: 100%;
+}
+.ac-save-bar__inner {
+  pointer-events: auto;
+  background: var(--ac-surface);
+  border: 1px solid var(--ac-border);
+  border-radius: 14px;
+  box-shadow: 0 10px 30px -14px rgba(15, 23, 42, 0.25);
+  padding: 10px 12px 10px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: 820px;
+  width: 100%;
+  flex-wrap: wrap;
+}
+.ac-save-bar__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: var(--ac-weight-semibold);
+  color: var(--ac-text);
+  flex: 1 1 200px;
+  min-width: 0;
+}
+.ac-save-bar__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--ac-text-subtle);
+  flex: none;
+}
+.ac-save-bar--saved  .ac-save-bar__dot { background: var(--ac-success); }
+.ac-save-bar--dirty  .ac-save-bar__dot { background: var(--ac-warning); animation: ac-save-bar-blink 1.4s ease-in-out infinite; }
+.ac-save-bar--saving .ac-save-bar__dot { background: var(--ac-info); }
+@keyframes ac-save-bar-blink { 50% { opacity: 0.35; } }
+
+.ac-save-bar__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.ac-save-bar__title { line-height: 1.2; }
+.ac-save-bar__mini {
+  font-family: var(--ac-font-mono);
+  font-size: 11px;
+  color: var(--ac-text-subtle);
+  font-weight: var(--ac-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ac-save-bar__actions {
+  display: flex;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+.ac-save-bar__spin {
+  width: 13px;
+  height: 13px;
+  border-radius: 999px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  opacity: 0.85;
+  animation: ac-save-bar-spin 0.8s linear infinite;
+  flex: none;
+}
+@keyframes ac-save-bar-spin { to { transform: rotate(360deg); } }
+
+/* =========================================================================
+   Responsive — stack on narrow viewports
+   ========================================================================= */
+@media (max-width: 760px) {
+  .ac-settings-section { padding: 18px 16px; }
+  .ac-field-row { grid-template-columns: 1fr; gap: 8px; }
+  .ac-field-row__label { padding-top: 0; }
+
+  .ac-conn-row {
+    grid-template-columns: 42px 1fr;
+    row-gap: 10px;
+  }
+  .ac-conn-row__actions {
+    grid-column: 1 / -1;
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .ac-save-bar { padding: 10px 4px 12px; }
+  .ac-save-bar__inner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 12px;
+  }
+  .ac-save-bar__actions { width: 100%; }
+  .ac-save-bar__actions .ac-btn { flex: 1; }
+}

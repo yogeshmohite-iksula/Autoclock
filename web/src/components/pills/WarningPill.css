@@ -1,0 +1,58 @@
+/* WarningPill — shared classes (NOT body-scoped). All selectors use `ac-warn`
+   prefix so they're safe across every page. */
+
+.ac-warn {
+  display: grid;
+  grid-template-columns: 36px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+}
+.ac-warn--amber {
+  background: rgba(245, 158, 11, 0.07);
+  border: 1px solid rgba(245, 158, 11, 0.30);
+}
+.ac-warn--red {
+  background: rgba(220, 38, 38, 0.06);
+  border: 1px solid rgba(220, 38, 38, 0.28);
+}
+.ac-warn__ic {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-family: var(--ac-font-mono);
+  font-size: 16px;
+  font-weight: var(--ac-weight-black);
+}
+.ac-warn--amber .ac-warn__ic { background: var(--ac-warning); }
+.ac-warn--red   .ac-warn__ic { background: var(--ac-danger); }
+
+.ac-warn__body { min-width: 0; }
+.ac-warn__title {
+  font-size: 13.5px;
+  font-weight: var(--ac-weight-bold);
+  color: var(--ac-text);
+}
+.ac-warn--amber .ac-warn__title { color: #78350F; }
+.ac-warn--red   .ac-warn__title { color: var(--ac-danger-text); }
+
+.ac-warn__sub {
+  margin-top: 3px;
+  font-size: 12.5px;
+  color: var(--ac-text-muted);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.ac-warn--amber .ac-warn__sub { color: #92400E; }
+.ac-warn--red   .ac-warn__sub { color: var(--ac-danger-text); opacity: 0.9; }
+
+.ac-warn__action { display: flex; }
+
+@media (max-width: 640px) {
+  .ac-warn { grid-template-columns: 36px 1fr; }
+  .ac-warn__action { grid-column: 1 / -1; }
+}

@@ -1,0 +1,157 @@
+/* RunListRail — list-of-runs left rail (P12 Reminder History only).
+   Body-class agnostic — pages own outer spacing. */
+
+.ac-runlist {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.ac-runlist--empty {
+  padding: 18px;
+  border: 1px dashed var(--ac-border);
+  border-radius: 12px;
+  color: var(--ac-text-muted);
+  text-align: center;
+  font-size: 13px;
+  background: var(--ac-surface);
+}
+
+.ac-runlist__item { min-width: 0; }
+
+.ac-runlist__row {
+  appearance: none;
+  width: 100%;
+  text-align: left;
+  background: var(--ac-surface);
+  border: 1px solid var(--ac-border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    "head head"
+    "when when"
+    "stats by";
+  gap: 6px 12px;
+  cursor: pointer;
+  transition: border-color .15s ease, background .15s ease, box-shadow .15s ease;
+  font-family: var(--ac-font-sans);
+  color: var(--ac-text);
+  min-width: 0;
+}
+.ac-runlist__row:hover {
+  border-color: var(--ac-border-strong);
+  background: var(--ac-surface-2);
+}
+.ac-runlist__row:focus-visible {
+  outline: 2px solid var(--ac-secondary);
+  outline-offset: 2px;
+}
+
+.ac-runlist__item.is-selected .ac-runlist__row {
+  border-color: rgba(220, 38, 38, .42);
+  background: var(--ac-surface);
+  box-shadow: 0 0 0 2px rgba(220, 38, 38, .14);
+}
+.ac-runlist__item.is-selected .ac-runlist__row::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--ac-secondary);
+  border-radius: 12px 0 0 12px;
+}
+.ac-runlist__row { position: relative; }
+
+.ac-runlist__row-head {
+  grid-area: head;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+}
+
+.ac-runlist__label {
+  font-size: 14px;
+  font-weight: var(--ac-weight-semibold);
+  color: var(--ac-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.ac-runlist__chip {
+  font-family: var(--ac-font-mono, ui-monospace, monospace);
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--ac-border);
+  white-space: nowrap;
+  flex: none;
+}
+.ac-runlist__chip--friday  { color: #7C2D12; background: rgba(245,158,11,.10); border-color: rgba(245,158,11,.30); }
+.ac-runlist__chip--monday  { color: #1E3A8A; background: rgba(37,99,235,.10);  border-color: rgba(37,99,235,.30); }
+.ac-runlist__chip--manual  { color: #4C1D95; background: rgba(139,92,246,.10); border-color: rgba(139,92,246,.30); }
+
+.ac-runlist__row-when {
+  grid-area: when;
+  font-family: var(--ac-font-mono, ui-monospace, monospace);
+  font-size: 11.5px;
+  color: var(--ac-text-muted);
+  letter-spacing: 0.02em;
+}
+
+.ac-runlist__row-stats {
+  grid-area: stats;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.ac-runlist__stat {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+}
+.ac-runlist__stat-num {
+  font-family: var(--ac-font-mono, ui-monospace, monospace);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ac-text);
+}
+.ac-runlist__stat-lbl {
+  font-size: 11px;
+  color: var(--ac-text-subtle);
+  font-weight: var(--ac-weight-semibold);
+  text-transform: lowercase;
+  letter-spacing: 0.02em;
+}
+
+.ac-runlist__row-by {
+  grid-area: by;
+  font-size: 11px;
+  color: var(--ac-text-subtle);
+  font-family: var(--ac-font-mono, ui-monospace, monospace);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  justify-self: end;
+  align-self: end;
+}
+
+/* Mobile — same layout works; just tighten padding */
+@media (max-width: 640px) {
+  .ac-runlist__row { padding: 10px 12px; }
+  .ac-runlist__label { font-size: 13.5px; }
+}

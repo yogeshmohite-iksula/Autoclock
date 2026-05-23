@@ -1,0 +1,99 @@
+/* ProjectRow — table-row styling for the top-projects table on P10. Layout
+   chosen so it works inside a semantic <table>, AND collapses cleanly to a
+   "stacked card" presentation on mobile (we let the page-css decide that). */
+
+.ac-proj-row { background: var(--ac-surface); }
+.ac-proj-row + .ac-proj-row { border-top: 1px solid var(--ac-border); }
+
+.ac-proj-row__rank {
+  padding: 12px 12px 12px 16px;
+  font-family: var(--ac-font-mono, JetBrains Mono, ui-monospace, monospace);
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--ac-text-subtle);
+  width: 36px;
+  text-align: right;
+  vertical-align: middle;
+}
+
+.ac-proj-row__name-cell {
+  padding: 12px 12px;
+  vertical-align: middle;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.ac-proj-row__swatch {
+  width: 10px; height: 10px; border-radius: 3px;
+  flex-shrink: 0;
+}
+.ac-proj-row__name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ac-text);
+  letter-spacing: -0.005em;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  min-width: 0;
+}
+.ac-proj-row__key {
+  font-family: var(--ac-font-mono, JetBrains Mono, ui-monospace, monospace);
+  font-size: 10.5px;
+  font-weight: 800;
+  color: var(--ac-text-muted);
+  background: var(--ac-n-100);
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+
+.ac-proj-row__hrs {
+  padding: 12px 12px;
+  vertical-align: middle;
+  font-family: var(--ac-font-mono, JetBrains Mono, ui-monospace, monospace);
+  font-size: 13px;
+  color: var(--ac-text);
+  white-space: nowrap;
+  text-align: right;
+  width: 80px;
+}
+.ac-proj-row__hrs strong { font-weight: 800; }
+.ac-proj-row__hrs-sub { color: var(--ac-text-muted); margin-left: 2px; font-size: 11px; }
+
+.ac-proj-row__util {
+  padding: 12px 16px 12px 12px;
+  vertical-align: middle;
+  display: flex; align-items: center; gap: 10px;
+  min-width: 160px;
+}
+.ac-proj-row__bar {
+  flex: 1;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--ac-n-100);
+  overflow: hidden;
+}
+.ac-proj-row__bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--ac-text-muted);
+  transition: width .35s ease;
+}
+.ac-proj-row__bar-fill--ok   { background: var(--ac-success); }
+.ac-proj-row__bar-fill--warn { background: var(--ac-warning); }
+.ac-proj-row__bar-fill--bad  { background: var(--ac-secondary); }
+
+.ac-proj-row__pct {
+  font-family: var(--ac-font-mono, JetBrains Mono, ui-monospace, monospace);
+  font-size: 12px;
+  font-weight: 800;
+  padding: 3px 7px;
+  border-radius: 999px;
+  color: var(--ac-text);
+  background: var(--ac-n-100);
+  flex-shrink: 0;
+}
+.ac-proj-row__pct--ok   { background: var(--ac-success-soft); color: var(--ac-success-text); }
+.ac-proj-row__pct--warn { background: var(--ac-warning-soft); color: var(--ac-warning-text); }
+.ac-proj-row__pct--bad  { background: var(--ac-secondary-soft); color: var(--ac-secondary); }

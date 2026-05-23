@@ -1,0 +1,102 @@
+/* IntegrationCard — a single section card on the P16 Integrations page.
+   Body-class agnostic: selectors live under `.ac-int-card` so the card is
+   reusable. The inline SaveBar (already global, .ac-save-bar) is scoped via
+   .ac-int-card__foot — we override its sticky positioning so each card's
+   SaveBar stays inline (not pinned to the viewport).
+*/
+
+.ac-int-card {
+  background: var(--ac-surface, #ffffff);
+  border: 1px solid var(--ac-border, #e2e8f0);
+  border-radius: 16px;
+  box-shadow: 0 1px 0 rgba(15, 23, 42, 0.02);
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+
+.ac-int-card.is-error {
+  border-color: var(--ac-danger, #dc2626);
+  box-shadow: 0 0 0 1px var(--ac-danger, #dc2626) inset, 0 1px 0 rgba(15, 23, 42, 0.02);
+}
+
+.ac-int-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--ac-border, #e2e8f0);
+  flex-wrap: wrap;
+}
+
+.ac-int-card__title-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.ac-int-card__glyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex: none;
+}
+
+.ac-int-card__title {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--ac-text, #0f172a);
+  margin: 0;
+  line-height: 1.25;
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+.ac-int-card__error {
+  padding: 12px 20px 0;
+}
+
+.ac-int-card__body {
+  padding: 18px 20px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ac-int-card__foot {
+  padding: 6px 12px 12px;
+}
+
+/* Override SaveBar's sticky behaviour — inside an IntegrationCard the bar
+   stays inline, not pinned to the viewport. Other selectors (status,
+   button styles, etc.) are inherited as-is from settings-components.css. */
+.ac-int-card__foot .ac-save-bar {
+  position: static;
+  padding: 6px 0 0;
+  background: none;
+}
+.ac-int-card__foot .ac-save-bar__inner {
+  box-shadow: none;
+  max-width: 100%;
+}
+
+/* ---- mobile (≤ 720px) ---- */
+@media (max-width: 720px) {
+  .ac-int-card__head {
+    padding: 14px 14px;
+  }
+  .ac-int-card__body {
+    padding: 14px 14px 6px;
+  }
+  .ac-int-card__foot {
+    padding: 6px 8px 12px;
+  }
+  .ac-int-card__title {
+    font-size: 15px;
+  }
+}

@@ -1,0 +1,84 @@
+/* BulkActionBar — body-class-agnostic. Default: inline-block bar.
+   ≤640px: sticks to the bottom of the viewport. */
+
+.ac-bulk-bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 10px 8px 14px;
+  background: var(--ac-surface);
+  border: 1px solid var(--ac-border);
+  border-radius: 999px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+}
+
+.ac-bulk-bar__count {
+  display: inline-flex; align-items: baseline; gap: 6px;
+  font-family: var(--ac-font-sans);
+  color: var(--ac-text);
+}
+.ac-bulk-bar__count-num {
+  font-size: 16px;
+  font-weight: var(--ac-weight-black);
+}
+.ac-bulk-bar__count-lbl {
+  font-size: 12px;
+  color: var(--ac-text-muted);
+}
+
+.ac-bulk-bar__actions {
+  display: inline-flex; gap: 8px; align-items: center;
+}
+.ac-bulk-bar__btn {
+  appearance: none;
+  border: 0;
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-family: var(--ac-font-sans);
+  font-size: 13px;
+  font-weight: var(--ac-weight-semibold);
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease;
+  white-space: nowrap;
+}
+.ac-bulk-bar__btn[disabled] {
+  opacity: 0.65; cursor: not-allowed;
+}
+.ac-bulk-bar__btn:focus-visible {
+  outline: 2px solid var(--ac-secondary);
+  outline-offset: 2px;
+}
+
+.ac-bulk-bar__btn--primary {
+  background: var(--ac-secondary);
+  color: #fff;
+}
+.ac-bulk-bar__btn--primary:hover { background: var(--ac-secondary-hover, var(--ac-secondary)); filter: brightness(0.95); }
+
+.ac-bulk-bar__btn--danger {
+  background: var(--ac-danger, #DC2626);
+  color: #fff;
+}
+
+.ac-bulk-bar__btn--ghost {
+  background: transparent;
+  color: var(--ac-text-muted);
+  border: 1px solid var(--ac-border);
+}
+.ac-bulk-bar__btn--ghost:hover { color: var(--ac-text); }
+
+/* ============ Mobile: sticky bottom ============ */
+@media (max-width: 640px) {
+  .ac-bulk-bar {
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    border-radius: 14px;
+    padding: 10px 14px;
+    z-index: 30;
+    justify-content: space-between;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18);
+  }
+  .ac-bulk-bar__btn { padding: 10px 16px; font-size: 14px; }
+}

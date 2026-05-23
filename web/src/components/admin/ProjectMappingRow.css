@@ -1,0 +1,212 @@
+/* ProjectMappingRow.css — global. Desktop: 7-col grid; mobile: vertical card.
+   Class prefix `ac-mapping-row` so it never collides with `.ac-user-row` or
+   any other page-scoped `.row`. */
+
+.ac-mapping-row {
+  display: grid;
+  grid-template-columns:
+    minmax(220px, 1.6fr)   /* swatch + name + kind */
+    minmax(80px,  0.5fr)   /* jira key tag */
+    minmax(180px, 1.5fr)   /* description */
+    minmax(96px,  0.6fr)   /* tasks count */
+    minmax(110px, 0.7fr)   /* last-sync */
+    minmax(110px, 0.7fr)   /* status pill */
+    minmax(190px, 1.0fr);  /* actions: Test + Edit */
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  background: var(--ac-bg-elev, #fff);
+  border: 1px solid var(--ac-border);
+  border-radius: 12px;
+  margin-bottom: 8px;
+}
+
+/* Project — swatch + name + kind tag */
+.ac-mapping-row__proj {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.ac-mapping-row__swatch {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  flex: 0 0 36px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ac-mapping-row__id {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.ac-mapping-row__name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ac-text, #0f172a);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ac-mapping-row__kind {
+  font-family: var(--ac-font-mono, ui-monospace, monospace);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ac-text-muted, #64748b);
+  margin-top: 2px;
+}
+.ac-mapping-row__kind--client {
+  color: #1D4ED8;
+}
+.ac-mapping-row__kind--internal {
+  color: #B45309;
+}
+
+/* Jira key tag */
+.ac-mapping-row__key {
+  display: flex;
+  align-items: center;
+}
+.ac-mapping-row__key-tag {
+  font-family: var(--ac-font-mono, ui-monospace, monospace);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ac-text, #0f172a);
+  background: var(--ac-bg-tint, #f4f6fa);
+  border: 1px solid var(--ac-border);
+  border-radius: 6px;
+  padding: 3px 8px;
+  letter-spacing: 0.02em;
+}
+
+/* Description */
+.ac-mapping-row__desc {
+  font-size: 13px;
+  color: var(--ac-text, #0f172a);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+.ac-mapping-row__muted {
+  color: var(--ac-text-muted, #64748b);
+  font-style: italic;
+}
+
+/* Tasks */
+.ac-mapping-row__tasks {
+  font-size: 12.5px;
+  color: var(--ac-text-muted, #64748b);
+  white-space: nowrap;
+}
+.ac-mapping-row__tasks-num {
+  font-family: var(--ac-font-mono, ui-monospace, monospace);
+  color: var(--ac-text, #0f172a);
+  font-weight: 700;
+}
+
+/* Last sync */
+.ac-mapping-row__last-sync {
+  font-size: 12.5px;
+  color: var(--ac-text-muted, #64748b);
+  white-space: nowrap;
+}
+
+/* Status */
+.ac-mapping-row__status {
+  display: flex;
+  align-items: center;
+}
+
+/* Actions */
+.ac-mapping-row__actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.ac-mapping-row__btn {
+  appearance: none;
+  border: 1px solid var(--ac-border);
+  background: var(--ac-bg-elev, #fff);
+  padding: 6px 11px;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ac-text, #0f172a);
+  cursor: pointer;
+}
+.ac-mapping-row__btn:hover:not(:disabled) {
+  background: var(--ac-bg-tint, #f4f6fa);
+}
+.ac-mapping-row__btn:focus-visible {
+  outline: 2px solid var(--ac-accent, #2563eb);
+  outline-offset: 1px;
+}
+
+/* ============ MOBILE — vertical card ============ */
+@media (max-width: 860px) {
+  .ac-mapping-row {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 14px;
+  }
+  .ac-mapping-row__proj { order: 1; }
+  .ac-mapping-row__key  { order: 2; }
+  .ac-mapping-row__key::before {
+    content: "Jira · ";
+    color: var(--ac-text-muted, #64748b);
+    font-weight: 600;
+    margin-right: 4px;
+  }
+  .ac-mapping-row__desc {
+    order: 3;
+    white-space: normal;
+    font-size: 13px;
+    color: var(--ac-text-muted, #64748b);
+  }
+  .ac-mapping-row__tasks {
+    order: 4;
+  }
+  .ac-mapping-row__tasks::before {
+    content: "Tasks · ";
+    color: var(--ac-text-muted, #64748b);
+    font-weight: 600;
+  }
+  .ac-mapping-row__last-sync {
+    order: 5;
+  }
+  .ac-mapping-row__last-sync::before {
+    content: "Last sync · ";
+    color: var(--ac-text-muted, #64748b);
+    font-weight: 600;
+  }
+  .ac-mapping-row__status {
+    order: 6;
+  }
+  .ac-mapping-row__actions {
+    order: 7;
+    justify-content: flex-end;
+    margin-top: 4px;
+  }
+  .ac-mapping-row__btn {
+    flex: 1;
+    text-align: center;
+    max-width: 140px;
+  }
+}

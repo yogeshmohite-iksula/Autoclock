@@ -1,0 +1,271 @@
+/* management.css — body-class scoped (`.page-management`). Every selector
+   begins with `.page-management` so the design's generic class names
+   (`.kpis`, `.filters`, `.charts`, `.teams`, `.team-grid`, `.top-projects`)
+   cannot clash with other pages on the route.
+   Lifted from docs/FrontEnd Design /Management Dashboard.html
+   (extraction notes P10). */
+
+/* ============ PAGE-HEAD ============ */
+.page-management .page-head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  align-items: end;
+  margin-bottom: 18px;
+}
+.page-management .page-head__left { min-width: 0; }
+.page-management .page-head h1 {
+  font-size: 28px;
+  font-weight: var(--ac-weight-black, 900);
+  letter-spacing: -0.025em;
+  line-height: 1.12;
+  color: var(--ac-text);
+  margin: 0;
+}
+.page-management .page-head__sub {
+  margin-top: 6px;
+  color: var(--ac-text-muted);
+  font-size: 13.5px;
+  line-height: 1.5;
+  max-width: 64ch;
+}
+.page-management .page-head__eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  margin-bottom: 10px;
+}
+.page-management .page-head__badge {
+  display: inline-flex; align-items: center;
+  font-family: var(--ac-font-mono, JetBrains Mono, ui-monospace, monospace);
+  font-size: 10.5px;
+  color: var(--ac-text-subtle);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: var(--ac-bg);
+  border: 1px solid var(--ac-border);
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+.page-management .page-head__badge b {
+  color: var(--ac-secondary);
+  font-weight: 900;
+  margin-right: 6px;
+}
+
+.page-management .filters {
+  display: flex; align-items: center; gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.page-management .error {
+  background: var(--ac-secondary-soft);
+  border: 1px solid rgba(220,38,38,.32);
+  color: var(--ac-secondary);
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+/* ============ KPI ROW ============ */
+.page-management .kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+/* ============ CHARTS GRID ============ */
+.page-management .charts {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.page-management .charts__card {
+  background: var(--ac-surface);
+  border: 1px solid var(--ac-border);
+  border-radius: 14px;
+  padding: 16px;
+  min-width: 0;
+  display: flex; flex-direction: column;
+}
+.page-management .charts__head { margin-bottom: 8px; }
+.page-management .charts__title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--ac-text);
+  letter-spacing: -0.005em;
+}
+.page-management .charts__sub {
+  margin: 2px 0 0;
+  font-size: 11.5px;
+  color: var(--ac-text-muted);
+}
+.page-management .charts__body { flex: 1; min-height: 0; }
+.page-management .charts__body--donut { display: flex; align-items: center; }
+.page-management .charts__body--donut > .ac-donut { width: 100%; }
+.page-management .loading {
+  color: var(--ac-text-muted);
+  font-size: 12px;
+  padding: 16px 0;
+}
+
+/* ============ TEAMS GRID ============ */
+.page-management .teams { margin-bottom: 20px; }
+.page-management .teams__head {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 10px;
+}
+.page-management .teams__count {
+  font-size: 12px;
+  color: var(--ac-text-muted);
+  font-weight: 600;
+}
+.page-management .team-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+.page-management .empty {
+  grid-column: 1 / -1;
+  color: var(--ac-text-muted);
+  font-size: 13px;
+  padding: 16px;
+  background: var(--ac-surface);
+  border: 1px dashed var(--ac-border);
+  border-radius: 12px;
+  text-align: center;
+}
+
+/* ============ TOP PROJECTS TABLE ============ */
+.page-management .top-projects { margin-bottom: 12px; }
+.page-management .top-projects__head {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 10px;
+}
+.page-management .top-projects__sub {
+  font-size: 12px;
+  color: var(--ac-text-muted);
+  font-weight: 600;
+}
+.page-management .top-projects__table-wrap {
+  background: var(--ac-surface);
+  border: 1px solid var(--ac-border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.page-management .top-projects__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  /* Layout: rank | name | hours | util — keep util cell from collapsing too narrow. */
+  table-layout: auto;
+}
+.page-management .top-projects__table caption.visually-hidden,
+.page-management .visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  border: 0; overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.page-management .top-projects__table thead th {
+  text-align: left;
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ac-text-subtle);
+  padding: 10px 12px;
+  background: var(--ac-surface-2);
+  border-bottom: 1px solid var(--ac-border);
+  white-space: nowrap;
+}
+.page-management .top-projects__table th.th-rank { text-align: right; padding-left: 16px; width: 36px; }
+.page-management .top-projects__table th.th-hrs  { text-align: right; width: 80px; }
+.page-management .top-projects__table th.th-util { padding-right: 16px; min-width: 160px; }
+.page-management .top-projects__table .loading-cell,
+.page-management .top-projects__table .empty-cell {
+  padding: 14px 16px;
+  color: var(--ac-text-muted);
+  font-size: 12.5px;
+  text-align: center;
+}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 1100px) {
+  .page-management .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .page-management .team-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 960px) {
+  .page-management .charts { grid-template-columns: 1fr; }
+  .page-management .team-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .page-management .page-head {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    align-items: start;
+  }
+  .page-management .filters { justify-content: flex-start; }
+}
+@media (max-width: 720px) {
+  .page-management .page-head h1 { font-size: 22px; }
+  .page-management .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .page-management .charts__card { padding: 12px; }
+  .page-management .team-grid { grid-template-columns: 1fr; }
+  /* Project table → stacked cards on mobile. Hide the header row, let each
+     <tr> render as a column-flex card via ProjectRow.css overrides below. */
+  .page-management .top-projects__table thead { display: none; }
+  .page-management .top-projects__table,
+  .page-management .top-projects__table tbody,
+  .page-management .top-projects__table tr {
+    display: block;
+    width: 100%;
+  }
+  .page-management .top-projects__table .ac-proj-row {
+    display: grid;
+    grid-template-columns: 28px 1fr auto;
+    grid-template-areas:
+      "rank name hrs"
+      "rank util util";
+    column-gap: 8px;
+    row-gap: 6px;
+    padding: 10px 12px;
+    align-items: center;
+  }
+  .page-management .top-projects__table .ac-proj-row + .ac-proj-row { border-top: 1px solid var(--ac-border); }
+  .page-management .top-projects__table .ac-proj-row__rank {
+    grid-area: rank;
+    padding: 0; text-align: center;
+    width: auto;
+    align-self: start;
+    padding-top: 2px;
+  }
+  .page-management .top-projects__table .ac-proj-row__name-cell {
+    grid-area: name;
+    padding: 0;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .page-management .top-projects__table .ac-proj-row__name { white-space: normal; }
+  .page-management .top-projects__table .ac-proj-row__hrs {
+    grid-area: hrs;
+    padding: 0;
+    width: auto;
+    text-align: right;
+  }
+  .page-management .top-projects__table .ac-proj-row__util {
+    grid-area: util;
+    padding: 0;
+    min-width: 0;
+  }
+  .page-management .top-projects__table .loading-cell,
+  .page-management .top-projects__table .empty-cell { display: block; padding: 14px 12px; }
+}
+@media (max-width: 480px) {
+  .page-management .kpis { grid-template-columns: 1fr; }
+}

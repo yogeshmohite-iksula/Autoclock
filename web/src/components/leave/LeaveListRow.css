@@ -1,0 +1,87 @@
+/* LeaveListRow.css — scoped to .page-leave. */
+
+.page-leave .leave-list-row {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1.4fr) minmax(0, 1.4fr) minmax(0, 2fr) 110px;
+  gap: 14px;
+  align-items: center;
+  padding: 12px 14px;
+  border: 1px solid var(--ac-border);
+  border-radius: 10px;
+  background: var(--ac-bg-elev, #fff);
+}
+
+.page-leave .leave-list-row + .leave-list-row { margin-top: 8px; }
+
+.page-leave .leave-list-row__avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: #fff;
+  font-weight: 700;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.page-leave .leave-list-row__person { min-width: 0; }
+.page-leave .leave-list-row__name {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ac-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.page-leave .leave-list-row__team {
+  font-size: 12px;
+  color: var(--ac-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.page-leave .leave-list-row__range { min-width: 0; }
+.page-leave .leave-list-row__range-txt {
+  font-family: var(--ac-font-mono, ui-monospace, monospace);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ac-text);
+}
+.page-leave .leave-list-row__range-sub {
+  font-size: 11.5px;
+  color: var(--ac-text-muted);
+}
+
+.page-leave .leave-list-row__reason {
+  font-size: 13px;
+  color: var(--ac-text);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.page-leave .leave-list-row__status {
+  display: flex;
+  justify-content: flex-end;
+}
+
+@media (max-width: 880px) {
+  .page-leave .leave-list-row {
+    grid-template-columns: 32px 1fr auto;
+    grid-template-areas:
+      "avatar person status"
+      "avatar range  range"
+      "avatar reason reason";
+    gap: 6px 12px;
+    padding: 12px;
+  }
+  .page-leave .leave-list-row__avatar { grid-area: avatar; align-self: start; }
+  .page-leave .leave-list-row__person { grid-area: person; }
+  .page-leave .leave-list-row__range  { grid-area: range; }
+  .page-leave .leave-list-row__reason { grid-area: reason; white-space: normal; }
+  .page-leave .leave-list-row__status { grid-area: status; }
+}

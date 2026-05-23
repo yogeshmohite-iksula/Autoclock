@@ -1,0 +1,194 @@
+/* reminders.css — body-class scoped (`.page-reminders`). All selectors begin
+   with `.page-reminders` so the design's generic class names (`.run-row`,
+   `.recip-row`, `.run-hero`, `.page-tabs`, `.email-card`, `.mini-stat`)
+   from `docs/FrontEnd Design /Reminder History.html` never clash with
+   other pages on the route.
+   Lifted from extraction notes (P12). */
+
+/* ============ PAGE-HEAD ============ */
+.page-reminders .page-head {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+.page-reminders .page-head__left { min-width: 0; }
+.page-reminders .page-head h1 {
+  font-size: 28px;
+  font-weight: var(--ac-weight-black, 900);
+  letter-spacing: -0.025em;
+  line-height: 1.12;
+  color: var(--ac-text);
+  margin: 0;
+}
+.page-reminders .page-head__sub {
+  margin-top: 6px;
+  color: var(--ac-text-muted);
+  font-size: 13.5px;
+  line-height: 1.5;
+  max-width: 64ch;
+}
+.page-reminders .page-head__eyebrow {
+  display: inline-flex; align-items: center; gap: 10px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.page-reminders .page-head__back {
+  font-family: var(--ac-font-mono, ui-monospace, monospace);
+  font-size: 11px;
+  color: var(--ac-text-muted);
+  text-decoration: none;
+  letter-spacing: 0.05em;
+  font-weight: var(--ac-weight-semibold);
+}
+.page-reminders .page-head__back:hover { color: var(--ac-secondary); text-decoration: underline; }
+.page-reminders .page-head__badge {
+  display: inline-flex; align-items: center;
+  font-family: var(--ac-font-mono, ui-monospace, monospace);
+  font-size: 10.5px;
+  color: var(--ac-text-subtle);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: var(--ac-bg);
+  border: 1px solid var(--ac-border);
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+.page-reminders .page-head__badge b {
+  color: var(--ac-secondary);
+  margin-right: 6px;
+  font-weight: 800;
+}
+
+/* ============ PAGE TABS (History / Templates / Settings) ============ */
+.page-reminders .page-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--ac-border);
+  margin-bottom: 18px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  /* allow horizontal scroll on narrow viewports */
+  min-width: 0;
+}
+.page-reminders .page-tabs__tab {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 10px 14px;
+  font-family: var(--ac-font-sans);
+  font-size: 13px;
+  font-weight: var(--ac-weight-semibold);
+  color: var(--ac-text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  text-decoration: none;
+}
+.page-reminders .page-tabs__tab:hover { color: var(--ac-text); }
+.page-reminders .page-tabs__tab:focus-visible {
+  outline: 2px solid var(--ac-secondary);
+  outline-offset: 2px;
+}
+.page-reminders .page-tabs__tab[aria-current="page"],
+.page-reminders .page-tabs__tab[aria-selected="true"] {
+  color: var(--ac-text);
+  border-bottom-color: var(--ac-secondary);
+}
+.page-reminders .page-tabs__tab[aria-disabled="true"],
+.page-reminders .page-tabs__tab:disabled {
+  color: var(--ac-text-subtle);
+  cursor: not-allowed;
+}
+
+/* ============ ERROR / LOADING ============ */
+.page-reminders .error {
+  border: 1px solid rgba(220,38,38,.30);
+  background: rgba(220,38,38,.06);
+  color: var(--ac-danger-text, #991B1B);
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+.page-reminders .loading {
+  padding: 16px;
+  color: var(--ac-text-muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+/* ============ 2-pane grid ============ */
+.page-reminders .pane-grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 340px) 1fr;
+  gap: 20px;
+  align-items: start;
+  min-width: 0;
+}
+
+.page-reminders .pane-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.page-reminders .pane-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+/* Mobile single-pane: rail above detail. Selection state still works. */
+@media (max-width: 900px) {
+  .page-reminders .pane-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Hide / show panes when ?runId is present on mobile.
+   We do this in JS rather than CSS — see ReminderHistoryPage.jsx —
+   because the URL also defines the "Back to runs" affordance. */
+.page-reminders .pane-grid.is-mobile-detail .pane-rail {
+  display: none;
+}
+
+/* ============ Rail filter bar above the runs list ============ */
+.page-reminders .rail-filters {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+.page-reminders .rail-filters .ac-filter-chips {
+  width: 100%;
+  min-width: 0;
+}
+.page-reminders .rail-filters .ac-filter-chips__group {
+  flex-wrap: wrap;
+}
+
+/* Recipients list — gap between PersonRow items */
+.page-reminders .recipients-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.page-reminders .recipients-empty {
+  padding: 16px;
+  color: var(--ac-text-muted);
+  font-size: 13px;
+  text-align: center;
+  background: var(--ac-surface);
+  border: 1px dashed var(--ac-border);
+  border-radius: 12px;
+}
+
+/* ============ Mobile tweaks ============ */
+@media (max-width: 640px) {
+  .page-reminders .page-head h1 { font-size: 22px; }
+  .page-reminders .pane-grid { gap: 14px; }
+}

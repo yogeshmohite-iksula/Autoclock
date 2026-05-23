@@ -1,0 +1,79 @@
+/* app-shell.css — additions on top of today.css for the shared App Shell.
+   today.css owns the topbar/sidebar/body-grid styles for backwards compatibility
+   (TodayPage shipped with these classes). This file adds:
+     - Mobile hamburger button
+     - Mobile sidebar drawer (slides over content, with backdrop)
+     - Drawer ESC / route-change behaviour is in AppShell.jsx
+*/
+
+/* ---------- Hamburger ---------- */
+.tdy-hamburger {
+  display: none;                       /* hidden on desktop */
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  border: 1px solid var(--ac-border);
+  background: var(--ac-surface);
+  color: var(--ac-text);
+  cursor: pointer;
+  align-items: center; justify-content: center;
+  margin-right: 6px;
+  flex: none;
+  transition: background var(--ac-transition);
+}
+.tdy-hamburger:hover { background: var(--ac-n-100); }
+.tdy-hamburger:focus-visible {
+  outline: 2px solid var(--ac-secondary);
+  outline-offset: 2px;
+}
+.tdy-hamburger svg { width: 18px; height: 18px; }
+
+/* ---------- Drawer backdrop ---------- */
+.tdy-drawer-backdrop {
+  display: none;                       /* shown only on mobile + drawer-open */
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  border: 0;
+  padding: 0;
+  z-index: 49;
+  cursor: pointer;
+}
+
+/* ---------- Mobile (≤720px) ---------- */
+@media (max-width: 720px) {
+  .tdy-hamburger { display: inline-flex; }
+
+  /* When drawer is open, the sidebar slides in over the main content. */
+  .tdy-root.is-drawer-open .tdy-sidebar {
+    display: flex;                     /* override today.css hide */
+    position: fixed;
+    inset: 56px 0 0 0;                 /* sit under the topbar */
+    width: 280px;
+    max-width: 84vw;
+    background: var(--ac-surface);
+    border-right: 1px solid var(--ac-border);
+    box-shadow: 4px 0 24px -16px rgba(15, 23, 42, 0.35);
+    z-index: 50;
+    overflow-y: auto;
+    padding: var(--ac-space-4);
+    animation: tdy-drawer-in 180ms ease-out both;
+  }
+  /* Show backdrop + restore the label width that today.css's ≤980px rule hides. */
+  .tdy-root.is-drawer-open .tdy-drawer-backdrop { display: block; }
+  .tdy-root.is-drawer-open .tdy-nav-item .label,
+  .tdy-root.is-drawer-open .tdy-nav-item .meta,
+  .tdy-root.is-drawer-open .tdy-nav-header span:first-child,
+  .tdy-root.is-drawer-open .tdy-collapse-btn .label { display: inline-block; }
+
+  /* Hide the desktop-only Collapse button inside the mobile drawer. */
+  .tdy-root.is-drawer-open .tdy-collapse-btn { display: none; }
+}
+@keyframes tdy-drawer-in {
+  from { transform: translateX(-12px); opacity: 0; }
+  to   { transform: translateX(0);     opacity: 1; }
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .tdy-root.is-drawer-open .tdy-sidebar { animation: none; }
+}
