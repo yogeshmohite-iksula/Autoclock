@@ -7,6 +7,11 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 
 ## [Unreleased]
 
+### Fixed — Deployment (fix/hostinger-outdir, follow-up to PR #8)
+- **Hostinger ENOENT persisted after PR #8 because the build output lived in `web/dist/` (a sibling of the app root), but Hostinger only copies the app root (`backend/`) to the runtime path** — the built SPA never reached the live directory. Web research (Hostinger docs + Passenger docs) confirmed: Node-hosted apps must keep static assets *inside* the app root.
+- **Fix:** Vite now writes the production bundle directly to `backend/public/` (configured in `web/vite.config.js` via `outDir: '../backend/public'` + `emptyOutDir: true` to opt-in to clearing stale assets across a directory boundary). `backend/server.js` now serves from `path.join(__dirname, 'public')` instead of `path.join(__dirname, '..', 'web', 'dist')`. `.gitignore` adds `backend/public/` (build output stays out of git; regenerated on every deploy).
+- **Verified locally** — clean state, ran the exact Hostinger sequence (`cd backend && NODE_ENV=production npm install`); postinstall fired, Vite built 191 modules in 1.81 s and wrote `../backend/public/index.html` + assets (no longer creates `web/dist/`). Booted `node server.js` on `:4002`; `GET /api/health` → 200 JSON; `GET /` → 200 SPA HTML with `<title>AutoClock</title>` + `<div id="root">`; `GET /sign-in` → 200 (catch-all); `GET /assets/index-…css` → 200 (express.static OK).
+
 ### Fixed — Deployment (fix/hostinger-deploy)
 - **Hostinger single-deploy now serves the React app instead of erroring with `ENOENT … web/dist/index.html`.** Hostinger's deploy root is `backend/`, so it only ran `npm install` there — `web/dist` was never built. Added a `postinstall` script to `backend/package.json` that builds the frontend after the backend installs: `cd ../web && PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm install --include=dev && npm run build`.
   - `--include=dev` is required because Vite is in `web/`'s `devDependencies` and Hostinger sets `NODE_ENV=production`, which makes plain `npm install` skip devDeps (would fail with `vite: not found`).
