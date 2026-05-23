@@ -7,6 +7,16 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 
 ## [Unreleased]
 
+### Fixed — Deployment (fix/hostinger-deploy)
+- **Hostinger single-deploy now serves the React app instead of erroring with `ENOENT … web/dist/index.html`.** Hostinger's deploy root is `backend/`, so it only ran `npm install` there — `web/dist` was never built. Added a `postinstall` script to `backend/package.json` that builds the frontend after the backend installs: `cd ../web && PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm install --include=dev && npm run build`.
+  - `--include=dev` is required because Vite is in `web/`'s `devDependencies` and Hostinger sets `NODE_ENV=production`, which makes plain `npm install` skip devDeps (would fail with `vite: not found`).
+  - `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1` prevents `@playwright/test`'s postinstall from downloading ~250 MB of browser binaries onto the production server (Playwright is dev-only, only needed for local E2E).
+  - Same command is exposed as a manual `npm run build:web` for the same purpose.
+- **Production frontend now talks to the real backend at the same origin.**
+  - `web/src/api/client.js` already used relative `/api` paths — no change needed (verified line 18 calls `fetch(path)` directly).
+  - New `web/.env.production` sets `VITE_USE_MOCKS=false` so `vite build` produces a bundle that calls real endpoints (the client.js default is mocks-ON unless `VITE_USE_MOCKS === 'false'`).
+- **Verified locally (no deploy burned):** ran the exact Hostinger sequence (`cd backend && NODE_ENV=production npm install`) — postinstall fired, Vite built 191 modules into `web/dist/` (432 B index.html + 374 KB JS + 210 KB CSS + lazy Chart.js chunk + 4 brand SVGs, ✓ 2.37 s). Booted `node server.js` on `:4001`; `GET /api/health` → 200 `{ok:true}`; `GET /` → 200 `text/html` with `<title>AutoClock</title>` + `<div id="root">` (the real SPA, not the ENOENT JSON); `GET /sign-in` → 200 (catch-all + SPA deep-link works).
+
 ### Added — Frontend (feat/frontend-allpages — 14 new pages)
 - **14 production pages** ported from `docs/FrontEnd Design/` and wired to the backend's EP-08..EP-22 (mocked where the backend hasn't shipped yet; opportunistic real-backend swap via `VITE_USE_MOCKS=0`):
   - **P03 App Shell** — extracted from TodayPage into `<AppShell>` (TopBar + Sidebar + ConnectionsCard + UserMenu) with role-aware nav (`navConfig.js` → `pm_lead | management | operations | admin` per ERD §8) and a **mobile drawer** (hamburger + backdrop + ESC + body-scroll-lock). TodayPage refactored to consume it.
