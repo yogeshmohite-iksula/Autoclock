@@ -7,6 +7,11 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 
 ## [Unreleased]
 
+### Added — Demo mode (feat/demo-mode)
+- **Production site flipped to DEMO MODE** — `web/.env.production` now sets `VITE_USE_MOCKS=true` so the live build runs entirely on in-memory mocks (no real Jira/Sheets/Gmail/DB calls). All 17 pages render with deterministic seeded data; any `@iksula.com` email signs in. Use to demo the UI without needing per-user OAuth or live integrations.
+- **`<DemoBanner />` ribbon** — `web/src/components/DemoBanner.{jsx,css}` — a 28 px sticky top warning ("DEMO MODE — data is not saved · all actions are simulated · Jira / Sheets / Gmail are mocked"). Rendered conditionally in `routes.jsx` via `{USE_MOCKS && <DemoBanner />}` so Vite **statically tree-shakes the component out** when `VITE_USE_MOCKS=false` (zero bytes in real-prod builds). Verified: production bundle contains `DEMO MODE` text + `.ac-demo-banner` CSS class when mocks ON; will be absent when mocks OFF.
+- **To exit demo mode** — change `web/.env.production` to `VITE_USE_MOCKS=false`, commit, push, redeploy. Same toggle, one file.
+
 ### Fixed — Deployment (fix/hostinger-outdir, follow-up to PR #8)
 - **Hostinger ENOENT persisted after PR #8 because the build output lived in `web/dist/` (a sibling of the app root), but Hostinger only copies the app root (`backend/`) to the runtime path** — the built SPA never reached the live directory. Web research (Hostinger docs + Passenger docs) confirmed: Node-hosted apps must keep static assets *inside* the app root.
 - **Fix:** Vite now writes the production bundle directly to `backend/public/` (configured in `web/vite.config.js` via `outDir: '../backend/public'` + `emptyOutDir: true` to opt-in to clearing stale assets across a directory boundary). `backend/server.js` now serves from `path.join(__dirname, 'public')` instead of `path.join(__dirname, '..', 'web', 'dist')`. `.gitignore` adds `backend/public/` (build output stays out of git; regenerated on every deploy).
