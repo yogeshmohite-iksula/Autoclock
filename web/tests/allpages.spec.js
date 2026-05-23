@@ -9,6 +9,7 @@ import {
   VIEWPORTS,
   trackErrors,
   signInAndOnboard,
+  gotoAuthed,
   assertNoHorizontalOverflow,
   assertNoOverlap,
   screenshot,
@@ -77,11 +78,12 @@ export function registerPageGate({ id, title, path, heading, primary, regions })
       test(`viewport @ ${vp.name} (${vp.width}×${vp.height}) › ${path} renders cleanly`, async ({ page }) => {
         const errors = trackErrors(page);
         await page.setViewportSize({ width: vp.width, height: vp.height });
-        await signInAndOnboard(page);
-        await page.goto(path);
+        // Use gotoAuthed (in-app history push) so the mock session survives —
+        // page.goto() reloads JS which resets SESSION_USER and bounces to /sign-in.
+        await gotoAuthed(page, path);
         await page.waitForLoadState('networkidle');
 
-        if (heading) await expect(page.getByRole('heading', { name: heading })).toBeVisible();
+        if (heading) await expect(page.getByRole('heading', { name: heading }).first()).toBeVisible();
         if (primary) await expect(page.getByRole('button', { name: primary }).or(page.getByRole('link', { name: primary })).first()).toBeVisible();
 
         await assertNoHorizontalOverflow(page);
@@ -93,3 +95,17 @@ export function registerPageGate({ id, title, path, heading, primary, regions })
     }
   });
 }
+
+// ===========================================================================
+// P04 — Close My Day (/close)
+// EP-12 preview + EP-13 idempotent close. The H1 is "Close your day — here's
+// what AutoClock will do." (matches /close my day/i). Primary action is the
+// "Close My Day" button in the action bar.
+// ===========================================================================
+registerPageGate({
+  id: 'close-my-day',
+  title: 'P04 Close My Day',
+  path: '/close',
+  heading: /Close your day/i,
+  primary: /^Close My Day/,  // matches both bare button + aria-label "Close My Day — confirm and sync"
+});

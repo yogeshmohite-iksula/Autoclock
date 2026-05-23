@@ -182,14 +182,37 @@ const ROUTES = [
     return ok({ ok: true });
   }],
 
-  // EP-12 — minimal preview; the real backend uses the deterministic parser
+  // EP-12 — minimal preview; the real backend uses the deterministic parser.
+  // Mock enriches each group with display-only fields (proj_name, color, slot_count,
+  // time_meta, title) so CloseMyDayPage can render the design fidelity. The real
+  // backend will return only the contract fields (jira_key, minutes, lines) and
+  // the page falls back gracefully via lookups against the projects/tasks payloads.
   ['POST', '/api/day/preview', (body) => {
     const date = body?.work_date || today;
     const entries = TODAY_ENTRIES.filter(e => e.work_date === date);
     const groups = entries.reduce((acc, e) => {
-      const g = acc.find(x => x.jira_key === e.jira_key) || (acc.push({ jira_key: e.jira_key, minutes: 0, lines: [] }), acc[acc.length - 1]);
+      const proj = PROJECTS.find(p => p.id === e.project_id);
+      const tasks = TASKS_BY_PROJECT[e.project_id] || [];
+      const task = tasks.find(t => t.id === e.jira_task_id);
+      let g = acc.find(x => x.jira_key === e.jira_key);
+      if (!g) {
+        g = {
+          jira_key: e.jira_key,
+          minutes: 0,
+          lines: [],
+          slot_count: 0,
+          title: task?.summary || e.jira_key,
+          proj_name: proj?.name || e.project_name,
+          color: proj?.color || '#64748B',
+          initial: (proj?.name || 'X').trim()[0]?.toUpperCase() || 'X',
+          slots: [],
+        };
+        acc.push(g);
+      }
       g.minutes += e.duration_minutes;
       g.lines.push(e.description);
+      g.slot_count += 1;
+      g.slots.push(`${e.slot_start}-${e.slot_end}`);
       return acc;
     }, []);
     const total_minutes = entries.reduce((a, e) => a + e.duration_minutes, 0);

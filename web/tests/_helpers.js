@@ -49,11 +49,16 @@ export async function signInAndOnboard(page) {
   await page.waitForURL(/\/today$/);
 }
 
-/** Sign in + onboard + navigate to an arbitrary authed path. */
+/** Sign in + onboard + navigate to an arbitrary authed path.
+ *  Uses an in-app history push (NOT page.goto) so the mock module's SESSION_USER
+ *  isn't reset by a full page reload. */
 export async function gotoAuthed(page, path) {
   await signInAndOnboard(page);
   if (path !== '/today') {
-    await page.goto(path);
+    await page.evaluate((p) => {
+      window.history.pushState({}, '', p);
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    }, path);
     await page.waitForURL(new RegExp(path.replace(/\//g, '\\/') + '$'));
   }
 }

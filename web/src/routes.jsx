@@ -8,6 +8,7 @@ import { useAuth } from './auth/AuthContext';
 import SignInPage from './pages/SignInPage';
 import OnboardingPage from './pages/OnboardingPage';
 import TodayPage from './pages/TodayPage';
+import CloseMyDayPage from './pages/CloseMyDayPage';
 
 // Legacy stubs (kept so /log, /preview, /dashboard work for Yogesh / Keval / Ali).
 import App from './App';
@@ -63,6 +64,10 @@ export default function AppRoutes() {
       <Route
         path="/today"
         element={<RequireAuth><RequireOnboarded><TodayPage /></RequireOnboarded></RequireAuth>}
+      />
+      <Route
+        path="/close"
+        element={<RequireAuth><RequireOnboarded><CloseMyDayPage /></RequireOnboarded></RequireAuth>}
       />
 
       {/* Legacy stubs under the original shell */}

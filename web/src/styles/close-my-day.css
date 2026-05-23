@@ -1,0 +1,436 @@
+/* close-my-day.css — body-class scoped (`.page-close-my-day`) per plan §5.
+   Every selector is prefixed so .row/.hero/.group/.dest can't bleed into
+   other pages. All colours come from var(--ac-*) tokens (autoclock-theme.css).
+   Lifted from docs/FrontEnd Design /Close My Day.html with prototype
+   scaffolding stripped. */
+
+/* ============ SECTION BADGE ============ */
+.page-close-my-day .sec-badge {
+  display: inline-flex; align-items: center; gap: 0;
+  font-family: var(--ac-font-mono); font-size: 10.5px;
+  color: var(--ac-text-subtle); font-weight: var(--ac-weight-black);
+  text-transform: uppercase; letter-spacing: 0.08em;
+  background: var(--ac-bg); border: 1px solid var(--ac-border);
+  padding: 4px 10px; border-radius: 999px;
+}
+.page-close-my-day .sec-badge b {
+  color: var(--ac-secondary); font-weight: var(--ac-weight-black); margin-right: 6px;
+}
+
+/* ============ HERO ============ */
+.page-close-my-day .hero {
+  display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: end;
+  margin-bottom: 22px;
+}
+.page-close-my-day .hero .eyebrow {
+  display: inline-flex; align-items: center; gap: 10px;
+  margin-bottom: 12px;
+}
+.page-close-my-day .hero h1 {
+  font-size: 32px; font-weight: var(--ac-weight-black);
+  letter-spacing: -0.025em; line-height: 1.12; max-width: 600px;
+}
+.page-close-my-day .hero h1 .accent { color: var(--ac-secondary); }
+.page-close-my-day .hero .sub {
+  margin-top: 10px; color: var(--ac-text-muted);
+  font-size: 14.5px; max-width: 560px; line-height: 1.55;
+}
+.page-close-my-day .hero .right {
+  display: flex; flex-direction: column; align-items: flex-end; gap: 8px;
+  min-width: 0;
+}
+.page-close-my-day .day-total {
+  display: inline-flex; align-items: baseline; gap: 8px;
+  background: var(--ac-secondary); color: #fff;
+  padding: 14px 22px; border-radius: 14px;
+  box-shadow: 0 14px 32px -14px rgba(220, 38, 38, 0.45);
+  transition: background var(--ac-transition), box-shadow var(--ac-transition);
+}
+.page-close-my-day .day-total[data-met="true"] {
+  background: var(--ac-success);
+  box-shadow: 0 14px 32px -14px rgba(16, 185, 129, 0.45);
+}
+.page-close-my-day .day-total .num {
+  font-family: var(--ac-font-mono); font-size: 28px;
+  font-weight: var(--ac-weight-black); letter-spacing: -0.02em; line-height: 1;
+}
+.page-close-my-day .day-total .lbl {
+  font-size: 12px; color: rgba(255, 255, 255, 0.78);
+  font-weight: var(--ac-weight-semibold);
+}
+.page-close-my-day .day-total-meta {
+  font-family: var(--ac-font-mono); font-size: 11px; color: var(--ac-text-subtle);
+  font-weight: var(--ac-weight-bold); text-transform: uppercase; letter-spacing: 0.04em;
+}
+
+/* ============ SECTION CARD ============ */
+.page-close-my-day .sec {
+  background: var(--ac-surface);
+  border: 1px solid var(--ac-border);
+  border-radius: 16px;
+  padding: 22px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+}
+.page-close-my-day .sec-head {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 16px; margin-bottom: 14px; flex-wrap: wrap;
+}
+.page-close-my-day .sec-head .title-block {
+  display: flex; flex-direction: column; gap: 8px; min-width: 0;
+}
+.page-close-my-day .sec-head .title {
+  font-size: 18px; font-weight: var(--ac-weight-black); letter-spacing: -0.015em;
+}
+.page-close-my-day .sec-head .lead {
+  font-size: 13px; color: var(--ac-text-muted);
+}
+.page-close-my-day .sec-head .right {
+  display: flex; align-items: center; gap: 8px;
+}
+
+/* ============ GROUPED-BY-TICKET SUMMARY (.group) ============ */
+.page-close-my-day .groups { display: flex; flex-direction: column; }
+.page-close-my-day .group {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  gap: 16px; align-items: center;
+  padding: 14px 4px; border-top: 1px solid var(--ac-border);
+  min-width: 0;
+}
+.page-close-my-day .group:first-child { border-top: 0; }
+.page-close-my-day .group .ic {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  background: var(--proj-color, var(--ac-text-subtle));
+  color: #fff;
+  display: grid; place-items: center;
+  font-weight: var(--ac-weight-black);
+  font-size: 13px; letter-spacing: -0.02em;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.15) inset,
+              0 4px 10px -6px rgba(15, 23, 42, 0.4);
+  flex: none;
+}
+.page-close-my-day .group .body { min-width: 0; }
+.page-close-my-day .group .top-row {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  min-width: 0;
+}
+.page-close-my-day .group .ticket {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--ac-font-mono); font-size: 12px;
+  font-weight: var(--ac-weight-bold); color: var(--ac-text);
+  background: var(--ac-bg); border: 1px solid var(--ac-border);
+  padding: 2px 8px 2px 6px; border-radius: 5px;
+  text-decoration: none;
+}
+.page-close-my-day .group .ticket:hover { background: var(--ac-n-100); }
+.page-close-my-day .group .ticket-title {
+  font-size: 14px; font-weight: var(--ac-weight-bold); color: var(--ac-text);
+  overflow-wrap: anywhere;
+}
+.page-close-my-day .group .merged {
+  font-family: var(--ac-font-mono); font-size: 10.5px;
+  color: var(--ac-text-subtle); font-weight: var(--ac-weight-bold);
+  text-transform: uppercase; letter-spacing: 0.04em;
+  background: var(--ac-bg); border: 1px dashed var(--ac-border-strong);
+  padding: 2px 8px; border-radius: 999px;
+}
+.page-close-my-day .group .proj-name {
+  font-size: 12.5px; color: var(--ac-text-muted);
+  font-weight: var(--ac-weight-semibold);
+  overflow-wrap: anywhere;
+}
+.page-close-my-day .group .desc {
+  margin-top: 6px;
+  font-size: 13.5px; color: var(--ac-text); line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+.page-close-my-day .group .desc .meta-time {
+  font-family: var(--ac-font-mono); font-size: 11px; color: var(--ac-text-subtle);
+  font-weight: var(--ac-weight-bold); margin-top: 4px; display: block;
+}
+.page-close-my-day .group .dur {
+  font-family: var(--ac-font-mono); font-size: 18px;
+  font-weight: var(--ac-weight-black); color: var(--ac-text);
+  text-align: right; line-height: 1;
+}
+.page-close-my-day .group .dur .lbl {
+  display: block; margin-top: 4px;
+  font-size: 10px; color: var(--ac-text-subtle); font-weight: var(--ac-weight-bold);
+  text-transform: uppercase; letter-spacing: 0.04em;
+}
+
+.page-close-my-day .total-strip {
+  display: grid; grid-template-columns: 44px 1fr auto; gap: 16px; align-items: center;
+  padding: 16px 4px 4px;
+  border-top: 1px dashed var(--ac-border-strong);
+}
+.page-close-my-day .total-strip .label {
+  font-size: 13px; font-weight: var(--ac-weight-bold); color: var(--ac-text);
+  text-transform: uppercase; letter-spacing: 0.04em; font-family: var(--ac-font-mono);
+}
+.page-close-my-day .total-strip .label .breakdown {
+  margin-left: 10px; color: var(--ac-text-subtle); font-weight: var(--ac-weight-semibold);
+  text-transform: none; letter-spacing: 0;
+  font-family: var(--ac-font-mono); font-size: 11px;
+}
+.page-close-my-day .total-strip .total {
+  font-family: var(--ac-font-mono);
+  font-size: 22px; font-weight: var(--ac-weight-black);
+  letter-spacing: -0.01em; color: var(--ac-text);
+}
+.page-close-my-day .total-strip .total.alert { color: var(--ac-danger); }
+
+/* ============ DESTINATIONS ============ */
+.page-close-my-day .dests {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+.page-close-my-day .dest {
+  border: 1px solid var(--ac-border);
+  border-radius: 14px;
+  padding: 16px;
+  background: var(--ac-bg);
+  display: flex; flex-direction: column; gap: 10px;
+  position: relative;
+  transition: var(--ac-transition);
+  min-width: 0;
+}
+.page-close-my-day .dest:hover {
+  border-color: var(--ac-border-strong); background: var(--ac-surface);
+}
+.page-close-my-day .dest .top-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+}
+.page-close-my-day .dest .ic {
+  width: 38px; height: 38px; border-radius: 10px;
+  background: var(--ac-surface); border: 1px solid var(--ac-border);
+  display: grid; place-items: center; flex: none;
+}
+.page-close-my-day .dest .ic svg { width: 22px; height: 22px; }
+.page-close-my-day .dest .ok {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: var(--ac-font-mono); font-size: 10px;
+  font-weight: var(--ac-weight-black);
+  color: var(--ac-success);
+  background: rgba(16, 185, 129, 0.10);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  padding: 3px 8px; border-radius: 999px;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+.page-close-my-day .dest .ok::before { content: "✓"; }
+.page-close-my-day .dest .title {
+  font-size: 14.5px; font-weight: var(--ac-weight-black); letter-spacing: -0.01em;
+}
+.page-close-my-day .dest .action-line {
+  font-size: 13px; color: var(--ac-text); line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.page-close-my-day .dest .action-line strong {
+  color: var(--ac-text); font-weight: var(--ac-weight-black);
+}
+.page-close-my-day .dest .action-line .num {
+  font-family: var(--ac-font-mono); color: var(--ac-secondary);
+  font-weight: var(--ac-weight-black);
+}
+.page-close-my-day .dest .detail {
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px dashed var(--ac-border);
+  font-family: var(--ac-font-mono); font-size: 11px;
+  color: var(--ac-text-subtle); font-weight: var(--ac-weight-semibold);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.page-close-my-day .dest .detail .key { color: var(--ac-text-muted); }
+.page-close-my-day .dest .detail a {
+  color: var(--ac-text); text-decoration: none;
+  border-bottom: 1px dashed var(--ac-border-strong);
+}
+.page-close-my-day .dest .detail a:hover { border-bottom-color: var(--ac-primary); }
+
+/* mini ticket list under jira dest */
+.page-close-my-day .mini-list {
+  display: flex; flex-direction: column; gap: 4px; margin-top: -2px;
+}
+.page-close-my-day .mini-list .row {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 11.5px; font-family: var(--ac-font-mono); color: var(--ac-text-muted);
+  min-width: 0;
+}
+.page-close-my-day .mini-list .row .key {
+  font-weight: var(--ac-weight-bold); color: var(--ac-text);
+  overflow-wrap: anywhere;
+}
+.page-close-my-day .mini-list .row .dur {
+  color: var(--ac-text-subtle); margin-left: auto;
+  white-space: nowrap;
+}
+
+/* ============ ACTION BAR ============ */
+.page-close-my-day .action-bar {
+  position: sticky; bottom: 0; flex: none;
+  padding: 16px 0;
+  display: flex; justify-content: center; pointer-events: none;
+  z-index: 4;
+  margin-top: 8px;
+}
+.page-close-my-day .action-bar-inner {
+  pointer-events: auto;
+  background: var(--ac-surface);
+  border: 1px solid var(--ac-border);
+  border-radius: 14px;
+  box-shadow: 0 14px 36px -16px rgba(15, 23, 42, 0.28);
+  padding: 12px 14px;
+  display: flex; align-items: center; gap: 14px;
+  width: 100%;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.page-close-my-day .reassure {
+  flex: 1 1 240px; min-width: 0;
+  display: flex; flex-direction: column; gap: 3px;
+}
+.page-close-my-day .reassure .top {
+  font-size: 13.5px; font-weight: var(--ac-weight-bold); color: var(--ac-text);
+  overflow-wrap: anywhere;
+}
+.page-close-my-day .reassure .top .num {
+  font-family: var(--ac-font-mono); color: var(--ac-primary);
+}
+.page-close-my-day .reassure .sub {
+  font-family: var(--ac-font-mono); font-size: 11px;
+  color: var(--ac-text-subtle); font-weight: var(--ac-weight-bold);
+  text-transform: uppercase; letter-spacing: 0.04em;
+  display: inline-flex; align-items: center; gap: 6px;
+  flex-wrap: wrap;
+}
+.page-close-my-day .reassure .sub .dot {
+  width: 6px; height: 6px; border-radius: 999px;
+  background: var(--ac-success); flex: none;
+}
+.page-close-my-day .action-bar .actions {
+  display: flex; gap: 10px; flex-wrap: wrap;
+}
+
+.page-close-my-day .btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  border-radius: 10px;
+  font-family: var(--ac-font-sans); font-size: 13.5px;
+  font-weight: var(--ac-weight-semibold);
+  border: 1px solid transparent; cursor: pointer;
+  transition: var(--ac-transition); white-space: nowrap;
+  height: 44px; padding: 0 18px;
+}
+.page-close-my-day .btn--ghost {
+  background: var(--ac-surface); color: var(--ac-text);
+  border-color: var(--ac-border-strong);
+}
+.page-close-my-day .btn--ghost:hover { background: var(--ac-n-100); }
+.page-close-my-day .btn--accent {
+  background: var(--ac-secondary); color: #fff; border-color: var(--ac-secondary);
+  box-shadow: 0 8px 22px -8px rgba(220, 38, 38, 0.45);
+  font-weight: var(--ac-weight-bold);
+}
+.page-close-my-day .btn--accent:hover:not(:disabled) { filter: brightness(1.05); }
+.page-close-my-day .btn--accent:disabled {
+  background: var(--ac-n-200); color: var(--ac-text-subtle);
+  border-color: var(--ac-n-200); box-shadow: none; cursor: not-allowed;
+}
+.page-close-my-day .btn--ghost:focus-visible,
+.page-close-my-day .btn--accent:focus-visible {
+  outline: 2px solid var(--ac-secondary);
+  outline-offset: 2px;
+}
+.page-close-my-day .btn .kbd {
+  font-family: var(--ac-font-mono); font-size: 10.5px;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 1px 5px; border-radius: 4px; line-height: 1;
+}
+.page-close-my-day .btn--ghost .kbd {
+  background: var(--ac-bg); border-color: var(--ac-border-strong);
+  color: var(--ac-text-muted);
+}
+.page-close-my-day .btn .spin {
+  width: 14px; height: 14px; border-radius: 999px;
+  border: 2px solid currentColor; border-top-color: transparent; opacity: 0.85;
+  animation: cmd-spin 0.8s linear infinite;
+}
+@keyframes cmd-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .page-close-my-day .btn .spin { animation: none; }
+}
+
+/* ============ EMPTY STATE (no entries to close) ============ */
+.page-close-my-day .empty {
+  background: var(--ac-surface);
+  border: 1px dashed var(--ac-border-strong);
+  border-radius: 16px;
+  padding: 28px 22px;
+  text-align: center;
+}
+.page-close-my-day .empty h2 {
+  font-size: 18px; font-weight: var(--ac-weight-black);
+  letter-spacing: -0.015em; margin-bottom: 8px;
+}
+.page-close-my-day .empty p {
+  color: var(--ac-text-muted); font-size: 13.5px; line-height: 1.55;
+  max-width: 480px; margin: 0 auto 14px;
+}
+
+/* ============ ERROR BANNER ============ */
+.page-close-my-day .ac-banner--danger {
+  background: rgba(220, 38, 38, 0.06);
+  border: 1px solid rgba(220, 38, 38, 0.28);
+  color: var(--ac-danger-text);
+  padding: 12px 14px;
+  border-radius: 10px;
+  margin-bottom: 14px;
+  font-size: 13px;
+}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 900px) {
+  .page-close-my-day .dests { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 720px) {
+  .page-close-my-day .hero { grid-template-columns: 1fr; }
+  .page-close-my-day .hero .right { align-items: flex-start; }
+  .page-close-my-day .hero h1 { font-size: 22px; }
+  .page-close-my-day .dests { grid-template-columns: 1fr; }
+  .page-close-my-day .group {
+    grid-template-columns: 40px 1fr; gap: 12px;
+  }
+  .page-close-my-day .group .dur {
+    grid-column: 1 / -1; justify-self: end;
+  }
+  .page-close-my-day .action-bar-inner {
+    flex-direction: column; align-items: stretch;
+  }
+  .page-close-my-day .action-bar .actions {
+    width: 100%;
+  }
+  .page-close-my-day .action-bar .actions .btn {
+    flex: 1;
+  }
+  .page-close-my-day .sec { padding: 16px; }
+}
+
+/* Animation — gentle rise on first paint */
+@keyframes cmd-rise {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .page-close-my-day .hero,
+  .page-close-my-day .sec,
+  .page-close-my-day .action-bar {
+    animation: cmd-rise 380ms ease both;
+  }
+  .page-close-my-day .sec:nth-of-type(2) { animation-delay: 60ms; }
+  .page-close-my-day .sec:nth-of-type(3) { animation-delay: 120ms; }
+}
