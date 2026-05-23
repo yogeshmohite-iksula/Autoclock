@@ -291,6 +291,53 @@ test.describe('P08 Team Dashboard — range tab toggles URL state', () => {
   }
 });
 
+// ===========================================================================
+// P09 — Team Member Detail (/team/:memberId)
+// OQ-AP-08. Role-gated to pm_lead+admin. Heading matches the member's name —
+// /team/2 = Anuja Patil (see __USERS in mocks.js). Primary action is the
+// always-visible "Share email" CTA in the header.
+// ===========================================================================
+registerPageGate({
+  id: 'team-member-detail',
+  title: 'P09 Team Member Detail',
+  path: '/team/2',
+  heading: /Anuja Patil/i,
+  primary: /Share email/i,
+});
+
+// Bespoke test — click the first DayRowExpandable and assert it expands
+// (ticket-list becomes visible). Run at both viewports.
+test.describe('P09 Team Member Detail — day row expands', () => {
+  for (const vp of VIEWPORTS) {
+    test(`viewport @ ${vp.name} (${vp.width}×${vp.height}) › expand a day reveals tickets`, async ({ page }) => {
+      const errors = trackErrors(page);
+      await page.setViewportSize({ width: vp.width, height: vp.height });
+      await gotoAuthed(page, '/team/2');
+      await page.waitForLoadState('networkidle');
+
+      // The first day-row's button should be aria-expanded="false" initially.
+      const firstDayBtn = page.locator('.page-team-member .day-row__head').first();
+      await expect(firstDayBtn).toBeVisible();
+      await expect(firstDayBtn).toHaveAttribute('aria-expanded', 'false');
+
+      // Click → expanded
+      await firstDayBtn.scrollIntoViewIfNeeded();
+      await firstDayBtn.click();
+      await expect(firstDayBtn).toHaveAttribute('aria-expanded', 'true');
+
+      // The first ticket-list should now be visible.
+      const firstTicketList = page.locator('.page-team-member .day-row.is-open .ticket-list').first();
+      await expect(firstTicketList).toBeVisible();
+      // It contains at least one TicketRow.
+      await expect(firstTicketList.locator('.ticket-row').first()).toBeVisible();
+
+      await assertNoHorizontalOverflow(page);
+      await screenshot(page, `team-member-detail-expand--${vp.name}`);
+      expect(errors, `console errors:\n${errors.join('\n')}`).toEqual([]);
+    });
+  }
+});
+
 // Bespoke test — full flow: sign-in → onboarding → Close My Day → confirm →
 // Sync Result. Asserts the "Your day is synced." hero is visible at both
 // viewports (mock EP-13 returns overall:'ok'). No overlap / no overflow /

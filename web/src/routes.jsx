@@ -13,6 +13,7 @@ import SyncResultPage from './pages/SyncResultPage';
 import SettingsPage from './pages/SettingsPage';
 import MyHistoryPage from './pages/MyHistoryPage';
 import TeamDashboardPage from './pages/TeamDashboardPage';
+import TeamMemberDetailPage from './pages/TeamMemberDetailPage';
 
 // Legacy stubs (kept so /log, /preview, /dashboard work for Yogesh / Keval / Ali).
 import App from './App';
@@ -92,6 +93,18 @@ export default function AppRoutes() {
             <RequireOnboarded>
               <RequireRole roles={['pm_lead']}>
                 <TeamDashboardPage />
+              </RequireRole>
+            </RequireOnboarded>
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/team/:memberId"
+        element={
+          <RequireAuth>
+            <RequireOnboarded>
+              <RequireRole roles={['pm_lead']}>
+                <TeamMemberDetailPage />
               </RequireRole>
             </RequireOnboarded>
           </RequireAuth>

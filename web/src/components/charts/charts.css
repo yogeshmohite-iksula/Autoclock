@@ -1,0 +1,25 @@
+/* charts.css — body-class-agnostic container styles for chart wrappers.
+   Chart.js needs a fixed-height parent because we use
+   `maintainAspectRatio: false` (otherwise the canvas grows on every resize).
+   Each consumer passes `height` inline — this file just owns the relative
+   positioning + max-width clamp so the canvas can't overflow its grid cell. */
+
+.ac-chart {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  /* `height` is set inline via the `height` prop. */
+}
+
+.ac-chart > canvas {
+  /* Chart.js writes width/height inline; the !important guards against
+     a stale aspect-ratio setting from a previous instance. */
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
+.ac-sparkline {
+  display: inline-block;
+  vertical-align: middle;
+}
