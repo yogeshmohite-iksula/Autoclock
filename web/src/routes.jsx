@@ -4,6 +4,8 @@
 
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './auth/AuthContext';
+import { USE_MOCKS } from './api';
+import DemoBanner from './components/DemoBanner';
 
 import SignInPage from './pages/SignInPage';
 import OnboardingPage from './pages/OnboardingPage';
@@ -64,8 +66,13 @@ function RootIndex() {
 
 export default function AppRoutes() {
   return (
-    <Routes>
-      <Route path="/" element={<RootIndex />} />
+    <>
+      {/* DemoBanner is statically tree-shaken when VITE_USE_MOCKS=false at build time —
+          USE_MOCKS becomes `false` and Vite eliminates the JSX branch entirely.
+          When VITE_USE_MOCKS=true, the banner mounts and warns users that data is mocked. */}
+      {USE_MOCKS && <DemoBanner />}
+      <Routes>
+        <Route path="/" element={<RootIndex />} />
 
       {/* New screens */}
       <Route path="/sign-in" element={<SignInPage />} />
@@ -209,7 +216,8 @@ export default function AppRoutes() {
         <Route path="/dashboard" element={<DashboardPage />} />
       </Route>
 
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </>
   );
 }
