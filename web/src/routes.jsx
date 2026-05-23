@@ -16,6 +16,7 @@ import TeamDashboardPage from './pages/TeamDashboardPage';
 import TeamMemberDetailPage from './pages/TeamMemberDetailPage';
 import ManagementDashboardPage from './pages/ManagementDashboardPage';
 import ComplianceConsolePage from './pages/ComplianceConsolePage';
+import ReminderHistoryPage from './pages/ReminderHistoryPage';
 
 // Legacy stubs (kept so /log, /preview, /dashboard work for Yogesh / Keval / Ali).
 import App from './App';
@@ -131,6 +132,18 @@ export default function AppRoutes() {
             <RequireOnboarded>
               <RequireRole roles={['operations']}>
                 <ComplianceConsolePage />
+              </RequireRole>
+            </RequireOnboarded>
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/ops/reminders"
+        element={
+          <RequireAuth>
+            <RequireOnboarded>
+              <RequireRole roles={['operations']}>
+                <ReminderHistoryPage />
               </RequireRole>
             </RequireOnboarded>
           </RequireAuth>

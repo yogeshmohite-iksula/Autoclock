@@ -447,6 +447,64 @@ test.describe('P11 Compliance Console — select + bulk send round-trip', () => 
   }
 });
 
+// ===========================================================================
+// P12 — Reminder History (/ops/reminders)
+// EP-18 (mocked). Role-gated to operations + admin. The mock viewer is
+// MOCK_USER.role='admin' so the route is reachable. H1 matches "Reminder
+// History"; primary is the always-visible "All N" filter chip on the rail.
+// ===========================================================================
+registerPageGate({
+  id: 'reminder-history',
+  title: 'P12 Reminder History',
+  path: '/ops/reminders',
+  heading: /Reminder History/i,
+  primary: /^All\s+\d+/,
+});
+
+// Bespoke test — click the second run in the rail, assert ?runId= updates and
+// the detail pane heading/data-run-id changes. Then click "Show email preview"
+// and assert the email-preview card appears. Runs at both viewports.
+test.describe('P12 Reminder History — select run + show email preview', () => {
+  for (const vp of VIEWPORTS) {
+    test(`viewport @ ${vp.name} (${vp.width}×${vp.height}) › click run 2 → ?runId & detail updates → show email`, async ({ page }) => {
+      const errors = trackErrors(page);
+      await page.setViewportSize({ width: vp.width, height: vp.height });
+      await gotoAuthed(page, '/ops/reminders');
+      await page.waitForLoadState('networkidle');
+
+      // Default selection is the first run — capture its id from the detail title.
+      const titleEl = page.locator('.page-reminders .ac-rundetail__title');
+      await expect(titleEl).toBeVisible();
+      const firstRunId = await titleEl.getAttribute('data-run-id');
+      expect(firstRunId).toBeTruthy();
+
+      // Click the second rail row.
+      const secondRow = page.locator('.page-reminders .ac-runlist__item').nth(1).locator('.ac-runlist__row');
+      await secondRow.scrollIntoViewIfNeeded();
+      await secondRow.click();
+
+      // URL gains ?runId=…
+      await expect(page).toHaveURL(/[?&]runId=/);
+      // Detail title's data-run-id has changed (i.e. detail pane updated).
+      await expect(titleEl).not.toHaveAttribute('data-run-id', firstRunId);
+
+      // Click "Show email preview" CTA — the panel appears.
+      const showBtn = page.getByRole('button', { name: /Show email preview/i });
+      await expect(showBtn).toBeVisible();
+      await showBtn.click();
+      await expect(page.locator('.page-reminders .ac-emailcard__panel')).toBeVisible();
+      // Hide CTA now toggles back to "Hide" label.
+      await expect(page.getByRole('button', { name: /Hide email preview/i })).toBeVisible();
+      // URL has showEmail=1.
+      await expect(page).toHaveURL(/[?&]showEmail=1/);
+
+      await assertNoHorizontalOverflow(page);
+      await screenshot(page, `reminder-history-flow--${vp.name}`);
+      expect(errors, `console errors:\n${errors.join('\n')}`).toEqual([]);
+    });
+  }
+});
+
 // Bespoke test — full flow: sign-in → onboarding → Close My Day → confirm →
 // Sync Result. Asserts the "Your day is synced." hero is visible at both
 // viewports (mock EP-13 returns overall:'ok'). No overlap / no overflow /
