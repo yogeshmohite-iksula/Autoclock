@@ -414,8 +414,11 @@ function __buildMemberDetail(memberId) {
 
 // Compliance — one row per employee
 function __buildCompliance(week) {
+  // Deterministic synth (no Math.random) so Playwright screenshots + counts are stable.
+  // Cycle through a fixed pattern of week-hour values keyed by index.
+  const PATTERN = [22, 38, 41, 30, 35, 18, 26, 40];
   const people = __USERS.filter(u => u.role === 'employee' || u.role === 'pm_lead').map((u, i) => {
-    const logged = 30 + Math.round(Math.random() * 12);
+    const logged = PATTERN[i % PATTERN.length];
     const target = 40;
     return { id: u.id, name: u.name, role: u.role, team: u.team, email: u.email, weekTarget: target, logged, gap: Math.max(0, target - logged), leave: 0, status: logged < target * 0.8 ? 'bad' : (logged < target ? 'short' : 'ok'), hue: u.hue, initial: u.initial };
   });

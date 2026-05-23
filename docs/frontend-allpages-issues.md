@@ -41,3 +41,15 @@ Format: one entry per issue, newest at the top.
 - **What:**   PR #3 backend returns the slim shape {team_id, kpis:{team_logged_today}, members:[{id,name,minutes_today}]}. P08 needs {team, range, kpis:{hoursLogged,onTrack,behind,onLeave,teamSize}, members:[{id,name,role,hue,initial,today,week,target,weekTarget,status,lastClose}]}. Mock extended now; backend follow-up needed for OQ-AP-07.
 - **Impact:** data-shape mismatch — frontend works on mocks; would 404/break on raw PR #3 backend until extension lands.
 - **Next:**   Keval — extend EP-14 to match the shape above. Frontend's api.team.team() already passes `range`.
+
+## 2026-05-23 — P11 Compliance Console — EP-16 mock made deterministic
+- **Where:**  web/src/api/mocks.js (`__buildCompliance`).
+- **What:**   Was using `Math.random()` to seed per-user weekly hours — that made the people list non-deterministic across reloads, which breaks Playwright counters / screenshot diffs. Swapped to a fixed pattern `[22, 38, 41, 30, 35, 18, 26, 40]` keyed by index.
+- **Impact:** dev-only; cosmetic. Real EP-16 from the backend would obviously be deterministic per (user, week).
+- **Next:**   None for backend. When EP-16 ships, mock can be removed from the route.
+
+## 2026-05-23 — P11 Compliance Console — EP-17 manual-recipient run shape (mock)
+- **Where:**  web/src/api/mocks.js (POST /api/ops/run-check handler) + web/src/api/ops.js.
+- **What:**   The page POSTs `{ type: 'manual', recipientIds: [...] }` and renders the response `{ runId, status, emailed, by }`. The mock returns `emailed: recipientIds.length` already; the backend handler in PR #3 needs to accept the `manual` type and persist the run to `reminder_runs` + `reminder_recipients` (TB-08/TB-09) with the chosen subset.
+- **Impact:** data-shape mismatch — frontend works on mocks; backend needs to widen EP-17 to accept the `manual` type alongside `friday`/`monday`.
+- **Next:**   Keval — extend EP-17 to accept `type: 'manual'` + `recipientIds: number[]`. Friday/Monday cron paths stay as-is.

@@ -1,0 +1,194 @@
+/* compliance.css — body-class scoped (`.page-compliance`). Every selector
+   begins with `.page-compliance` so the design's generic class names
+   (`.row`, `.stat`, `.stats-row`, `.filters`, `.filters-row`, `.queue`)
+   never clash with other pages on the route.
+   Lifted from docs/FrontEnd Design /Compliance Console.html
+   (extraction notes P11). */
+
+/* ============ PAGE-HEAD ============ */
+.page-compliance .page-head {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+.page-compliance .page-head__left { min-width: 0; }
+.page-compliance .page-head h1 {
+  font-size: 28px;
+  font-weight: var(--ac-weight-black, 900);
+  letter-spacing: -0.025em;
+  line-height: 1.12;
+  color: var(--ac-text);
+  margin: 0;
+}
+.page-compliance .page-head__sub {
+  margin-top: 6px;
+  color: var(--ac-text-muted);
+  font-size: 13.5px;
+  line-height: 1.5;
+  max-width: 64ch;
+}
+.page-compliance .page-head__eyebrow {
+  display: inline-flex; align-items: center; gap: 10px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.page-compliance .page-head__back {
+  font-family: var(--ac-font-mono, ui-monospace, monospace);
+  font-size: 11px;
+  color: var(--ac-text-muted);
+  text-decoration: none;
+  letter-spacing: 0.05em;
+  font-weight: var(--ac-weight-semibold);
+}
+.page-compliance .page-head__back:hover { color: var(--ac-secondary); text-decoration: underline; }
+.page-compliance .page-head__badge {
+  display: inline-flex; align-items: center;
+  font-family: var(--ac-font-mono, JetBrains Mono, ui-monospace, monospace);
+  font-size: 10.5px;
+  color: var(--ac-text-subtle);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: var(--ac-bg);
+  border: 1px solid var(--ac-border);
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+.page-compliance .page-head__badge b {
+  color: var(--ac-secondary);
+  margin-right: 6px;
+  font-weight: 800;
+}
+
+/* ============ ERROR / LOADING / EMPTY ============ */
+.page-compliance .error {
+  border: 1px solid rgba(220,38,38,.30);
+  background: rgba(220,38,38,.06);
+  color: var(--ac-danger-text, #991B1B);
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+.page-compliance .loading {
+  padding: 16px;
+  color: var(--ac-text-muted);
+  font-size: 13px;
+  text-align: center;
+}
+.page-compliance .empty {
+  padding: 24px;
+  color: var(--ac-text-muted);
+  font-size: 13.5px;
+  text-align: center;
+  background: var(--ac-surface);
+  border: 1px dashed var(--ac-border);
+  border-radius: 12px;
+}
+
+/* ============ STATS ROW (4 KpiCard variant="stat") ============ */
+.page-compliance .stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+@media (max-width: 900px) {
+  .page-compliance .stats-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* ============ FILTERS ROW ============ */
+.page-compliance .filters-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.page-compliance .filters-row__quick {
+  display: inline-flex;
+  align-items: center;
+}
+.page-compliance .link-btn {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--ac-secondary);
+  font-family: var(--ac-font-sans);
+  font-size: 13px;
+  font-weight: var(--ac-weight-semibold);
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 8px;
+}
+.page-compliance .link-btn:hover { background: var(--ac-n-100); }
+.page-compliance .link-btn[disabled] { color: var(--ac-text-subtle); cursor: not-allowed; }
+.page-compliance .link-btn:focus-visible { outline: 2px solid var(--ac-secondary); outline-offset: 2px; }
+
+/* ============ CONFIRM BANNER ============ */
+.page-compliance .confirm-banner {
+  position: relative;
+}
+.page-compliance .confirm-banner__actions {
+  margin: -8px 0 16px 0;
+  display: flex; justify-content: flex-end;
+}
+
+/* ============ PERSON LIST ============ */
+.page-compliance .people-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 80px; /* room for sticky mobile bulk-bar */
+}
+
+/* ============ ROW ACTION BUTTON (per-person Send) ============ */
+.page-compliance .row-action {
+  appearance: none;
+  border: 1px solid var(--ac-border);
+  background: var(--ac-surface);
+  color: var(--ac-text-muted);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-family: var(--ac-font-sans);
+  font-size: 12px;
+  font-weight: var(--ac-weight-semibold);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color .15s ease, background .15s ease;
+}
+.page-compliance .row-action:hover {
+  color: var(--ac-secondary);
+  border-color: rgba(37,99,235,.32);
+}
+.page-compliance .row-action:focus-visible {
+  outline: 2px solid var(--ac-secondary);
+  outline-offset: 2px;
+}
+
+/* ============ BULK ACTION BAR — desktop position ============ */
+.page-compliance .bulk-bar-anchor {
+  position: sticky;
+  bottom: 24px;
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+  pointer-events: none;
+  z-index: 12;
+}
+.page-compliance .bulk-bar-anchor .ac-bulk-bar {
+  pointer-events: auto;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12);
+}
+
+/* ============ Mobile tweaks ============ */
+@media (max-width: 640px) {
+  .page-compliance .page-head h1 { font-size: 22px; }
+  .page-compliance .filters-row { flex-direction: column; align-items: stretch; }
+  .page-compliance .filters-row__quick { justify-content: flex-end; }
+  .page-compliance .people-list { gap: 10px; margin-bottom: 100px; }
+  /* On mobile the bar is fixed-bottom via its own CSS; suppress the sticky anchor. */
+  .page-compliance .bulk-bar-anchor { position: static; }
+}

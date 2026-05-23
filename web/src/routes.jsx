@@ -15,6 +15,7 @@ import MyHistoryPage from './pages/MyHistoryPage';
 import TeamDashboardPage from './pages/TeamDashboardPage';
 import TeamMemberDetailPage from './pages/TeamMemberDetailPage';
 import ManagementDashboardPage from './pages/ManagementDashboardPage';
+import ComplianceConsolePage from './pages/ComplianceConsolePage';
 
 // Legacy stubs (kept so /log, /preview, /dashboard work for Yogesh / Keval / Ali).
 import App from './App';
@@ -118,6 +119,18 @@ export default function AppRoutes() {
             <RequireOnboarded>
               <RequireRole roles={['management']}>
                 <ManagementDashboardPage />
+              </RequireRole>
+            </RequireOnboarded>
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/ops/compliance"
+        element={
+          <RequireAuth>
+            <RequireOnboarded>
+              <RequireRole roles={['operations']}>
+                <ComplianceConsolePage />
               </RequireRole>
             </RequireOnboarded>
           </RequireAuth>

@@ -383,6 +383,70 @@ test.describe('P10 Management Dashboard — range tab toggles URL state', () => 
   }
 });
 
+// ===========================================================================
+// P11 — Compliance Console (/ops/compliance)
+// EP-16 (data) + EP-17 (run-check). Role-gated to operations + admin. The
+// mock viewer is MOCK_USER.role='admin' so the route is reachable. H1
+// matches "Weekly compliance"; primary is the always-visible "All" filter
+// chip (every people view starts on `all`).
+// ===========================================================================
+registerPageGate({
+  id: 'compliance-console',
+  title: 'P11 Compliance Console',
+  path: '/ops/compliance',
+  heading: /Weekly compliance/i,
+  // The "All" filter chip's accessible name is "All N" (label + count
+  // pip). Match a leading "All " followed by digits — the count is always
+  // present because the people list is seeded by the deterministic mock.
+  primary: /^All\s+\d+/,
+});
+
+// Bespoke test — select the first PersonRow, expect the BulkActionBar with
+// count 1, click "Send reminders", expect a confirmation banner, click
+// "Confirm", expect the success banner ("Emailed N people"). Runs at both
+// viewports (mobile breakpoints flip the bar to sticky-bottom).
+test.describe('P11 Compliance Console — select + bulk send round-trip', () => {
+  for (const vp of VIEWPORTS) {
+    test(`viewport @ ${vp.name} (${vp.width}×${vp.height}) › select → confirm → emailed`, async ({ page }) => {
+      const errors = trackErrors(page);
+      await page.setViewportSize({ width: vp.width, height: vp.height });
+      await gotoAuthed(page, '/ops/compliance');
+      await page.waitForLoadState('networkidle');
+
+      // No bulk-bar visible on first load (nothing selected).
+      await expect(page.locator('.ac-bulk-bar')).toHaveCount(0);
+
+      // Click the first PersonRow's checkbox.
+      const firstCheckbox = page.locator('.page-compliance .ac-personrow__check input[type="checkbox"]').first();
+      await firstCheckbox.scrollIntoViewIfNeeded();
+      await firstCheckbox.check();
+
+      // BulkActionBar appears with count "1".
+      const bulkBar = page.locator('.page-compliance .ac-bulk-bar');
+      await expect(bulkBar).toBeVisible();
+      await expect(bulkBar.locator('.ac-bulk-bar__count-num')).toHaveText('1');
+
+      // Click "Send reminders" → confirmation banner appears.
+      await bulkBar.getByRole('button', { name: /^Send reminders$/ }).click();
+      const confirmBanner = page.locator('.page-compliance .confirm-banner');
+      await expect(confirmBanner).toBeVisible();
+      await expect(confirmBanner.getByText(/Send reminders to 1 selected/i)).toBeVisible();
+
+      // Click "Confirm" → success banner appears.
+      await confirmBanner.getByRole('button', { name: /^Confirm$/ }).click();
+      // Success banner: ac-alert--success with "Emailed …" title.
+      await expect(page.locator('.ac-alert--success')).toBeVisible({ timeout: 6_000 });
+      await expect(page.getByText(/Emailed/i).first()).toBeVisible();
+      // Bulk-bar is hidden again (selection cleared after a successful send).
+      await expect(page.locator('.page-compliance .ac-bulk-bar')).toHaveCount(0);
+
+      await assertNoHorizontalOverflow(page);
+      await screenshot(page, `compliance-console-flow--${vp.name}`);
+      expect(errors, `console errors:\n${errors.join('\n')}`).toEqual([]);
+    });
+  }
+});
+
 // Bespoke test — full flow: sign-in → onboarding → Close My Day → confirm →
 // Sync Result. Asserts the "Your day is synced." hero is visible at both
 // viewports (mock EP-13 returns overall:'ok'). No overlap / no overflow /
