@@ -40,6 +40,8 @@ Visual system: `docs/AutoClock_Designs.html` (7-screen mockup). Brand assets: `d
 - **MUST** keep this file under 200 lines — link to docs with `@` imports.
 - **MUST** keep context ≤ 50% — use sub-agents or `/compact` before continuing.
 
+Extended security rules (token-body logging, rotating refresh-token atomic overwrite, input validation at trust boundaries) live in `.claude/rules/security.md` — auto-loaded; read before touching `auth/` or `services/crypto.js`.
+
 ## 6. Repository Etiquette
 1. Branch from `main`: `feat/backend`, `feat/jira-sync`, `feat/frontend`, `feat/extension`.
 2. Commit small and often — clear imperative messages ("add EP-09 entry create").
@@ -51,11 +53,22 @@ Visual system: `docs/AutoClock_Designs.html` (7-screen mockup). Brand assets: `d
 ## 7. Commands
 | Where | Command | What |
 |---|---|---|
-| `backend/` | `npm run dev` | Express on `:4000` (auto-reload) |
-| `backend/` | `npm test` | Backend tests |
-| `web/` | `npm run dev` | Vite on `:5173` |
-| `web/` | `npm run build` | Production build |
+| `backend/` | `npm run dev` | Express on `:4000` (auto-reload via `node --watch`) |
+| `backend/` | `npm start` | Production server |
+| `backend/` | `npm run init-db` | Bootstrap schema from `schema.sql` into the SQLite file |
+| `backend/` | `npm run verify-db` | Sanity-check the DB (`scripts/verify-db.js`) |
+| `backend/` | `npm test` | Backend tests — Node built-in runner (`node --test test/`) |
+| `backend/` | `node --test test/<file>.test.js` | **Run a single backend test file** |
+| `backend/` | `npm run pm2:start` \| `pm2:logs` \| `pm2:stop` | PM2 controls for self-hosted deploy |
+| `web/` | `npm run dev` | Vite on `:5173` — **requires backend running on `:4000` first** |
+| `web/` | `npm run build` | Production build → `web/dist/` |
+| `web/` | `npm run preview` | Serve the built bundle |
 | `web/` | `npm test` | **Playwright via CLI** — `npx playwright test` |
+| `web/` | `npm run test:headed` | Playwright with a visible browser (debugging) |
+| `web/` | `npx playwright test tests/<f>.spec.js` | **Run a single E2E file** |
+| `web/` | `npx playwright test -g "pattern"` | **Run E2E tests by name match** |
+
+First-time setup: `cp .env.example backend/.env` (the populated env lives at **`backend/.env`**, not repo root), then `npm run init-db` in `backend/` before `npm run dev`.
 
 ## 8. Testing
 MVP manual checklist (every PR):
