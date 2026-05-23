@@ -84,7 +84,15 @@ export function registerPageGate({ id, title, path, heading, primary, regions })
         await page.waitForLoadState('networkidle');
 
         if (heading) await expect(page.getByRole('heading', { name: heading }).first()).toBeVisible();
-        if (primary) await expect(page.getByRole('button', { name: primary }).or(page.getByRole('link', { name: primary })).first()).toBeVisible();
+        if (primary) {
+          // Primary actions in AutoClock pages are buttons, links, or — for
+          // segmented view-toggles like My History — `role="tab"` controls.
+          const primaryEl = page.getByRole('button', { name: primary })
+            .or(page.getByRole('link', { name: primary }))
+            .or(page.getByRole('tab', { name: primary }))
+            .first();
+          await expect(primaryEl).toBeVisible();
+        }
 
         await assertNoHorizontalOverflow(page);
         if (regions && regions.length) await assertNoOverlap(page, regions);
@@ -177,6 +185,61 @@ test.describe('P06 Settings — edit + save round-trip', () => {
 
       await assertNoHorizontalOverflow(page);
       await screenshot(page, `settings-edit-flow--${vp.name}`);
+      expect(errors, `console errors:\n${errors.join('\n')}`).toEqual([]);
+    });
+  }
+});
+
+// ===========================================================================
+// P07 — My History (/history)
+// EP-08 extended to a date range (OQ-AP-06). H1 is "My History", primary
+// action is the always-visible "List" tab in the view-toggle.
+// ===========================================================================
+registerPageGate({
+  id: 'my-history',
+  title: 'P07 My History',
+  path: '/history',
+  heading: /^My History$/,
+  primary: /^List$/,
+});
+
+// Bespoke test — toggle list → calendar, then click a different day in the
+// rail and verify the right panel updates. Run at both viewports.
+test.describe('P07 My History — list/calendar toggle + day selection', () => {
+  for (const vp of VIEWPORTS) {
+    test(`viewport @ ${vp.name} (${vp.width}×${vp.height}) › toggle views + pick a day`, async ({ page }) => {
+      const errors = trackErrors(page);
+      await page.setViewportSize({ width: vp.width, height: vp.height });
+      await gotoAuthed(page, '/history');
+      await page.waitForLoadState('networkidle');
+
+      // List view is the default — the rail list is visible, calendar grid is not.
+      await expect(page.locator('.page-history .rail-list')).toBeVisible();
+      await expect(page.locator('.page-history .cal-grid')).toHaveCount(0);
+
+      // Toggle to calendar via the tab button.
+      const calTab = page.getByRole('tab', { name: /^Calendar$/ });
+      await calTab.click();
+      await expect(calTab).toHaveAttribute('aria-selected', 'true');
+      await expect(page.locator('.page-history .cal-grid')).toBeVisible();
+      await expect(page.locator('.page-history .rail-list')).toHaveCount(0);
+
+      // Toggle back to list to pick a different day.
+      await page.getByRole('tab', { name: /^List$/ }).click();
+      await expect(page.locator('.page-history .rail-list')).toBeVisible();
+
+      // Capture the current selected day's date label, click a different rail row,
+      // then assert the date label changes.
+      const before = await page.locator('.page-history .panel-hero__date').getAttribute('data-day-key');
+      // Pick the first rail row that is NOT the currently selected one.
+      const otherRow = page.locator('.page-history .rail-row:not(.is-selected)').first();
+      await otherRow.scrollIntoViewIfNeeded();
+      await otherRow.click();
+      // Right panel updates (data-day-key attribute changes).
+      await expect(page.locator('.page-history .panel-hero__date')).not.toHaveAttribute('data-day-key', before || '');
+
+      await assertNoHorizontalOverflow(page);
+      await screenshot(page, `my-history-toggle--${vp.name}`);
       expect(errors, `console errors:\n${errors.join('\n')}`).toEqual([]);
     });
   }

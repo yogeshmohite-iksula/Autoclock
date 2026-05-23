@@ -1,0 +1,513 @@
+/* my-history.css — body-class scoped (`.page-history`) per plan §5.
+   Every selector is prefixed so .rail-row/.cal-cell/.sync-pill/.day/.hrs/.month
+   etc. (deliberately generic names) cannot bleed into other pages.
+   All colours come from var(--ac-*) tokens (autoclock-theme.css).
+   Lifted from docs/FrontEnd Design /My History.html with prototype scaffolding
+   stripped and adapted to the production data shape (extraction notes §P07). */
+
+/* ============ PAGE-HEAD ============ */
+.page-history .page-head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  align-items: end;
+  margin-bottom: 16px;
+}
+.page-history .page-head__left { min-width: 0; }
+.page-history .page-head h1 {
+  font-size: 28px;
+  font-weight: var(--ac-weight-black);
+  letter-spacing: -0.025em;
+  color: var(--ac-text);
+  margin: 0 0 6px;
+  line-height: 1.1;
+}
+.page-history .page-head__sub {
+  font-size: 13.5px;
+  color: var(--ac-text-muted);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ============ VIEW TOGGLE (tablist) ============ */
+.page-history .view-toggle {
+  display: inline-flex;
+  background: var(--ac-bg);
+  border: 1px solid var(--ac-border);
+  border-radius: 10px;
+  padding: 3px;
+  gap: 2px;
+}
+.page-history .view-toggle__btn {
+  appearance: none;
+  border: 0; background: transparent; cursor: pointer;
+  padding: 6px 14px;
+  font-family: var(--ac-font-sans);
+  font-size: 13px;
+  font-weight: var(--ac-weight-semibold);
+  color: var(--ac-text-muted);
+  border-radius: 7px;
+  line-height: 1;
+}
+.page-history .view-toggle__btn:hover { color: var(--ac-text); }
+.page-history .view-toggle__btn:focus-visible {
+  outline: 2px solid var(--ac-secondary);
+  outline-offset: 2px;
+}
+.page-history .view-toggle__btn.is-active {
+  background: var(--ac-text);
+  color: var(--ac-bg);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.18);
+}
+
+/* ============ LOADING / EMPTY ============ */
+.page-history .history-loading {
+  padding: 24px;
+  font-size: 14px;
+  color: var(--ac-text-muted);
+  background: var(--ac-bg);
+  border: 1px dashed var(--ac-border);
+  border-radius: 12px;
+  text-align: center;
+}
+.page-history .history-empty {
+  padding: 36px 24px;
+  background: var(--ac-bg);
+  border: 1px dashed var(--ac-border);
+  border-radius: 12px;
+  text-align: center;
+}
+.page-history .history-empty h2 {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: var(--ac-weight-bold);
+  color: var(--ac-text);
+}
+.page-history .history-empty p {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--ac-text-muted);
+}
+
+/* ============ TWO-COL GRID ============ */
+.page-history .history-grid {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 24px;
+  align-items: start;
+  min-width: 0;
+}
+.page-history .history-rail {
+  background: var(--ac-bg);
+  border: 1px solid var(--ac-border);
+  border-radius: 12px;
+  padding: 8px;
+  position: sticky;
+  top: 16px;
+  max-height: calc(100vh - 32px);
+  overflow: auto;
+  min-width: 0;
+}
+
+/* ============ RAIL — LIST VIEW ============ */
+.page-history .rail-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.page-history .rail-row {
+  appearance: none;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 38px 32px 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  color: var(--ac-text);
+  font-family: var(--ac-font-sans);
+}
+.page-history .rail-row:hover { background: var(--ac-n-100); }
+.page-history .rail-row:focus-visible {
+  outline: 2px solid var(--ac-secondary);
+  outline-offset: -2px;
+}
+.page-history .rail-row.is-selected {
+  background: var(--ac-text);
+  color: var(--ac-bg);
+}
+.page-history .rail-row.is-selected .wd,
+.page-history .rail-row.is-selected .hrs-num,
+.page-history .rail-row.is-selected .day { color: var(--ac-bg); }
+.page-history .rail-row.is-selected .hrs-bar { background: rgba(255, 255, 255, 0.18); }
+.page-history .rail-row.is-selected .hrs-bar__fill { background: #fff; }
+
+.page-history .rail-row .wd {
+  font-family: var(--ac-font-mono);
+  font-size: 10.5px;
+  font-weight: var(--ac-weight-black);
+  letter-spacing: 0.06em;
+  color: var(--ac-text-subtle);
+  text-transform: uppercase;
+}
+.page-history .rail-row .day {
+  font-family: var(--ac-font-mono);
+  font-size: 18px;
+  font-weight: var(--ac-weight-black);
+  color: var(--ac-text);
+  line-height: 1;
+  text-align: center;
+}
+.page-history .rail-row .hrs {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.page-history .rail-row .hrs-num {
+  font-family: var(--ac-font-mono);
+  font-size: 11.5px;
+  font-weight: var(--ac-weight-bold);
+  color: var(--ac-text-muted);
+  line-height: 1;
+}
+.page-history .rail-row .hrs-bar {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--ac-n-100);
+  overflow: hidden;
+}
+.page-history .rail-row .hrs-bar__fill {
+  display: block;
+  height: 100%;
+  background: var(--ac-secondary);
+  border-radius: 999px;
+  transition: width 200ms ease;
+}
+.page-history .rail-row .sync-pill-slot { flex: none; }
+
+/* ============ RAIL — CALENDAR VIEW ============ */
+.page-history .cal { padding: 8px 4px; }
+.page-history .cal-month {
+  font-family: var(--ac-font-mono);
+  font-size: 11px;
+  font-weight: var(--ac-weight-black);
+  color: var(--ac-text-subtle);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0 6px 10px;
+}
+.page-history .cal-head {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-bottom: 6px;
+}
+.page-history .cal-head__cell {
+  font-family: var(--ac-font-mono);
+  font-size: 10px;
+  font-weight: var(--ac-weight-bold);
+  color: var(--ac-text-subtle);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 4px 0;
+}
+.page-history .cal-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.page-history .cal-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+.page-history .cal-cell {
+  aspect-ratio: 1 / 1;
+  min-width: 0;
+}
+.page-history .cal-cell.is-blank { background: transparent; }
+.page-history .cal-cell__btn {
+  appearance: none;
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column;
+  align-items: stretch; justify-content: space-between;
+  padding: 4px;
+  background: var(--ac-bg);
+  border: 1px solid var(--ac-border);
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: var(--ac-font-sans);
+  color: var(--ac-text);
+  position: relative;
+}
+.page-history .cal-cell__btn:hover:not(:disabled):not(.is-empty) {
+  background: var(--ac-n-100);
+  border-color: var(--ac-border-strong);
+}
+.page-history .cal-cell__btn:focus-visible {
+  outline: 2px solid var(--ac-secondary);
+  outline-offset: 1px;
+}
+.page-history .cal-cell__btn.is-empty {
+  cursor: default;
+  background: var(--ac-n-100);
+  opacity: 0.7;
+}
+.page-history .cal-cell__btn.is-selected {
+  background: var(--ac-text);
+  border-color: var(--ac-text);
+  color: var(--ac-bg);
+}
+.page-history .cal-cell__btn.is-selected .cal-cell__bar { background: rgba(255, 255, 255, 0.18); }
+.page-history .cal-cell__btn.is-selected .cal-cell__bar-fill { background: #fff; }
+
+.page-history .cal-cell__day {
+  font-family: var(--ac-font-mono);
+  font-size: 12px;
+  font-weight: var(--ac-weight-bold);
+  line-height: 1;
+  text-align: left;
+}
+.page-history .cal-cell__bar {
+  height: 3px;
+  border-radius: 999px;
+  background: var(--ac-n-100);
+  overflow: hidden;
+}
+.page-history .cal-cell__bar-fill {
+  display: block;
+  height: 100%;
+  background: var(--ac-secondary);
+  border-radius: 999px;
+}
+.page-history .cal-cell__dot {
+  position: absolute;
+  top: 4px; right: 4px;
+  width: 6px; height: 6px;
+  border-radius: 999px;
+  background: var(--ac-text-subtle);
+}
+.page-history .cal-cell__dot.is-synced  { background: var(--ac-success); }
+.page-history .cal-cell__dot.is-partial { background: var(--ac-warning); }
+.page-history .cal-cell__dot.is-skipped { background: var(--ac-text-subtle); }
+.page-history .cal-cell__dot.is-failed  { background: var(--ac-danger); }
+
+/* ============ DAY PANEL (right pane) ============ */
+.page-history .day-panel {
+  min-width: 0;
+  background: var(--ac-bg);
+  border: 1px solid var(--ac-border);
+  border-radius: 12px;
+  padding: 20px 22px;
+}
+.page-history .panel-hero {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 16px; margin-bottom: 14px;
+  padding-bottom: 14px; border-bottom: 1px solid var(--ac-border);
+  min-width: 0;
+}
+.page-history .panel-hero__left { min-width: 0; }
+.page-history .panel-hero__eyebrow {
+  font-family: var(--ac-font-mono);
+  font-size: 10.5px;
+  font-weight: var(--ac-weight-black);
+  color: var(--ac-text-subtle);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+}
+.page-history .panel-hero__date {
+  font-size: 22px;
+  font-weight: var(--ac-weight-black);
+  letter-spacing: -0.02em;
+  color: var(--ac-text);
+  margin: 0 0 10px;
+  line-height: 1.1;
+}
+.page-history .panel-meta {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
+  min-width: 0;
+}
+.page-history .panel-meta__total {
+  display: inline-flex; align-items: baseline; gap: 6px;
+}
+.page-history .panel-meta__num {
+  font-family: var(--ac-font-mono);
+  font-size: 16px;
+  font-weight: var(--ac-weight-black);
+  color: var(--ac-text);
+  line-height: 1;
+}
+.page-history .panel-meta__lbl {
+  font-size: 11px;
+  font-weight: var(--ac-weight-bold);
+  color: var(--ac-text-subtle);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.page-history .panel-meta__tickets {
+  font-size: 12px;
+  color: var(--ac-text-muted);
+  font-weight: var(--ac-weight-semibold);
+}
+
+/* ============ TICKET-GROUP CARDS (shared with P04) ============
+   We re-style the generic `.group` row scoped under `.page-history`
+   so it can't collide with `.page-close-my-day`. Visual fidelity
+   matches close-my-day.css §GROUPED-BY-TICKET. */
+.page-history .groups { display: flex; flex-direction: column; min-width: 0; }
+.page-history .group {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  gap: 16px; align-items: center;
+  padding: 14px 4px; border-top: 1px solid var(--ac-border);
+  min-width: 0;
+}
+.page-history .group:first-child { border-top: 0; }
+.page-history .group .ic {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  background: var(--proj-color, var(--ac-text-subtle));
+  color: #fff;
+  display: grid; place-items: center;
+  font-weight: var(--ac-weight-black);
+  font-size: 13px; letter-spacing: -0.02em;
+  flex: none;
+}
+.page-history .group .body { min-width: 0; }
+.page-history .group .top-row {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  min-width: 0;
+}
+.page-history .group .ticket {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--ac-font-mono); font-size: 12px;
+  font-weight: var(--ac-weight-bold); color: var(--ac-text);
+  background: var(--ac-bg); border: 1px solid var(--ac-border);
+  padding: 2px 8px 2px 6px; border-radius: 5px;
+  text-decoration: none;
+}
+.page-history .group .ticket:hover { background: var(--ac-n-100); }
+.page-history .group .ticket-title {
+  font-size: 14px; font-weight: var(--ac-weight-bold); color: var(--ac-text);
+  overflow-wrap: anywhere;
+}
+.page-history .group .merged {
+  font-family: var(--ac-font-mono); font-size: 10.5px;
+  color: var(--ac-text-subtle); font-weight: var(--ac-weight-bold);
+  text-transform: uppercase; letter-spacing: 0.04em;
+  background: var(--ac-bg); border: 1px dashed var(--ac-border-strong);
+  padding: 2px 8px; border-radius: 999px;
+}
+.page-history .group .proj-name {
+  font-size: 12.5px; color: var(--ac-text-muted);
+  font-weight: var(--ac-weight-semibold);
+  overflow-wrap: anywhere;
+}
+.page-history .group .desc {
+  margin-top: 6px;
+  font-size: 13px; color: var(--ac-text); line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+.page-history .group .desc .meta-time {
+  font-family: var(--ac-font-mono); font-size: 11px; color: var(--ac-text-subtle);
+  font-weight: var(--ac-weight-bold); margin-top: 4px; display: block;
+}
+.page-history .group .dur {
+  font-family: var(--ac-font-mono); font-size: 16px;
+  font-weight: var(--ac-weight-black); color: var(--ac-text);
+  text-align: right; line-height: 1;
+}
+.page-history .group .dur .lbl {
+  display: block; margin-top: 4px;
+  font-size: 10px; color: var(--ac-text-subtle); font-weight: var(--ac-weight-bold);
+  text-transform: uppercase; letter-spacing: 0.04em;
+}
+
+/* ============ EMPTY STATE (shared) ============ */
+.page-history .empty-state {
+  padding: 28px 16px;
+  text-align: center;
+  background: var(--ac-bg);
+  border: 1px dashed var(--ac-border);
+  border-radius: 12px;
+  color: var(--ac-text-muted);
+}
+.page-history .empty-state__title {
+  margin: 0 0 6px;
+  font-size: 16px;
+  font-weight: var(--ac-weight-bold);
+  color: var(--ac-text);
+}
+.page-history .empty-state__body {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ac-text-muted);
+}
+.page-history .empty-state__cta { margin-top: 12px; }
+
+/* ============ MOBILE — collapse rail to top tab strip ============
+   At ≤900px we drop the sticky two-col grid and stack: rail becomes
+   a horizontal-scrolling strip on top, day panel becomes the body. */
+@media (max-width: 900px) {
+  .page-history .page-head {
+    grid-template-columns: 1fr;
+    align-items: flex-start;
+  }
+  .page-history .view-toggle { align-self: flex-start; }
+  .page-history .history-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .page-history .history-rail {
+    position: static;
+    max-height: none;
+    padding: 8px;
+    overflow: visible;
+  }
+  /* List view: horizontal-scroll strip of compact pills */
+  .page-history .rail-list {
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 6px;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+  .page-history .rail-list > li { flex: none; }
+  .page-history .rail-row {
+    grid-template-columns: auto auto auto auto;
+    gap: 8px;
+    padding: 8px 10px;
+    min-width: 0;
+  }
+  .page-history .rail-row .hrs { flex-direction: row; align-items: center; gap: 8px; }
+  .page-history .rail-row .hrs-bar { width: 48px; height: 4px; }
+  /* Calendar view: tighter cells at mobile */
+  .page-history .cal-cell__day { font-size: 11px; }
+  .page-history .day-panel { padding: 16px 14px; }
+  .page-history .panel-hero__date { font-size: 18px; }
+  .page-history .group {
+    grid-template-columns: 36px 1fr;
+    gap: 10px;
+    padding: 12px 2px;
+  }
+  .page-history .group .ic { width: 32px; height: 32px; font-size: 11px; }
+  .page-history .group .dur {
+    grid-column: 2;
+    text-align: left;
+    font-size: 14px;
+  }
+  .page-history .group .dur .lbl { display: inline; margin: 0 0 0 6px; }
+}
