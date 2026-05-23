@@ -4,9 +4,18 @@
 import { request } from './client';
 
 export const dashboardApi = {
-  /** EP-14 — PM/Lead team metrics. */
-  team: () => request('/api/dashboard/team'),
+  /** EP-14 — PM/Lead team metrics. Accepts optional teamId + range. */
+  team({ teamId, range = 'today' } = {}) {
+    const qs = new URLSearchParams();
+    if (teamId != null) qs.set('team_id', String(teamId));
+    qs.set('range', range);
+    return request(`/api/dashboard/team?${qs}`);
+  },
 
-  /** EP-15 — Management org metrics. (M1 — server returns a 501 today.) */
-  org: () => request('/api/dashboard/org'),
+  /** EP-15 — Management org metrics. Range: week|month|quarter (OQ-AP-09). */
+  org({ range = 'week' } = {}) {
+    const qs = new URLSearchParams();
+    qs.set('range', range);
+    return request(`/api/dashboard/org?${qs}`);
+  },
 };

@@ -7,6 +7,52 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 
 ## [Unreleased]
 
+### Added — Frontend (feat/frontend-allpages — 14 new pages)
+- **14 production pages** ported from `docs/FrontEnd Design/` and wired to the backend's EP-08..EP-22 (mocked where the backend hasn't shipped yet; opportunistic real-backend swap via `VITE_USE_MOCKS=0`):
+  - **P03 App Shell** — extracted from TodayPage into `<AppShell>` (TopBar + Sidebar + ConnectionsCard + UserMenu) with role-aware nav (`navConfig.js` → `pm_lead | management | operations | admin` per ERD §8) and a **mobile drawer** (hamburger + backdrop + ESC + body-scroll-lock). TodayPage refactored to consume it.
+  - **P04 `/close` Close My Day** — preview + confirm via EP-12; navigates to `/close/result` carrying the EP-13 response in `location.state`.
+  - **P05 `/close/result` Sync Result** — per-system outcome (Jira / Sheets / Gmail), unified `<StatusPill>` with tone map, per-system retry (EP-13 idempotency).
+  - **P06 `/settings`** — Profile · Reminders · Appearance · Connections · Danger zone with section-scoped `<SaveBar>` (clean / dirty / saving). User-scope `GET/PUT /api/me/settings` (new EP — OQ-AP-04).
+  - **P07 `/history` My History** — list + month-calendar views (URL-driven `?view=`), 14-day range via EP-08 extended (OQ-AP-06).
+  - **P08 `/team` Team Dashboard** — KPI row + team-selector + range tabs + MemberRow table. EP-14 extended (OQ-AP-07).
+  - **P09 `/team/:memberId` Team Member Detail** — 14-day `<BarChart>` (Chart.js, lazy-loaded) + DayRowExpandable + AlertBanner. New EP `GET /api/team/members/:id` (OQ-AP-08).
+  - **P10 `/org` Management Dashboard** — KPIs + `<Donut>` (Chart.js) + 8-week `<TrendChart>` + per-team cards with `<Sparkline>` + top-projects table. EP-15 extended with `?range=` (OQ-AP-09).
+  - **P11 `/ops/compliance` Compliance Console** — 4 stat cards + `<FilterChips>` + selectable `<PersonRow>`s + `<BulkActionBar>` with confirm/run/sent state machine. EP-16 + EP-17.
+  - **P12 `/ops/reminders` Reminder History** — 2-pane (rail of past runs + detail pane with EmailPreviewCard). EP-18.
+  - **P13 `/ops/leave` Leave Calendar** — month-grid + list / upcoming / holidays views + `<AddLeaveModal>`. EP-21 with holidays returned alongside (OQ-AP-11).
+  - **P14 `/admin/users` Users and Roles** — admin-tabs shell + stat row + filter chips + UserTableRow + InviteUserModal. EP-19.
+  - **P15 `/admin/projects` Project Mapping** — ProjectMappingRow + MappingFormModal + live `<TestConnectionButton>` state machine. EP-20 + new POST `/api/admin/projects/test` (OQ-AP-12).
+  - **P16 `/admin/integrations`** — Jira / Google / Email / Reader sections, each with its own section-scoped `<SaveBar>` (independent dirty state). EP-22 section-scoped (OQ-AP-13).
+- **Shared components** built generic at first-use and reused downstream:
+  - `<AppShell>` + `<TopBar>` + `<Sidebar>` + `<Icon>` + `navConfig.js`
+  - `<StatusPill tone size>` — replaces 5 near-duplicate pills (OQ-AP-05)
+  - `<KpiCard variant={default|stat|metric}>` + `<MetricCard delta>` (P08 → P09 → P10 → P11)
+  - `<TeamSelector>` · `<RangeTabs>` · `<HoursBar>` · `<MemberRow>` · `<MemberStatusPill>`
+  - `<BarChart>` · `<TrendChart>` · `<Sparkline>` · `<Donut>` (Chart.js wrappers, lazy `chart.js/auto`)
+  - `<PersonRow>` (P11/P12/P14) · `<FilterChips>` · `<BulkActionBar>`
+  - `<AlertBanner>` (P09/P11) · `<SaveBar>` · `<SegmentedRadio>` · `<ConnRow>` · `<SettingsSection>` (P06/P16)
+  - `<AdminTabs>` · `<RoleChip>` · `<ConnectionDotsInline>` · `<InviteUserModal>` · `<UserTableRow>` (P14 → P15/P16)
+  - `<TicketGroupCard>` (P04 → P07) · `<DestinationRow>` (P04 → P05) · `<WarningPill>` (P04 → P11)
+  - `<JiraGlyph>` · `<SheetsGlyph>` · `<GmailGlyph>` (P04 → P05/P06/P15/P16)
+  - `<MonthCalendar>` · `<LeaveLegend>` · `<HolidayChip>` (P13)
+  - `<EmailPreviewCard>` · `<RunListRail>` · `<RunDetailPane>` (P12)
+  - `<IntegrationCard>` · `<ScopeChip>` · `<TestConnectionButton>` · `<ProjectMappingRow>` · `<MappingFormModal>` (P15/P16)
+- **CSS strategy:** every page CSS file is **body-class scoped** (`.page-close-my-day`, `.page-compliance`, `.page-mapping`, etc.) so the unprefixed prototype selectors (`.row`, `.kpi`, `.stat`, `.section`, `.actions`, `.field`, `.cell`, `.dot`) don't collide across pages.
+- **API surface:** 7 new namespaces added to `web/src/api/` — `history`, `team`, `ops`, `leave`, `admin`, `settings`, `integrations`. `dashboard.js` extended with `range`. All routed through `client.js`; `request(path, { method, body })` signature kept; mocks default ON via `VITE_USE_MOCKS`.
+- **Mock backend** extended with ~30 mock catalogue entries (`__USERS`, `__ADMIN_PROJECTS`, `__ADMIN_SETTINGS`, `__ME_SETTINGS`, `__INTEGRATIONS`, plus builders `__buildHistory`, `__buildOrgDashboard`, `__buildMemberDetail`, `__buildCompliance`, `__buildReminders`, `__buildLeave`, `__buildTeamDashboard`). All shapes documented; backend-swap is a one-flag flip.
+- **Routes:** 14 new routes added to `web/src/routes.jsx` under existing `<RequireAuth><RequireOnboarded>` plus a new `<RequireRole>` guard. `admin` is auto-allowed by every gate.
+- **Brand assets:** `AutoClock_Logo.svg`, `_Logo_dark.svg`, `_Icon.svg`, `_AppIcon.svg` copied from `docs/FrontEnd Design /assets/` into `web/public/assets/`.
+
+### Tested — Frontend (feat/frontend-allpages)
+- **58 Playwright tests passing** across 14 pages × 2 viewports (1440×900 desktop + 390×844 mobile) + bespoke flow tests (P03 drawer, P04 confirm-and-sync, P05 retry, P06 save round-trip, P07 list↔calendar, P08 range-tab URL, P09 day expand, P10 month range, P11 bulk-send, P12 select-run, P13 modal+view-toggle, P14 invite, P15 add-with-test-connection, P16 per-card SaveBar independence).
+- Per-page gate asserts: no console errors · no horizontal overflow · no unrelated-region overlap · primary heading + primary action visible · full-page screenshot saved to `test-results/screenshots/`.
+- Existing 7 smoke tests still green at the new viewports.
+
+### Repo hygiene
+- `docs/frontend-allpages-plan.md` — the approved plan + 17 OQ defaults.
+- `docs/frontend-allpages-issues.md` — non-blocking issues + backend follow-ups logged during the build (instead of stopping the page-by-page progress).
+- `MOCK_USER.role` bumped to `admin` so all role-gated routes are reachable in dev + Playwright (real users get their actual role from EP-01).
+
 ### Fixed — Frontend (PR #2 visual review)
 - **Issue 1 — `/sign-in` never displayed.** Mock backend auto-signed-in the demo user on module load, and `RequireAuth` bounced any visit to `/sign-in` straight to `/onboarding`. Mocks now start signed-out (`SESSION_USER = null`; `/api/auth/me` → 401), `/api/auth/login` sets the session, `/api/auth/logout` clears it, and onboarding completion flips `connections.jira` to `connected` via a new `_setMockOnboardingComplete()` helper so the demo walks the full Sign-in → Onboarding → Today flow.
 - **Issue 2 — mobile chrome corners overlapped centered content.** `.chrome` decorations now hide at `≤640px` (`chrome.css`). Sign-in + Onboarding shells switch from `position:absolute` centring on fixed `100vh` to flow layout with `min-height:100vh` + `padding:24px 16px` so the card vertically centres on small viewports without the corner overlap. Today page hides the sidebar, collapses `.tdy-body-grid` to a single column, and adds `min-width:0` + `overflow-wrap:anywhere` so the form chain (`.tdy-field`, `.tdy-dd-btn`) no longer overflows 375px. Project / ticket pills stay on one line via `white-space:nowrap` while the slot top-line wraps.

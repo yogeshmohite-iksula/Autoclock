@@ -1,0 +1,50 @@
+/* StatusPill — unified pill for sync / health / status / role indicators.
+   Uses the canonical theme tokens; never invents colour. */
+
+.ac-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-family: var(--ac-font-sans);
+  font-size: var(--ac-text-xs);
+  font-weight: var(--ac-weight-semibold);
+  line-height: 1.4;
+  background: var(--ac-n-100);
+  color: var(--ac-text-muted);
+  border: 1px solid var(--ac-border);
+  white-space: nowrap;
+}
+.ac-pill__ic {
+  width: 14px; height: 14px;
+  display: grid; place-items: center;
+  border-radius: 999px;
+  background: var(--ac-text-subtle);
+  color: #fff;
+  font-size: 9px;
+  font-weight: var(--ac-weight-black);
+  flex: none;
+}
+.ac-pill--sm { padding: 2px 7px; gap: 4px; font-size: 11px; }
+.ac-pill--sm .ac-pill__ic { width: 8px; height: 8px; }
+
+.ac-pill--ok      { color: var(--ac-success);     background: rgba(16,185,129,.08); border-color: rgba(16,185,129,.25); }
+.ac-pill--ok      .ac-pill__ic { background: var(--ac-success); }
+.ac-pill--success { color: var(--ac-success);     background: rgba(16,185,129,.08); border-color: rgba(16,185,129,.25); }
+.ac-pill--success .ac-pill__ic { background: var(--ac-success); }
+
+.ac-pill--partial { color: #92400E;               background: rgba(245,158,11,.10); border-color: rgba(245,158,11,.30); }
+.ac-pill--partial .ac-pill__ic { background: var(--ac-warning); }
+.ac-pill--warn    { color: #92400E;               background: rgba(245,158,11,.10); border-color: rgba(245,158,11,.30); }
+.ac-pill--warn    .ac-pill__ic { background: var(--ac-warning); }
+
+.ac-pill--failed  { color: var(--ac-danger-text); background: var(--ac-danger-soft); border-color: #FECACA; }
+.ac-pill--failed  .ac-pill__ic { background: var(--ac-danger); }
+
+.ac-pill--retrying { color: #1D4ED8;              background: rgba(37,99,235,.08);  border-color: rgba(37,99,235,.25); }
+.ac-pill--retrying .ac-pill__ic { background: #2563EB; animation: ac-pill-spin 1.2s linear infinite; }
+@keyframes ac-pill-spin { to { transform: rotate(360deg); } }
+
+.ac-pill--skipped { color: var(--ac-text-subtle); background: var(--ac-n-100);      border-color: var(--ac-border); }
+.ac-pill--pending { color: var(--ac-text-subtle); background: var(--ac-n-100);      border-color: var(--ac-border); }
+.ac-pill--idle    { color: var(--ac-text-subtle); background: var(--ac-n-100);      border-color: var(--ac-border); }
+.ac-pill--info    { color: var(--ac-text-muted);  background: var(--ac-n-100);      border-color: var(--ac-border); }

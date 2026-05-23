@@ -1,0 +1,35 @@
+/* ScopeChip — small read-only "tag" for OAuth scope names. Body-class
+   agnostic — the chip is reusable anywhere we need to render a scope/role.
+   Layout: dot + monospace text. Wraps when the parent flex container runs
+   out of width (used in P16 ScopeChip lists). */
+
+.ac-scope-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px 4px 8px;
+  border-radius: 999px;
+  background: var(--ac-surface-2, #f1f5f9);
+  border: 1px solid var(--ac-border, #e2e8f0);
+  color: var(--ac-text, #0f172a);
+  font-size: 12px;
+  font-family: var(--ac-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.4;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.ac-scope-chip__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--ac-info, #2563eb);
+  flex: none;
+}
+
+.ac-scope-chip__txt {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

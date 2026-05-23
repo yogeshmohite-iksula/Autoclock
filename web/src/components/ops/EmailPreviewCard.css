@@ -1,0 +1,133 @@
+/* EmailPreviewCard — body-class agnostic. Used inside the P12
+   RunDetailPane trailing slot. Full width by default. */
+
+.ac-emailcard {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: var(--ac-surface);
+  border: 1px solid var(--ac-border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.ac-emailcard__toggle {
+  appearance: none;
+  background: var(--ac-surface);
+  border: 0;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-family: var(--ac-font-sans);
+  color: var(--ac-text);
+  text-align: left;
+  width: 100%;
+  min-width: 0;
+}
+.ac-emailcard__toggle:hover { background: var(--ac-surface-2); }
+.ac-emailcard__toggle:focus-visible { outline: 2px solid var(--ac-secondary); outline-offset: -2px; }
+
+.ac-emailcard__toggle-ic {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  background: rgba(220, 38, 38, .12);
+  color: var(--ac-secondary);
+  border-radius: 6px;
+  font-size: 13px;
+  flex: none;
+}
+.ac-emailcard__toggle-lbl {
+  flex: 1 1 auto;
+  font-size: 13.5px;
+  font-weight: var(--ac-weight-semibold);
+  min-width: 0;
+}
+.ac-emailcard__toggle-chev {
+  color: var(--ac-text-subtle);
+  font-size: 12px;
+}
+
+/* ============ Panel ============ */
+.ac-emailcard__panel {
+  border-top: 1px solid var(--ac-border);
+  background: var(--ac-surface-2);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.ac-emailcard__head {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.ac-emailcard__subject {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.ac-emailcard__subject .ac-emailcard__field-val {
+  font-size: 15px;
+  font-weight: var(--ac-weight-semibold);
+  color: var(--ac-text);
+}
+.ac-emailcard__meta {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 10px;
+  font-size: 12px;
+}
+.ac-emailcard__meta-row {
+  display: contents;
+}
+.ac-emailcard__field-lbl {
+  font-family: var(--ac-font-mono, ui-monospace, monospace);
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ac-text-subtle);
+  white-space: nowrap;
+}
+.ac-emailcard__field-val {
+  font-size: 12.5px;
+  color: var(--ac-text-muted);
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+
+.ac-emailcard__body {
+  margin: 0;
+  padding: 14px 16px;
+  background: var(--ac-surface);
+  border: 1px solid var(--ac-border);
+  border-radius: 10px;
+  font-family: var(--ac-font-mono, ui-monospace, monospace);
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--ac-text);
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+  max-width: 100%;
+  min-width: 0;
+}
+
+/* ============ Mobile ============ */
+@media (max-width: 640px) {
+  .ac-emailcard__toggle { padding: 10px 12px; }
+  .ac-emailcard__panel  { padding: 12px 12px; }
+  .ac-emailcard__meta   { grid-template-columns: 1fr; }
+  .ac-emailcard__field-lbl { display: block; margin-bottom: 2px; }
+  .ac-emailcard__body   { font-size: 12px; padding: 12px; }
+}

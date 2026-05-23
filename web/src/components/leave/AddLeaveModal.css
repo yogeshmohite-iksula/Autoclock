@@ -1,0 +1,153 @@
+/* AddLeaveModal.css — global (not scoped under .page-leave because the modal
+   portals over everything). Scoped under .leave-modal-backdrop instead. */
+
+.leave-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 24px;
+}
+
+.leave-modal {
+  background: var(--ac-bg-elev, #fff);
+  border-radius: 14px;
+  border: 1px solid var(--ac-border);
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.25);
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.leave-modal__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px 12px;
+  border-bottom: 1px solid var(--ac-border);
+}
+
+.leave-modal__title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--ac-text);
+}
+
+.leave-modal__close {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--ac-text-muted);
+}
+.leave-modal__close:hover { background: var(--ac-bg-tint, #f4f5f7); color: var(--ac-text); }
+.leave-modal__close:focus-visible { outline: 2px solid var(--ac-accent, #2563eb); outline-offset: 1px; }
+
+.leave-modal__form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px 20px 20px;
+}
+
+.leave-modal__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.leave-modal__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.leave-modal__label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ac-text);
+}
+
+.leave-modal__input {
+  width: 100%;
+  padding: 9px 11px;
+  border-radius: 8px;
+  border: 1px solid var(--ac-border);
+  background: var(--ac-bg-elev, #fff);
+  font: inherit;
+  color: var(--ac-text);
+}
+.leave-modal__input:focus-visible {
+  outline: 2px solid var(--ac-accent, #2563eb);
+  outline-offset: 1px;
+  border-color: transparent;
+}
+
+.leave-modal__error {
+  font-size: 13px;
+  color: var(--ac-danger, #b91c1c);
+  background: rgba(220, 38, 38, 0.08);
+  border: 1px solid rgba(220, 38, 38, 0.4);
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+
+.leave-modal__actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+.leave-modal__btn {
+  appearance: none;
+  border: 0;
+  padding: 9px 16px;
+  border-radius: 9px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 13.5px;
+}
+.leave-modal__btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.leave-modal__btn--primary {
+  background: var(--ac-accent, #2563eb);
+  color: #fff;
+}
+.leave-modal__btn--primary:hover:not(:disabled) { filter: brightness(1.05); }
+.leave-modal__btn--primary:focus-visible { outline: 2px solid var(--ac-accent, #2563eb); outline-offset: 2px; }
+
+.leave-modal__btn--ghost {
+  background: transparent;
+  border: 1px solid var(--ac-border);
+  color: var(--ac-text);
+}
+.leave-modal__btn--ghost:hover:not(:disabled) { background: var(--ac-bg-tint, #f4f5f7); }
+.leave-modal__btn--ghost:focus-visible { outline: 2px solid var(--ac-accent, #2563eb); outline-offset: 2px; }
+
+/* Mobile — full-screen sheet */
+@media (max-width: 640px) {
+  .leave-modal-backdrop { padding: 0; align-items: stretch; }
+  .leave-modal {
+    border-radius: 0;
+    max-width: 100vw;
+    width: 100vw;
+    max-height: 100vh;
+    min-height: 100vh;
+  }
+  .leave-modal__row { grid-template-columns: 1fr; }
+}

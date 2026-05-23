@@ -8,6 +8,19 @@ import { useAuth } from './auth/AuthContext';
 import SignInPage from './pages/SignInPage';
 import OnboardingPage from './pages/OnboardingPage';
 import TodayPage from './pages/TodayPage';
+import CloseMyDayPage from './pages/CloseMyDayPage';
+import SyncResultPage from './pages/SyncResultPage';
+import SettingsPage from './pages/SettingsPage';
+import MyHistoryPage from './pages/MyHistoryPage';
+import TeamDashboardPage from './pages/TeamDashboardPage';
+import TeamMemberDetailPage from './pages/TeamMemberDetailPage';
+import ManagementDashboardPage from './pages/ManagementDashboardPage';
+import ComplianceConsolePage from './pages/ComplianceConsolePage';
+import ReminderHistoryPage from './pages/ReminderHistoryPage';
+import LeaveCalendarPage from './pages/LeaveCalendarPage';
+import UsersRolesPage from './pages/UsersRolesPage';
+import ProjectMappingPage from './pages/ProjectMappingPage';
+import IntegrationsPage from './pages/IntegrationsPage';
 
 // Legacy stubs (kept so /log, /preview, /dashboard work for Yogesh / Keval / Ali).
 import App from './App';
@@ -26,6 +39,18 @@ function RequireOnboarded({ children }) {
   const { onboardingComplete, loading } = useAuth();
   if (loading) return null;
   if (!onboardingComplete) return <Navigate to="/onboarding" replace />;
+  return children;
+}
+
+/** Role-gated route guard. `admin` is always allowed.
+ *  Used by the 14 new pages — server-side RBAC is the source of truth (ERD §8). */
+// eslint-disable-next-line react-refresh/only-export-components
+export function RequireRole({ roles, children }) {
+  const { user, loading } = useAuth();
+  if (loading) return null;
+  if (!user) return <Navigate to="/sign-in" replace />;
+  const allowed = new Set([...roles, 'admin']);
+  if (!allowed.has(user.role)) return <Navigate to="/today" replace />;
   return children;
 }
 
@@ -51,6 +76,130 @@ export default function AppRoutes() {
       <Route
         path="/today"
         element={<RequireAuth><RequireOnboarded><TodayPage /></RequireOnboarded></RequireAuth>}
+      />
+      <Route
+        path="/close"
+        element={<RequireAuth><RequireOnboarded><CloseMyDayPage /></RequireOnboarded></RequireAuth>}
+      />
+      <Route
+        path="/close/result"
+        element={<RequireAuth><RequireOnboarded><SyncResultPage /></RequireOnboarded></RequireAuth>}
+      />
+      <Route
+        path="/settings"
+        element={<RequireAuth><RequireOnboarded><SettingsPage /></RequireOnboarded></RequireAuth>}
+      />
+      <Route
+        path="/history"
+        element={<RequireAuth><RequireOnboarded><MyHistoryPage /></RequireOnboarded></RequireAuth>}
+      />
+      <Route
+        path="/team"
+        element={
+          <RequireAuth>
+            <RequireOnboarded>
+              <RequireRole roles={['pm_lead']}>
+                <TeamDashboardPage />
+              </RequireRole>
+            </RequireOnboarded>
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/team/:memberId"
+        element={
+          <RequireAuth>
+            <RequireOnboarded>
+              <RequireRole roles={['pm_lead']}>
+                <TeamMemberDetailPage />
+              </RequireRole>
+            </RequireOnboarded>
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/org"
+        element={
+          <RequireAuth>
+            <RequireOnboarded>
+              <RequireRole roles={['management']}>
+                <ManagementDashboardPage />
+              </RequireRole>
+            </RequireOnboarded>
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/ops/compliance"
+        element={
+          <RequireAuth>
+            <RequireOnboarded>
+              <RequireRole roles={['operations']}>
+                <ComplianceConsolePage />
+              </RequireRole>
+            </RequireOnboarded>
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/ops/reminders"
+        element={
+          <RequireAuth>
+            <RequireOnboarded>
+              <RequireRole roles={['operations']}>
+                <ReminderHistoryPage />
+              </RequireRole>
+            </RequireOnboarded>
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/ops/leave"
+        element={
+          <RequireAuth>
+            <RequireOnboarded>
+              <RequireRole roles={['operations']}>
+                <LeaveCalendarPage />
+              </RequireRole>
+            </RequireOnboarded>
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/admin/users"
+        element={
+          <RequireAuth>
+            <RequireOnboarded>
+              <RequireRole roles={['admin']}>
+                <UsersRolesPage />
+              </RequireRole>
+            </RequireOnboarded>
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/admin/projects"
+        element={
+          <RequireAuth>
+            <RequireOnboarded>
+              <RequireRole roles={['admin']}>
+                <ProjectMappingPage />
+              </RequireRole>
+            </RequireOnboarded>
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/admin/integrations"
+        element={
+          <RequireAuth>
+            <RequireOnboarded>
+              <RequireRole roles={['admin']}>
+                <IntegrationsPage />
+              </RequireRole>
+            </RequireOnboarded>
+          </RequireAuth>
+        }
       />
 
       {/* Legacy stubs under the original shell */}

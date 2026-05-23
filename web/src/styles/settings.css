@@ -1,0 +1,290 @@
+/* settings.css — body-class scoped (`.page-settings`) per plan §5.
+   Every selector is prefixed so .row/.section/.toggle can't bleed.
+   All colours come from var(--ac-*) tokens (autoclock-theme.css).
+   Shared parts (SettingsSection/SegmentedRadio/ConnRow/SaveBar) live in
+   settings-components.css and are body-class-agnostic. */
+
+/* ============ ROOT ============ */
+.page-settings {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 36px 8px 0;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* The error banner sits above the page head so it never gets covered by
+   the sticky save bar. */
+.page-settings .ac-banner {
+  margin-bottom: 14px;
+}
+
+/* ============ PAGE HEAD ============ */
+.page-settings__head {
+  margin-bottom: 22px;
+}
+.page-settings__title {
+  margin: 0;
+  font-size: 30px;
+  font-weight: var(--ac-weight-black);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: var(--ac-text);
+}
+.page-settings__sub {
+  margin: 6px 0 0;
+  color: var(--ac-text-muted);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+/* ============ LOADING ============ */
+.page-settings__loading {
+  background: var(--ac-surface);
+  border: 1px dashed var(--ac-border-strong);
+  border-radius: 16px;
+  padding: 38px 24px;
+  text-align: center;
+  color: var(--ac-text-muted);
+  font-size: 13.5px;
+  font-weight: var(--ac-weight-semibold);
+}
+
+/* ============ PROFILE GRID ============ */
+.page-settings__profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.page-settings__ro-field {
+  background: var(--ac-bg);
+  border: 1px solid var(--ac-border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  min-width: 0;
+}
+.page-settings__ro-label {
+  font-family: var(--ac-font-mono);
+  font-size: 10px;
+  color: var(--ac-text-subtle);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: var(--ac-weight-bold);
+}
+.page-settings__ro-value {
+  margin-top: 4px;
+  font-size: 13.5px;
+  color: var(--ac-text);
+  font-weight: var(--ac-weight-semibold);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.page-settings__role-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--ac-primary);
+  color: #fff;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-family: var(--ac-font-mono);
+  font-size: 10px;
+  font-weight: var(--ac-weight-black);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.page-settings__ro-note {
+  margin-top: 6px;
+  font-family: var(--ac-font-mono);
+  font-size: 10.5px;
+  color: var(--ac-text-subtle);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.page-settings__ro-note svg { width: 12px; height: 12px; }
+
+/* ============ TIME PAIR ============ */
+.page-settings__time-pair {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.page-settings__time-input {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--ac-bg);
+  border: 1px solid var(--ac-border);
+  border-radius: 10px;
+  padding: 0 10px 0 12px;
+  height: 38px;
+}
+.page-settings__time-input:focus-within {
+  border-color: var(--ac-primary);
+  box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.08);
+}
+.page-settings__time-lbl {
+  font-family: var(--ac-font-mono);
+  font-size: 10px;
+  color: var(--ac-text-subtle);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: var(--ac-weight-bold);
+}
+.page-settings__time-input input[type='time'] {
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font-family: var(--ac-font-mono);
+  font-size: 13.5px;
+  color: var(--ac-text);
+  font-weight: var(--ac-weight-semibold);
+  width: 90px;
+  min-width: 0;
+}
+.page-settings__time-arrow {
+  color: var(--ac-text-subtle);
+  font-family: var(--ac-font-mono);
+  font-size: 13px;
+}
+
+/* ============ TOGGLE ============ */
+.page-settings__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+.page-settings__toggle input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 1px;
+  height: 1px;
+}
+.page-settings__toggle-track {
+  position: relative;
+  width: 38px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--ac-n-300);
+  transition: var(--ac-transition);
+  flex: none;
+  display: block;
+}
+.page-settings__toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  transition: transform var(--ac-transition);
+}
+.page-settings__toggle input:checked + .page-settings__toggle-track {
+  background: var(--ac-success);
+}
+.page-settings__toggle input:checked + .page-settings__toggle-track .page-settings__toggle-thumb {
+  transform: translateX(16px);
+}
+.page-settings__toggle input:focus-visible + .page-settings__toggle-track {
+  outline: 2px solid var(--ac-primary);
+  outline-offset: 2px;
+}
+.page-settings__toggle-label {
+  font-size: 13px;
+  font-weight: var(--ac-weight-semibold);
+  color: var(--ac-text);
+}
+
+/* ============ SWATCHES ============ */
+.page-settings__swatches {
+  display: inline-flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.page-settings__swatch {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  box-shadow:
+    0 0 0 1px rgba(15, 23, 42, 0.1),
+    0 2px 6px -2px rgba(15, 23, 42, 0.18);
+  transition: transform var(--ac-transition), box-shadow var(--ac-transition);
+}
+.page-settings__swatch:hover { transform: translateY(-1px); }
+.page-settings__swatch.is-on {
+  box-shadow:
+    0 0 0 2px var(--ac-text),
+    0 0 0 4px var(--ac-surface),
+    0 6px 12px -4px rgba(15, 23, 42, 0.25);
+}
+.page-settings__swatch:focus-visible {
+  outline: 2px solid var(--ac-primary);
+  outline-offset: 3px;
+}
+.page-settings__swatch svg { width: 18px; height: 18px; }
+
+/* ============ DANGER ZONE ============ */
+.page-settings__danger-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.page-settings__danger-copy {
+  margin: 0;
+  flex: 1 1 240px;
+  color: var(--ac-text-muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+.page-settings__danger-copy strong {
+  color: var(--ac-text);
+  font-weight: var(--ac-weight-bold);
+}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 760px) {
+  .page-settings { padding: 24px 4px 0; }
+  .page-settings__title { font-size: 24px; }
+  .page-settings__profile-grid { grid-template-columns: 1fr; gap: 10px; }
+  .page-settings__time-input input[type='time'] { width: 100%; }
+  .page-settings__time-input { flex: 1; }
+  .page-settings__time-arrow { display: none; }
+  .page-settings__danger-row { flex-direction: column; align-items: stretch; }
+  .page-settings__danger-row .ac-btn { width: 100%; }
+}
+
+/* ============ ENTRANCE ============ */
+@keyframes ac-settings-rise {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.page-settings .ac-settings-section,
+.page-settings .page-settings__head {
+  animation: ac-settings-rise 480ms ease both;
+}
+.page-settings .page-settings__head { animation-delay: 30ms; }
+.page-settings .ac-settings-section:nth-of-type(1) { animation-delay: 60ms; }
+.page-settings .ac-settings-section:nth-of-type(2) { animation-delay: 120ms; }
+.page-settings .ac-settings-section:nth-of-type(3) { animation-delay: 180ms; }
+.page-settings .ac-settings-section:nth-of-type(4) { animation-delay: 240ms; }
+.page-settings .ac-settings-section:nth-of-type(5) { animation-delay: 300ms; }

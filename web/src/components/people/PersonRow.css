@@ -1,0 +1,132 @@
+/* PersonRow — body-class-agnostic. Pages style spacing/layout context.
+   Default layout: horizontal row. ≤640px stacks into a card. */
+
+.ac-personrow {
+  display: grid;
+  grid-template-columns: auto auto 1fr auto auto auto;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  background: var(--ac-surface);
+  border: 1px solid var(--ac-border);
+  border-radius: 12px;
+  min-width: 0;
+}
+.ac-personrow.has-check {
+  grid-template-columns: 28px auto 1fr auto auto auto;
+}
+.ac-personrow.is-selected {
+  background: rgba(37, 99, 235, 0.04);
+  border-color: rgba(37, 99, 235, 0.32);
+}
+
+/* Checkbox */
+.ac-personrow__check {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; cursor: pointer;
+  position: relative;
+}
+.ac-personrow__check input[type="checkbox"] {
+  position: absolute; inset: 0; opacity: 0; cursor: pointer; margin: 0;
+}
+.ac-personrow__check-box {
+  display: inline-block;
+  width: 18px; height: 18px;
+  border: 1.5px solid var(--ac-n-300, #CBD5E1);
+  border-radius: 5px;
+  background: var(--ac-surface);
+  transition: border-color .15s ease, background .15s ease;
+}
+.ac-personrow__check input:checked + .ac-personrow__check-box {
+  background: var(--ac-secondary, #2563EB);
+  border-color: var(--ac-secondary, #2563EB);
+}
+.ac-personrow__check input:checked + .ac-personrow__check-box::after {
+  content: '';
+  display: block;
+  width: 5px; height: 9px;
+  border: solid #fff; border-width: 0 2px 2px 0;
+  transform: translate(5.5px, 2.5px) rotate(45deg);
+}
+.ac-personrow__check input:focus-visible + .ac-personrow__check-box {
+  outline: 2px solid var(--ac-secondary, #2563EB);
+  outline-offset: 2px;
+}
+
+/* Avatar */
+.ac-personrow__avatar {
+  width: 36px; height: 36px;
+  border-radius: 999px;
+  color: #fff;
+  font-family: var(--ac-font-sans);
+  font-weight: var(--ac-weight-black);
+  font-size: 13px;
+  display: grid; place-items: center;
+  flex: none;
+}
+
+/* Identity block */
+.ac-personrow__id { min-width: 0; }
+.ac-personrow__name {
+  font-size: 14px;
+  font-weight: var(--ac-weight-semibold);
+  color: var(--ac-text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.ac-personrow__sub {
+  font-size: 12px;
+  color: var(--ac-text-muted);
+  margin-top: 2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.ac-personrow__role { color: var(--ac-text-muted); }
+.ac-personrow__team { color: var(--ac-text-subtle); }
+.ac-personrow__meta { color: var(--ac-text-subtle); }
+
+/* Hours */
+.ac-personrow__hours {
+  display: inline-flex; align-items: baseline; gap: 8px;
+  white-space: nowrap;
+}
+.ac-personrow__hours-val {
+  font-family: var(--ac-font-mono);
+  font-size: 13px;
+  color: var(--ac-text);
+  font-weight: var(--ac-weight-semibold);
+}
+.ac-personrow__gap {
+  font-size: 11px;
+  font-weight: var(--ac-weight-semibold);
+  color: #92400E;
+  background: rgba(245, 158, 11, .10);
+  border: 1px solid rgba(245, 158, 11, .30);
+  border-radius: 999px;
+  padding: 1px 8px;
+  line-height: 1.4;
+}
+
+/* Status + action — already styled by their inner pill/button */
+.ac-personrow__status { display: inline-flex; align-items: center; }
+.ac-personrow__action { display: inline-flex; align-items: center; }
+
+/* ============ Mobile: stack into card ============ */
+@media (max-width: 640px) {
+  .ac-personrow,
+  .ac-personrow.has-check {
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas:
+      "check id     action"
+      ".     hours  hours"
+      ".     status status";
+    row-gap: 8px;
+    padding: 12px 14px;
+  }
+  .ac-personrow__check  { grid-area: check;  align-self: start; margin-top: 4px; }
+  .ac-personrow__avatar { display: none; } /* avatar hidden on mobile for density */
+  .ac-personrow__id     { grid-area: id; }
+  .ac-personrow__hours  { grid-area: hours; }
+  .ac-personrow__status { grid-area: status; justify-self: start; }
+  .ac-personrow__action { grid-area: action; justify-self: end; }
+  .ac-personrow__name   { white-space: normal; }
+  .ac-personrow__sub    { white-space: normal; }
+}

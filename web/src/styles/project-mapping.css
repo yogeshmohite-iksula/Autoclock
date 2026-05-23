@@ -1,0 +1,142 @@
+/* project-mapping.css — body-class scoped (`.page-mapping`). Every selector
+   below starts with `.page-mapping` so the design's unprefixed class names
+   (`.row`, `.stat`, `.actions`, `.field`) never clash with sibling pages.
+   Source: docs/FrontEnd Design /Project Mapping.html (P15). */
+
+/* ============ PAGE-HEAD ============ */
+.page-mapping .page-head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  margin-bottom: 14px;
+  align-items: end;
+}
+
+.page-mapping .page-head__left { min-width: 0; }
+.page-mapping .page-head h1 {
+  font-size: 28px;
+  font-weight: var(--ac-weight-black, 900);
+  letter-spacing: -0.025em;
+  line-height: 1.12;
+  color: var(--ac-text);
+  margin: 0;
+}
+.page-mapping .page-head__sub {
+  margin-top: 6px;
+  color: var(--ac-text-muted);
+  font-size: 13.5px;
+  line-height: 1.5;
+  max-width: 60ch;
+}
+.page-mapping .page-head__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.page-mapping .page-head__badge {
+  font-family: var(--ac-font-mono, ui-monospace, monospace);
+  font-size: 11px;
+  color: var(--ac-text-muted);
+  background: var(--ac-bg-tint, #f4f6fa);
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--ac-border);
+}
+.page-mapping .page-head__badge b { color: var(--ac-text); margin-right: 4px; }
+
+.page-mapping .page-head__right {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.page-mapping .page-head__primary {
+  appearance: none;
+  border: 0;
+  background: var(--ac-accent, #2563eb);
+  color: #fff;
+  padding: 9px 16px;
+  border-radius: 9px;
+  font-weight: 700;
+  font-size: 13.5px;
+  cursor: pointer;
+}
+.page-mapping .page-head__primary:hover { filter: brightness(1.05); }
+.page-mapping .page-head__primary:focus-visible {
+  outline: 2px solid var(--ac-accent, #2563eb);
+  outline-offset: 2px;
+}
+
+/* ============ ERROR + LOADING + EMPTY ============ */
+.page-mapping .error {
+  background: rgba(220, 38, 38, 0.08);
+  border: 1px solid rgba(220, 38, 38, 0.4);
+  color: var(--ac-danger, #b91c1c);
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+.page-mapping .loading {
+  color: var(--ac-text-muted, #64748b);
+  padding: 22px 0;
+  font-size: 14px;
+  text-align: center;
+}
+.page-mapping .empty {
+  color: var(--ac-text-muted, #64748b);
+  padding: 22px 14px;
+  border: 1px dashed var(--ac-border);
+  border-radius: 12px;
+  text-align: center;
+  font-size: 14px;
+}
+
+/* ============ KPI ROW ============ */
+.page-mapping .mapping-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+/* ============ FILTER ROW ============ */
+.page-mapping .mapping-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+/* ============ MAPPING LIST ============ */
+.page-mapping .mapping-list {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============ MOBILE ============ */
+@media (max-width: 860px) {
+  .page-mapping .page-head {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+  .page-mapping .page-head__right {
+    justify-content: flex-start;
+  }
+  .page-mapping .page-head__primary {
+    width: 100%;
+  }
+  .page-mapping .mapping-kpis {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-mapping .page-head h1 {
+    font-size: 24px;
+  }
+}
