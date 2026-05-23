@@ -15,6 +15,28 @@ const PORT = process.env.PORT || 4000;
 // --- Bootstrapping ---
 initDb();
 
+// --- CORS (must be first — before session, routes, everything) ---
+// Credentials (session cookies) require an explicit origin, not '*'.
+// ALLOWED_ORIGINS env: comma-separated list, e.g. "http://localhost:5173,https://app.example.com"
+const ALLOWED_ORIGINS = new Set(
+  (process.env.ALLOWED_ORIGINS || 'http://localhost:5173')
+    .split(',').map(s => s.trim()).filter(Boolean)
+);
+
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin && ALLOWED_ORIGINS.has(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
+    res.setHeader('Vary', 'Origin');
+  }
+  // Preflight — answer immediately, no further processing needed.
+  if (req.method === 'OPTIONS') return res.sendStatus(204);
+  next();
+});
+
 // --- Global middleware ---
 app.use(express.json({ limit: '256kb' }));
 app.use(cookieParser());
