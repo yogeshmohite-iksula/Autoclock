@@ -17,6 +17,18 @@ Format: one entry per issue, newest at the top.
 
 ---
 
+## 2026-05-23 — P13 Leave Calendar — holidays endpoint not separated (OQ-AP-11)
+- **Where:**  web/src/api/leave.js; web/src/api/mocks.js (`__buildLeave`).
+- **What:**   `GET /api/leave?month=YYYY-MM` returns `{ holidays, leave, summary }` in one shot. Real ERD says holidays are global (TB-11 `settings`), but per OQ-AP-11 we ship them in the same payload to avoid a sister endpoint for M0. The frontend treats them as month-scoped.
+- **Impact:** data-shape decision — keep an eye on it when M1 lands. Either keep the combined response or split `GET /api/leave?month=` + `GET /api/holidays?year=` (year-scoped is more cacheable).
+- **Next:**   Keval / backend swimlane — confirm the combined response is the canonical shape; if so, EP-21 docs need an update.
+
+## 2026-05-23 — P13 Leave Calendar — POST /api/leave response is permissive
+- **Where:**  web/src/api/mocks.js (route handler for POST /api/leave) and web/src/pages/LeaveCalendarPage.jsx (`onAddSubmit`).
+- **What:**   The mock returns `{ ok:true, leave:{ id, ...payload } }` — no validation, no overlap check, no team lookup. The frontend optimistically appends the row to the in-memory list with status `'pending'` if the server didn't supply one. Real EP-21 POST will need to (a) verify the actor has permission to create leave for `pid`, (b) compute team from the user record, (c) flag overlap with existing leave / holidays, (d) decide an approval workflow (auto-approve for ops? PM lead approval?).
+- **Impact:** UX gap — current modal shows "Saving…" then closes; no approval flow visible.
+- **Next:**   Keval / backend swimlane + Yogesh — define approval policy + response shape (status, approver, audit reference).
+
 ## 2026-05-23 — P10 Management Dashboard — EP-15 range param defaults to week (OQ-AP-09)
 - **Where:**  web/src/pages/ManagementDashboardPage.jsx; web/src/api/dashboard.js (already wired); web/src/api/mocks.js (`__buildOrgDashboard`).
 - **What:**   Backend currently stubs EP-15 (M1). Frontend defaults `range` to `week` (URL `?range=week|month|quarter`) and renders against the mock shape `{ range, kpis, donut, trend8w, teams, topProjects }`. Real EP-15 will need to accept the `range` query param and return the same shape (or equivalent).

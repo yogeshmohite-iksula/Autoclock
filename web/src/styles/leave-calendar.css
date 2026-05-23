@@ -1,0 +1,244 @@
+/* leave-calendar.css — body-class scoped (`.page-leave`). All selectors begin
+   with `.page-leave` so the design's generic class names (`.cell`, `.cal-head`,
+   `.legend`, `.holiday`, `.list-row`) from `docs/FrontEnd Design /Leave
+   Calendar.html` never clash with other pages on the route.
+   Lifted from extraction notes (P13). */
+
+/* ============ PAGE-HEAD ============ */
+.page-leave .page-head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  margin-bottom: 14px;
+  align-items: end;
+}
+
+.page-leave .page-head__left { min-width: 0; }
+.page-leave .page-head h1 {
+  font-size: 28px;
+  font-weight: var(--ac-weight-black, 900);
+  letter-spacing: -0.025em;
+  line-height: 1.12;
+  color: var(--ac-text);
+  margin: 0;
+}
+.page-leave .page-head__sub {
+  margin-top: 6px;
+  color: var(--ac-text-muted);
+  font-size: 13.5px;
+  line-height: 1.5;
+  max-width: 60ch;
+}
+.page-leave .page-head__eyebrow {
+  display: inline-flex; align-items: center; gap: 10px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.page-leave .page-head__badge {
+  font-family: var(--ac-font-mono, ui-monospace, monospace);
+  font-size: 11px;
+  color: var(--ac-text-muted);
+  background: var(--ac-bg-tint, #f4f6fa);
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--ac-border);
+}
+.page-leave .page-head__badge b { color: var(--ac-text); margin-right: 4px; }
+
+.page-leave .page-head__right {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* Month-chip */
+.page-leave .month-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid var(--ac-border);
+  background: var(--ac-bg-elev, #fff);
+  padding: 4px 6px;
+  border-radius: 999px;
+}
+.page-leave .month-chip__label {
+  font-family: var(--ac-font-mono, ui-monospace, monospace);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ac-text);
+  padding: 0 8px;
+  white-space: nowrap;
+}
+.page-leave .month-chip__btn {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--ac-text);
+  font-size: 13px;
+}
+.page-leave .month-chip__btn:hover { background: var(--ac-bg-tint, #f4f6fa); }
+.page-leave .month-chip__btn:focus-visible {
+  outline: 2px solid var(--ac-accent, #2563eb);
+  outline-offset: 1px;
+}
+
+/* Primary CTA */
+.page-leave .page-head__primary {
+  appearance: none;
+  border: 0;
+  background: var(--ac-accent, #2563eb);
+  color: #fff;
+  padding: 9px 16px;
+  border-radius: 9px;
+  font-weight: 700;
+  font-size: 13.5px;
+  cursor: pointer;
+}
+.page-leave .page-head__primary:hover { filter: brightness(1.05); }
+.page-leave .page-head__primary:focus-visible {
+  outline: 2px solid var(--ac-accent, #2563eb);
+  outline-offset: 2px;
+}
+
+/* ============ VIEW TABS ============ */
+.page-leave .view-tabs {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--ac-bg-tint, #f4f6fa);
+  border: 1px solid var(--ac-border);
+  border-radius: 999px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.page-leave .view-tab {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ac-text-muted);
+  cursor: pointer;
+}
+.page-leave .view-tab:hover { color: var(--ac-text); }
+.page-leave .view-tab.is-active {
+  background: var(--ac-bg-elev, #fff);
+  color: var(--ac-text);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+}
+.page-leave .view-tab:focus-visible {
+  outline: 2px solid var(--ac-accent, #2563eb);
+  outline-offset: 2px;
+}
+
+/* ============ BODY ============ */
+.page-leave .leave-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 18px;
+  align-items: start;
+}
+
+.page-leave .leave-body__main { min-width: 0; }
+.page-leave .leave-body__rail { min-width: 0; }
+
+@media (max-width: 880px) {
+  .page-leave .leave-body {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============ LIST SECTION (used for list + upcoming) ============ */
+.page-leave .leave-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.page-leave .empty {
+  text-align: center;
+  padding: 28px 16px;
+  color: var(--ac-text-muted);
+  background: var(--ac-bg-tint, #f6f7f9);
+  border: 1px dashed var(--ac-border);
+  border-radius: 12px;
+  font-size: 13px;
+}
+
+.page-leave .loading {
+  padding: 24px 16px;
+  color: var(--ac-text-muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+.page-leave .error {
+  border: 1px solid rgba(220, 38, 38, 0.4);
+  background: rgba(220, 38, 38, 0.06);
+  color: var(--ac-danger, #b91c1c);
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+/* ============ HOLIDAYS VIEW ============ */
+.page-leave .leave-holidays { min-width: 0; }
+.page-leave .leave-holidays__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.page-leave .leave-holidays__row {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  background: var(--ac-bg-elev, #fff);
+  border: 1px solid var(--ac-border);
+  border-radius: 10px;
+}
+.page-leave .leave-holidays__date {
+  font-family: var(--ac-font-mono, ui-monospace, monospace);
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ac-text);
+}
+
+@media (max-width: 640px) {
+  .page-leave .page-head {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+  .page-leave .page-head__right {
+    justify-content: space-between;
+    width: 100%;
+  }
+  .page-leave .page-head__primary {
+    flex: 1;
+    max-width: 50%;
+  }
+  .page-leave .leave-holidays__row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+}

@@ -1,0 +1,187 @@
+/* MonthCalendar.css — scoped to .page-leave. */
+
+.page-leave .leave-month {
+  width: 100%;
+  min-width: 0;
+}
+
+.page-leave .leave-month__grid {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 6px;
+  table-layout: fixed;
+}
+
+.page-leave .leave-month__wd {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ac-text-muted);
+  text-align: left;
+  padding: 4px 6px 8px;
+  font-weight: 700;
+}
+.page-leave .leave-month__wd--we { color: var(--ac-danger, #b91c1c); }
+
+.page-leave .leave-month__cell {
+  background: var(--ac-bg-elev, #fff);
+  border: 1px solid var(--ac-border);
+  border-radius: 8px;
+  vertical-align: top;
+  padding: 0;
+  min-height: 96px;
+  height: 96px;
+  position: relative;
+}
+
+.page-leave .leave-month__cell.is-out {
+  background: transparent;
+  border-color: transparent;
+  opacity: 0.45;
+}
+
+.page-leave .leave-month__cell.is-weekend {
+  background: var(--ac-bg-tint, #f6f7f9);
+}
+
+.page-leave .leave-month__cell.is-holiday {
+  background: rgba(220, 38, 38, 0.06);
+  border-color: rgba(220, 38, 38, 0.55);
+}
+
+.page-leave .leave-month__cell.is-today {
+  outline: 2px solid var(--ac-accent, #2563eb);
+  outline-offset: -2px;
+}
+
+.page-leave .leave-month__btn {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: 0;
+  padding: 8px;
+  gap: 4px;
+  text-align: left;
+  font-family: inherit;
+  color: inherit;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.page-leave .leave-month__btn:focus-visible {
+  outline: 2px solid var(--ac-accent, #2563eb);
+  outline-offset: -2px;
+}
+
+.page-leave .leave-month__day {
+  font-family: var(--ac-font-mono, ui-monospace, monospace);
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--ac-text);
+  line-height: 1;
+}
+
+.page-leave .leave-month__cell.is-out .leave-month__day { color: var(--ac-text-muted); }
+.page-leave .leave-month__cell.is-today .leave-month__day { color: var(--ac-accent, #2563eb); }
+
+.page-leave .leave-month__avatars {
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+  margin-top: auto;
+}
+
+.page-leave .leave-month__av {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1.5px solid var(--ac-bg-elev, #fff);
+}
+.page-leave .leave-month__av--more {
+  background: var(--ac-text-muted, #64748b);
+}
+
+.page-leave .leave-holiday-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10.5px;
+  color: var(--ac-danger, #b91c1c);
+  background: rgba(220, 38, 38, 0.08);
+  padding: 1.5px 6px;
+  border-radius: 999px;
+  align-self: flex-start;
+  max-width: 100%;
+  overflow: hidden;
+}
+.page-leave .leave-holiday-chip__dot { font-size: 10px; }
+.page-leave .leave-holiday-chip__txt {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 600;
+}
+.page-leave .leave-holiday-chip--compact { font-size: 10px; padding: 1px 5px; }
+
+/* ---- Compact mobile-mode ------------------------------------------------ */
+
+.page-leave .leave-month--compact .leave-month__grid {
+  border-spacing: 3px;
+}
+.page-leave .leave-month--compact .leave-month__cell {
+  min-height: 44px;
+  height: 44px;
+  border-radius: 6px;
+}
+.page-leave .leave-month--compact .leave-month__btn {
+  padding: 4px;
+  align-items: flex-start;
+}
+.page-leave .leave-month--compact .leave-month__day {
+  font-size: 11px;
+}
+.page-leave .leave-month--compact .leave-month__compact-badge {
+  position: absolute;
+  right: 4px;
+  bottom: 3px;
+  font-size: 9.5px;
+  font-weight: 700;
+  background: rgba(245, 158, 11, 0.75);
+  color: #fff;
+  padding: 1px 4px;
+  border-radius: 999px;
+  line-height: 1;
+}
+.page-leave .leave-month--compact .leave-month__compact-holiday {
+  position: absolute;
+  right: 4px;
+  top: 3px;
+  font-size: 9px;
+  color: var(--ac-danger, #b91c1c);
+}
+.page-leave .leave-month--compact .leave-month__wd {
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  padding: 2px 2px 4px;
+}
+
+/* ---- Responsive breakpoints --------------------------------------------- */
+@media (max-width: 880px) {
+  .page-leave .leave-month__cell {
+    min-height: 70px;
+    height: 70px;
+  }
+  .page-leave .leave-month__wd { font-size: 10px; }
+  .page-leave .leave-month__btn { padding: 5px; gap: 2px; }
+  .page-leave .leave-month__av { width: 16px; height: 16px; font-size: 9px; border-width: 1px; }
+}

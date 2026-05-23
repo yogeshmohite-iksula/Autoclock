@@ -17,6 +17,7 @@ import TeamMemberDetailPage from './pages/TeamMemberDetailPage';
 import ManagementDashboardPage from './pages/ManagementDashboardPage';
 import ComplianceConsolePage from './pages/ComplianceConsolePage';
 import ReminderHistoryPage from './pages/ReminderHistoryPage';
+import LeaveCalendarPage from './pages/LeaveCalendarPage';
 
 // Legacy stubs (kept so /log, /preview, /dashboard work for Yogesh / Keval / Ali).
 import App from './App';
@@ -144,6 +145,18 @@ export default function AppRoutes() {
             <RequireOnboarded>
               <RequireRole roles={['operations']}>
                 <ReminderHistoryPage />
+              </RequireRole>
+            </RequireOnboarded>
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/ops/leave"
+        element={
+          <RequireAuth>
+            <RequireOnboarded>
+              <RequireRole roles={['operations']}>
+                <LeaveCalendarPage />
               </RequireRole>
             </RequireOnboarded>
           </RequireAuth>

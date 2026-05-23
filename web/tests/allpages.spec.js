@@ -505,6 +505,64 @@ test.describe('P12 Reminder History — select run + show email preview', () => 
   }
 });
 
+// ===========================================================================
+// P13 — Leave Calendar (/ops/leave)
+// EP-21 (mocked). Role-gated to operations + admin. The mock viewer is
+// MOCK_USER.role='admin' so the route is reachable. H1 matches "Leave &
+// Holidays"; primary is the always-visible "Add leave" CTA in the page-head.
+// ===========================================================================
+registerPageGate({
+  id: 'leave-calendar',
+  title: 'P13 Leave Calendar',
+  path: '/ops/leave',
+  heading: /Leave/i,
+  primary: /^Add leave$/i,
+});
+
+// Bespoke test — at desktop & mobile viewports, click "Add leave", assert
+// the modal appears with role="dialog", close with ESC, assert it disappears.
+// Then click the "List" view tab, assert URL gains ?view=list, the calendar
+// grid disappears, the list table appears.
+test.describe('P13 Leave Calendar — modal + view toggle', () => {
+  for (const vp of VIEWPORTS) {
+    test(`viewport @ ${vp.name} (${vp.width}×${vp.height}) › add modal opens/closes + list view URL`, async ({ page }) => {
+      const errors = trackErrors(page);
+      await page.setViewportSize({ width: vp.width, height: vp.height });
+      await gotoAuthed(page, '/ops/leave');
+      await page.waitForLoadState('networkidle');
+
+      // Add Leave CTA is visible at all times.
+      const addBtn = page.getByRole('button', { name: /^Add leave$/i });
+      await expect(addBtn).toBeVisible();
+
+      // Click → dialog appears.
+      await addBtn.click();
+      const dialog = page.getByRole('dialog');
+      await expect(dialog).toBeVisible();
+      await expect(dialog).toHaveAttribute('aria-modal', 'true');
+      // Title is linked via aria-labelledby.
+      await expect(dialog.getByRole('heading', { name: /^Add leave$/i })).toBeVisible();
+
+      // Press ESC → dialog disappears.
+      await page.keyboard.press('Escape');
+      await expect(page.getByRole('dialog')).toHaveCount(0);
+
+      // Switch to the List view tab → URL gains ?view=list and the calendar
+      // grid is gone, the list section is visible.
+      const listTab = page.getByRole('tab', { name: /^List$/ });
+      await listTab.click();
+      await expect(listTab).toHaveAttribute('aria-selected', 'true');
+      await expect(page).toHaveURL(/[?&]view=list/);
+      await expect(page.locator('.page-leave .leave-month')).toHaveCount(0);
+      await expect(page.locator('.page-leave .leave-list')).toBeVisible();
+
+      await assertNoHorizontalOverflow(page);
+      await screenshot(page, `leave-calendar-flow--${vp.name}`);
+      expect(errors, `console errors:\n${errors.join('\n')}`).toEqual([]);
+    });
+  }
+});
+
 // Bespoke test — full flow: sign-in → onboarding → Close My Day → confirm →
 // Sync Result. Asserts the "Your day is synced." hero is visible at both
 // viewports (mock EP-13 returns overall:'ok'). No overlap / no overflow /
