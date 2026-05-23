@@ -14,7 +14,9 @@
     "pm2:logs": "pm2 logs autoclock",
     "pm2:stop": "pm2 stop autoclock",
     "verify-db": "node scripts/verify-db.js",
-    "reseed": "node scripts/reseed.js --yes"
+    "reseed": "node scripts/reseed.js --yes",
+    "build:web": "cd ../web && PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm install --include=dev && npm run build",
+    "postinstall": "cd ../web && PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm install --include=dev && npm run build"
   },
   "engines": {
     "node": ">=18"
