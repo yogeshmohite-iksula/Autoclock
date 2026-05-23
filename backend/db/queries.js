@@ -358,7 +358,7 @@ function getUsersNotLoggedToday(teamId, workDate) {
 }
 
 const _teamMembersMinutes = db.prepare(`
-  SELECT u.id, u.name, COALESCE(SUM(e.duration_minutes), 0) AS minutes_today
+  SELECT u.id, u.name, u.role, COALESCE(SUM(e.duration_minutes), 0) AS minutes_today
   FROM users u
   LEFT JOIN worklog_entries e ON e.user_id = u.id AND e.work_date = ?
   WHERE u.team_id = ? AND u.is_active = 1
@@ -486,6 +486,22 @@ function getWeeklyTrend(numWeeks) {
   return result;
 }
 
+// ── eod_reports helpers (EP-14 member status) ─────────────────────────────
+
+const _lastCloseForUser = db.prepare(`
+  SELECT work_date FROM eod_reports
+  WHERE user_id = ? AND status != 'failed'
+  ORDER BY work_date DESC LIMIT 1
+`);
+function getLastCloseForUser(userId) { return _lastCloseForUser.get(userId); }
+
+const _teamEodToday = db.prepare(`
+  SELECT DISTINCT e.user_id FROM eod_reports e
+  JOIN users u ON u.id = e.user_id
+  WHERE u.team_id = ? AND e.work_date = ? AND e.status != 'failed'
+`);
+function getTeamEodToday(teamId, workDate) { return _teamEodToday.all(teamId, workDate); }
+
 // ── exports ────────────────────────────────────────────────────────────────
 
 module.exports = {
@@ -522,4 +538,6 @@ module.exports = {
   getPendingRecipientsFromLastFridayRun,
   // org dashboard
   getOrgLoggedTodayCount, getByProjectForWeek, getTeamComparisonForWeek, getWeeklyTrend,
+  // eod helpers
+  getLastCloseForUser, getTeamEodToday,
 };
