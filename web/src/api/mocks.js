@@ -10,11 +10,11 @@ const MOCK_USER = {
   id: 1,
   name: 'Yogesh Mohite',
   email: 'yogesh@iksula.com',
-  // pm_lead so the demo viewer can see the role-gated /team route from
-  // feat/frontend-allpages (P08 Team Dashboard). RequireRole admits pm_lead +
-  // admin; everyone authed still sees Today/History/Settings. Settings page
-  // still displays "PM / Lead" via ROLE_LABELS — verified manually.
-  role: 'pm_lead',
+  // 'admin' so every role-gated page (/team, /org, /ops/*, /admin/*) is
+  // reachable in dev + Playwright — RequireRole auto-allows admin (see
+  // web/src/routes.jsx). Real users get their actual role from EP-01
+  // (Google OIDC, ERD §8). Bumped from pm_lead during P10 build.
+  role: 'admin',
   team_id: 1,
   // 'active' on first boot so the demo flow walks through onboarding.
   // OnboardingPage flips this to 'connected' on Finish; the route guard
