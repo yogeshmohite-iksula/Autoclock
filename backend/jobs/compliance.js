@@ -14,7 +14,7 @@ function weekBounds(dateStr) {
   return { weekStart: mon.toISOString().slice(0, 10), weekEnd: sun.toISOString().slice(0, 10) };
 }
 
-async function runCheck(type, triggeredBy, actorUserId) {
+async function runCheck(type, triggeredBy, actorUserId, options = {}) {
   const today = new Date().toISOString().slice(0, 10);
   const { weekStart, weekEnd } = weekBounds(today);
   const settings  = Q.getAllSettings();
@@ -26,9 +26,12 @@ async function runCheck(type, triggeredBy, actorUserId) {
     Q.getWeeklyMinutesPerUser(weekStart, weekEnd).map(r => [r.user_id, r.minutes])
   );
 
-  // Monday: mark complied users from the last Friday run, then restrict candidates to still-pending.
+  // Restrict candidates based on run type.
   let candidates = allUsers;
-  if (type === 'monday') {
+  if (type === 'manual') {
+    const ids = new Set(options.recipientIds || []);
+    candidates = allUsers.filter(u => ids.has(u.id));
+  } else if (type === 'monday') {
     const prevPending = Q.getPendingRecipientsFromLastFridayRun();
     for (const p of prevPending) {
       const leaveMin   = (Q.getLeaveDaysForWeek(p.user_id, weekStart, weekEnd).leave_hours || 0) * 60;
