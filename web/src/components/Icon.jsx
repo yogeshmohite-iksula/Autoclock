@@ -33,6 +33,8 @@ export default function Icon({ name, size = 18 }) {
     case 'chevron-down': return <svg viewBox="0 0 24 24" {...wh}><path d="M6 9l6 6 6-6" {...s}/></svg>;
     case 'chevron-right': return <svg viewBox="0 0 24 24" {...wh}><path d="M9 6l6 6-6 6" {...s}/></svg>;
     case 'arrow-left':   return <svg viewBox="0 0 24 24" {...wh}><path d="M14 6l-6 6 6 6M5 12h14" {...s}/></svg>;
+    case 'check':    return <svg viewBox="0 0 24 24" {...wh}><path d="M5 12.5l4.5 4.5L19 7.5" {...s}/></svg>;
+    case 'lock':     return <svg viewBox="0 0 24 24" {...wh}><rect x="5" y="11" width="14" height="9" rx="2" {...s}/><path d="M8 11V8a4 4 0 0 1 8 0v3" {...s}/></svg>;
     default: return null;
   }
 }
