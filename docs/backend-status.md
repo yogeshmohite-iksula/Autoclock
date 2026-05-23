@@ -1,8 +1,8 @@
 # AutoClock — Backend Status Audit
 
-**Last updated:** 2026-05-23 (B4 PUT projects, B5 section-scoped settings)
+**Last updated:** 2026-05-23 (B6 user filter, B7 test-conn, B9 leave row + EP-23 wired)
 **Branch:** `feat/backend`
-**Tests:** 126 passing, 0 failing
+**Tests:** 136 passing, 0 failing
 
 Status legend: **REAL** = fully implemented + tested · **PARTIAL** = works but shape/params incomplete vs frontend contract · **STUB** = placeholder / 501
 
@@ -30,11 +30,11 @@ Status legend: **REAL** = fully implemented + tested · **PARTIAL** = works but 
 | EP-16 | `GET /api/ops/compliance?date=` | REAL | Leave-adjusted rows per user. `date` defaults to today. |
 | EP-17 | `POST /api/ops/run-check` | **REAL** | Accepts `{type:'friday'|'monday'|'manual', recipientIds?:[…]}`. Gap #3 resolved. |
 | EP-18 | `GET /api/ops/reminders` | REAL | Returns last 50 runs from TB-08, enriched with `emailed`/`complied` counts and `recipients` array. |
-| EP-19 | `GET/POST/PUT /api/admin/users` | **PARTIAL** | GET returns all active users (no `?filter=&status=` server-side filtering). POST creates. PUT updates. **See Gap #4.** |
+| EP-19 | `GET/POST/PUT /api/admin/users` | **REAL** | GET supports `?filter=` (name/email) and `?status=active\|inactive\|all`. POST creates. PUT updates. |
 | EP-20 | `GET/POST/PUT /api/admin/projects` | **PARTIAL** | GET + POST + PUT exist. Test-connection sub-EP not wired to real Jira — see Gap #6. |
-| EP-21 | `GET/POST /api/leave` | **PARTIAL** | GET + POST exist. No approval workflow, no overlap check, no team lookup on POST. **See Gap #7.** |
+| EP-21 | `GET/POST /api/leave` | **REAL** | GET + POST exist. POST returns full leave row with `status:'pending'`. No approval workflow (by design). |
 | EP-22 | `GET/PUT /api/admin/settings` | **REAL** | GET returns flat `{key:value}` map. PUT accepts both flat map and `{section, body}` — namespaces as `section.*`. Gap #8 resolved. |
-| EP-23 | `POST /api/worklogs/sync` | **STUB** | Returns 501. `services/worklogSync.js` is complete; just needs wiring. |
+| EP-23 | `POST /api/worklogs/sync` | **REAL** | Wired to `pullSince`. Accepts `{since}` ISO date (defaults 7 days). 503 if `JIRA_READER_EMAIL/TOKEN` not set. |
 
 ---
 

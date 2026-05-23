@@ -251,3 +251,37 @@ test('EP-18 reminders enriched with emailed + complied counts', async () => {
     assert.ok(Array.isArray(run.recipients), 'run.recipients is array');
   }
 });
+
+// ── EP-23 worklog sync (B9) ───────────────────────────────────────────────────
+
+test('EP-23 POST /api/worklogs/sync without reader env → 503 CONFIG_ERROR', async () => {
+  const cookie = await login('omkar@iksula.com');
+  const res  = await post('/api/worklogs/sync', {}, cookie);
+  const body = await res.json();
+  // JIRA_READER_EMAIL / JIRA_READER_TOKEN not set in test env → 503
+  assert.equal(res.status, 503);
+  assert.equal(body.error.code, 'CONFIG_ERROR');
+});
+
+test('EP-23 POST /api/worklogs/sync with invalid since → 400 BAD_REQUEST', async () => {
+  // Temporarily set reader env so we get past the config guard
+  const origEmail = process.env.JIRA_READER_EMAIL;
+  const origToken = process.env.JIRA_READER_TOKEN;
+  process.env.JIRA_READER_EMAIL = 'reader@iksula.com';
+  process.env.JIRA_READER_TOKEN = 'dummy';
+
+  const cookie = await login('omkar@iksula.com');
+  const res    = await post('/api/worklogs/sync', { since: 'not-a-date' }, cookie);
+  const body   = await res.json();
+  assert.equal(res.status, 400);
+  assert.equal(body.error.code, 'BAD_REQUEST');
+
+  process.env.JIRA_READER_EMAIL = origEmail;
+  process.env.JIRA_READER_TOKEN = origToken;
+});
+
+test('EP-23 POST /api/worklogs/sync as employee → 403 FORBIDDEN', async () => {
+  const cookie = await login('yogesh@iksula.com'); // employee
+  const res  = await post('/api/worklogs/sync', {}, cookie);
+  assert.equal(res.status, 403);
+});

@@ -21,6 +21,11 @@ const _allActiveUsers = db.prepare(
 );
 function getAllActiveUsers() { return _allActiveUsers.all(); }
 
+const _allUsers = db.prepare(
+  'SELECT id, name, email, role, team_id, onboarding_status, is_active FROM users ORDER BY name'
+);
+function getAllUsers() { return _allUsers.all(); }
+
 const _createUser = db.prepare(`
   INSERT INTO users (name, email, role, team_id, onboarding_status, is_active)
   VALUES (@name, @email, @role, @team_id, 'invited', 1)
@@ -309,9 +314,11 @@ const _upsertLeave = db.prepare(`
     hours      = excluded.hours
 `);
 function upsertLeaveDay({ user_id, leave_date, leave_type, hours = 8, created_by_user_id }) {
-  const info = _upsertLeave.run({ user_id, leave_date, leave_type, hours, created_by_user_id });
-  return info.lastInsertRowid;
+  _upsertLeave.run({ user_id, leave_date, leave_type, hours, created_by_user_id });
 }
+
+const _leaveByUserDate = db.prepare('SELECT * FROM leave_days WHERE user_id = ? AND leave_date = ?');
+function getLeaveByUserDate(userId, leaveDate) { return _leaveByUserDate.get(userId, leaveDate); }
 
 // ── reminder_runs ──────────────────────────────────────────────────────────
 
@@ -517,7 +524,7 @@ function getTeamEodToday(teamId, workDate) { return _teamEodToday.all(teamId, wo
 
 module.exports = {
   // users
-  getUserByEmail, getUserById, getAllActiveUsers, createUser, updateUser,
+  getUserByEmail, getUserById, getAllActiveUsers, getAllUsers, createUser, updateUser,
   // teams
   getAllTeams,
   // projects
@@ -535,7 +542,7 @@ module.exports = {
   // settings
   getAllSettings, upsertSettings,
   // leave_days
-  getLeaveDays, getAllLeaveDays, upsertLeaveDay,
+  getLeaveDays, getAllLeaveDays, upsertLeaveDay, getLeaveByUserDate,
   // reminder_runs
   createReminderRun, getRecentReminderRuns,
   // audit_log

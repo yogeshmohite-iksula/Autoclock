@@ -82,9 +82,21 @@ router.get('/reminders', ops, (_req, res) => {
 });
 
 // EP-23 POST /api/worklogs/sync — mounted separately at /api/worklogs in server.js (ERD §6)
+const { pullSince } = require('../services/worklogSync');
 const worklogsRouter = express.Router();
-worklogsRouter.post('/sync', ops, (_req, res) => {
-  res.status(501).json({ error: { code: 'NOT_IMPLEMENTED', message: 'EP-23 is a stretch goal (Hr 12 gate) — DevDoc §6.7' } });
+worklogsRouter.post('/sync', ops, async (req, res) => {
+  if (!process.env.JIRA_READER_EMAIL || !process.env.JIRA_READER_TOKEN)
+    return res.status(503).json({ error: { code: 'CONFIG_ERROR', message: 'JIRA_READER_EMAIL and JIRA_READER_TOKEN must be set' } });
+  const { since } = req.body || {};
+  const sinceMs = since ? new Date(since).getTime() : Date.now() - 7 * 24 * 60 * 60 * 1000;
+  if (isNaN(sinceMs)) return res.status(400).json({ error: { code: 'BAD_REQUEST', message: 'since must be a valid ISO date string' } });
+  try {
+    const worklogs = await pullSince(sinceMs);
+    res.json({ ok: true, count: worklogs.length, worklogs });
+  } catch (e) {
+    const status = [401, 403, 429].includes(e.status) ? e.status : 500;
+    res.status(status).json({ error: { code: 'JIRA_ERROR', message: e.message } });
+  }
 });
 
 module.exports = router;

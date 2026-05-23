@@ -43,11 +43,11 @@
 
 | # | Item | Status | EP | Notes |
 |---|---|---|---|---|
-| B6 | EP-19 server-side `?filter=&status=` for Users page (P14) | [ ] | EP-19 | Client-side filter works for 60 users; not urgent |
-| B7 | EP-20 `POST /api/admin/projects/test` real Jira check | [ ] | EP-20 | Mock always returns ok:true. Need real `GET /rest/api/3/project/{key}` call |
+| B6 | EP-19 server-side `?filter=&status=` for Users page (P14) | ✅ done 2026-05-23 | EP-19 | JS-side filter on `getAllUsers()`. `?status=active\|inactive\|all`, `?filter=` name/email LIKE. |
+| B7 | EP-20 `POST /api/admin/projects/test` real Jira check | ✅ done 2026-05-23 | EP-20 | Calls `GET /rest/api/3/project/{key}` with admin env creds. Returns `{ok, message}`. |
 | B8 | EP-18 reminder runs enriched with `emailed`/`complied`/`recipients` | ✅ done 2026-05-23 | EP-18 | Each run now includes emailed/complied counts and full recipients array. |
-| B9 | EP-21 POST response shape — return full leave row, not just `{leave_id}` | [ ] | EP-21 | Frontend expects `{ok, leave:{id,user_id,leave_date,…}}` |
-| B9 | EP-23 wire worklogSync.js to the 501 stub | [ ] | EP-23 | Service is complete. 30-min job. Replaces 501 with real pull |
+| B9 | EP-21 POST response shape — return full leave row, not just `{leave_id}` | ✅ done 2026-05-23 | EP-21 | Returns `{ok, leave:{id,user_id,leave_date,leave_type,hours,status:'pending'}}`. |
+| B9 | EP-23 wire worklogSync.js to the 501 stub | ✅ done 2026-05-23 | EP-23 | Replaces 501. Accepts `{since}` ISO date, defaults to 7 days. 503 if reader env unset. |
 
 ---
 

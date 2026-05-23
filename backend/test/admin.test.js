@@ -168,3 +168,84 @@ test('EP-22 PUT /api/admin/settings section without body → 400 BAD_REQUEST', a
   assert.equal(res.status, 400);
   assert.equal(body.error.code, 'BAD_REQUEST');
 });
+
+// ── EP-19 server-side filtering (B6) ─────────────────────────────────────────
+
+test('EP-19 GET /api/admin/users no params → active users only', async () => {
+  const cookie = await login('tejas@iksula.com');
+  const body   = await (await get('/api/admin/users', cookie)).json();
+  assert.ok(Array.isArray(body.users), 'users is array');
+  assert.ok(body.users.length > 0,    'at least one active user');
+  assert.ok(body.users.every(u => u.is_active === 1), 'all returned users are active');
+});
+
+test('EP-19 GET /api/admin/users?status=all → includes inactive users', async () => {
+  const { db } = require('../db');
+  db.prepare("UPDATE users SET is_active=0 WHERE email='sneha@iksula.com'").run();
+
+  const cookie = await login('tejas@iksula.com');
+  const all    = await (await get('/api/admin/users?status=all', cookie)).json();
+  const active = await (await get('/api/admin/users?status=active', cookie)).json();
+  assert.ok(all.users.length > active.users.length, 'status=all returns more rows than active');
+  assert.ok(all.users.some(u => u.is_active === 0), 'inactive user present in status=all');
+
+  db.prepare("UPDATE users SET is_active=1 WHERE email='sneha@iksula.com'").run();
+});
+
+test('EP-19 GET /api/admin/users?filter=yogesh → name match', async () => {
+  const cookie = await login('tejas@iksula.com');
+  const body   = await (await get('/api/admin/users?filter=yogesh', cookie)).json();
+  assert.ok(body.users.length > 0, 'at least one result');
+  assert.ok(body.users.every(u => u.name.toLowerCase().includes('yogesh') || u.email.toLowerCase().includes('yogesh')), 'all results match filter');
+});
+
+test('EP-19 GET /api/admin/users?filter=zzznomatch → empty array', async () => {
+  const cookie = await login('tejas@iksula.com');
+  const body   = await (await get('/api/admin/users?filter=zzznomatch', cookie)).json();
+  assert.equal(body.users.length, 0, 'no match returns empty array');
+});
+
+// ── EP-20 POST /api/admin/projects/test (B7) ──────────────────────────────────
+
+test('EP-20 POST /api/admin/projects/test without env → {ok:false, message}', async () => {
+  const cookie = await login('tejas@iksula.com');
+  const res  = await post('/api/admin/projects/test', { jira_project_key: 'PIM' }, cookie);
+  const body = await res.json();
+  assert.equal(res.status, 200);
+  assert.equal(body.ok, false);
+  assert.ok(body.message, 'message present');
+});
+
+test('EP-20 POST /api/admin/projects/test missing jira_project_key → 400', async () => {
+  const cookie = await login('tejas@iksula.com');
+  const res  = await post('/api/admin/projects/test', {}, cookie);
+  const body = await res.json();
+  assert.equal(res.status, 400);
+  assert.equal(body.error.code, 'BAD_REQUEST');
+});
+
+// ── EP-21 leave POST full row (B9) ────────────────────────────────────────────
+
+test('EP-21 POST /api/leave returns full leave row with status field', async () => {
+  const cookie = await login('omkar@iksula.com'); // operations
+  const res  = await post('/api/leave', {
+    user_id:    3,
+    leave_date: '2099-06-01',
+    leave_type: 'pto',
+    hours:      8,
+  }, cookie);
+  const body = await res.json();
+  assert.equal(res.status, 200);
+  assert.equal(body.ok, true);
+  assert.ok(body.leave,                      'leave object present');
+  assert.ok(body.leave.id,                   'leave.id present');
+  assert.equal(body.leave.user_id, 3,        'leave.user_id matches');
+  assert.equal(body.leave.leave_date, '2099-06-01');
+  assert.equal(body.leave.leave_type, 'pto');
+  assert.equal(body.leave.hours, 8);
+  assert.equal(body.leave.status, 'pending', 'status field present');
+
+  // Cleanup
+  const { db } = require('../db');
+  db.prepare("DELETE FROM leave_days WHERE user_id=3 AND leave_date='2099-06-01'").run();
+});
