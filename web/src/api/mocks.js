@@ -10,7 +10,11 @@ const MOCK_USER = {
   id: 1,
   name: 'Yogesh Mohite',
   email: 'yogesh@iksula.com',
-  role: 'employee',
+  // pm_lead so the demo viewer can see the role-gated /team route from
+  // feat/frontend-allpages (P08 Team Dashboard). RequireRole admits pm_lead +
+  // admin; everyone authed still sees Today/History/Settings. Settings page
+  // still displays "PM / Lead" via ROLE_LABELS — verified manually.
+  role: 'pm_lead',
   team_id: 1,
   // 'active' on first boot so the demo flow walks through onboarding.
   // OnboardingPage flips this to 'connected' on Finish; the route guard
@@ -227,14 +231,11 @@ const ROUTES = [
     overall: 'ok',
   })],
 
-  // EP-14 — minimal team dashboard
-  ['GET', '/api/dashboard/team', () => ok({
-    team_id: 1,
-    kpis: { team_logged_today: 1 },
-    by_ticket: [],
-    not_logged_today: [],
-    members: [{ id: 1, name: 'Yogesh Mohite', minutes_today: TODAY_ENTRIES.reduce((a,e) => a + e.duration_minutes, 0) }],
-  })],
+  // EP-14 — extended team dashboard (OQ-AP-07)
+  // Returns { team, range, kpis: {hoursLogged, onTrack, behind, onLeave},
+  //          members:[{id, name, role, hue, today, week, target, weekTarget,
+  //          status:'logging'|'closed'|'partial'|'missing'|'leave', lastClose, initial}] }
+  ['GET', '/api/dashboard/team', (_b, _f, path) => ok(__buildTeamDashboard(paramOf(path, 'range') || 'today'))],
 
   // Onboarding-connections (NO EP yet — mock only; see OQ-F3)
   ['GET', '/api/auth/connections', () => ok({ ...CONNECTIONS })],
@@ -428,6 +429,55 @@ function __buildCompliance(week) {
     target: 40,
     stats: { peopleUnder, peopleOk, peopleOnLeave, weekHrsAggregate: weekHrs },
     people,
+  };
+}
+
+// Team dashboard — extended shape used by P08 (Team Dashboard) and P09 detail.
+// Synthesises per-member today/week/target/status/lastClose from __USERS so the
+// UI design fidelity is preserved without the backend implementing OQ-AP-07 yet.
+function __buildTeamDashboard(range) {
+  // PM/lead view: include the pm_lead viewer + all employee teammates. Exclude
+  // management/operations/admin (they're cross-team viewers, not members).
+  const TEAM_NAME = 'SiteOne PIM Squad';
+  const TEAM_COLOR = '#2563EB';
+  const ranks = __USERS.filter(u => u.role === 'employee' || u.role === 'pm_lead');
+  // Deterministic-ish synth driven by user.id so screenshots are stable per range.
+  // Five statuses cycle: 0=logging, 1=closed, 2=closed, 3=missing, 4=partial,
+  // 5=leave (rare), 6=missing.
+  const STATUSES = ['logging', 'closed', 'closed', 'missing', 'partial', 'leave', 'missing', 'closed'];
+  const TARGETS_TODAY = 480;       // 8h × 60
+  const TARGETS_WEEK  = 2400;      // 40h × 60
+  const members = ranks.map((u, i) => {
+    const status = STATUSES[i % STATUSES.length];
+    // today mins by status
+    let today = 0;
+    if (status === 'logging') today = 330;
+    else if (status === 'closed')  today = 460 + (i % 3) * 25;
+    else if (status === 'partial') today = 210;
+    else if (status === 'missing') today = 0;
+    else if (status === 'leave')   today = 0;
+    // week mins — closer to target for closed/logging, behind for missing/partial.
+    let week = TARGETS_WEEK - (status === 'missing' ? 1020 : status === 'partial' ? 420 : status === 'leave' ? 1920 : 150 + (i % 4) * 60);
+    if (range === 'today')  week = Math.round(week * 0.7);
+    if (range === 'sprint') week = Math.round(week * 2.1);
+    if (range === 'month')  week = Math.round(week * 4.3);
+    return {
+      id: u.id, name: u.name, role: 'QA Engineer',
+      hue: u.hue || '#2563EB', initial: (u.initial || u.name[0]).toUpperCase(),
+      today, week, target: TARGETS_TODAY, weekTarget: TARGETS_WEEK,
+      status, lastClose: status === 'closed' ? 'today, 5:42 PM' : status === 'logging' ? 'today, 11:00 AM' : status === 'partial' ? 'today, 1:15 PM' : status === 'leave' ? 'Mon, 6:00 PM' : 'yesterday, 6:00 PM',
+    };
+  });
+  const teamSize  = members.filter(m => m.status !== 'leave').length;
+  const onLeave   = members.filter(m => m.status === 'leave').length;
+  const onTrack   = members.filter(m => m.status === 'closed' || m.status === 'logging').length;
+  const behind    = members.filter(m => m.status === 'partial' || m.status === 'missing').length;
+  const hoursLogged = members.reduce((a, m) => a + m.today, 0);
+  return {
+    team: { id: 1, name: TEAM_NAME, color: TEAM_COLOR },
+    range,
+    kpis: { hoursLogged, onTrack, behind, onLeave, teamSize },
+    members,
   };
 }
 

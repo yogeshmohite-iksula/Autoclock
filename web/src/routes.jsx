@@ -12,6 +12,7 @@ import CloseMyDayPage from './pages/CloseMyDayPage';
 import SyncResultPage from './pages/SyncResultPage';
 import SettingsPage from './pages/SettingsPage';
 import MyHistoryPage from './pages/MyHistoryPage';
+import TeamDashboardPage from './pages/TeamDashboardPage';
 
 // Legacy stubs (kept so /log, /preview, /dashboard work for Yogesh / Keval / Ali).
 import App from './App';
@@ -83,6 +84,18 @@ export default function AppRoutes() {
       <Route
         path="/history"
         element={<RequireAuth><RequireOnboarded><MyHistoryPage /></RequireOnboarded></RequireAuth>}
+      />
+      <Route
+        path="/team"
+        element={
+          <RequireAuth>
+            <RequireOnboarded>
+              <RequireRole roles={['pm_lead']}>
+                <TeamDashboardPage />
+              </RequireRole>
+            </RequireOnboarded>
+          </RequireAuth>
+        }
       />
 
       {/* Legacy stubs under the original shell */}

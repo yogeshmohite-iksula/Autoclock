@@ -245,6 +245,52 @@ test.describe('P07 My History — list/calendar toggle + day selection', () => {
   }
 });
 
+// ===========================================================================
+// P08 — Team Dashboard (/team)
+// EP-14 extended shape (OQ-AP-07). Role-gated to pm_lead + admin. The mock
+// user is now pm_lead (mocks.js MOCK_USER) so the helper's sign-in flow
+// admits the test. H1 is "Team Dashboard"; primary is the always-visible
+// "Today" or "Week" range tab (one of them is always a stable button).
+// ===========================================================================
+registerPageGate({
+  id: 'team-dashboard',
+  title: 'P08 Team Dashboard',
+  path: '/team',
+  heading: /Team Dashboard|My Team/i,
+  primary: /^Today$|^Week$/,
+});
+
+// Bespoke test — at desktop viewport, click the "Week" range tab and assert
+// it becomes aria-selected="true" and the URL gains ?range=week. Run at both
+// viewports — the tab control is identical at mobile.
+test.describe('P08 Team Dashboard — range tab toggles URL state', () => {
+  for (const vp of VIEWPORTS) {
+    test(`viewport @ ${vp.name} (${vp.width}×${vp.height}) › click Week → ?range=week & aria-selected`, async ({ page }) => {
+      const errors = trackErrors(page);
+      await page.setViewportSize({ width: vp.width, height: vp.height });
+      await gotoAuthed(page, '/team');
+      await page.waitForLoadState('networkidle');
+
+      // Today is selected by default
+      const todayTab = page.getByRole('tab', { name: /^Today$/ });
+      await expect(todayTab).toHaveAttribute('aria-selected', 'true');
+
+      // Click Week
+      const weekTab = page.getByRole('tab', { name: /^Week$/ });
+      await weekTab.click();
+
+      // aria-selected flips + URL gains ?range=week
+      await expect(weekTab).toHaveAttribute('aria-selected', 'true');
+      await expect(todayTab).toHaveAttribute('aria-selected', 'false');
+      await expect(page).toHaveURL(/[?&]range=week/);
+
+      await assertNoHorizontalOverflow(page);
+      await screenshot(page, `team-dashboard-range--${vp.name}`);
+      expect(errors, `console errors:\n${errors.join('\n')}`).toEqual([]);
+    });
+  }
+});
+
 // Bespoke test — full flow: sign-in → onboarding → Close My Day → confirm →
 // Sync Result. Asserts the "Your day is synced." hero is visible at both
 // viewports (mock EP-13 returns overall:'ok'). No overlap / no overflow /
