@@ -70,6 +70,17 @@ function createProject({ name, jira_project_key }) {
   return info.lastInsertRowid;
 }
 
+const _updateProject = db.prepare(`
+  UPDATE projects SET
+    name             = COALESCE(@name, name),
+    jira_project_key = COALESCE(@jira_project_key, jira_project_key),
+    is_active        = COALESCE(@is_active, is_active)
+  WHERE id = @id
+`);
+function updateProject(id, { name, jira_project_key, is_active } = {}) {
+  return _updateProject.run({ id, name: name ?? null, jira_project_key: jira_project_key ?? null, is_active: is_active ?? null }).changes;
+}
+
 // ── jira_tasks ─────────────────────────────────────────────────────────────
 
 const _tasksByProject = db.prepare(
@@ -510,7 +521,7 @@ module.exports = {
   // teams
   getAllTeams,
   // projects
-  getActiveProjects, getProjectById, getAllProjectsAdmin, createProject,
+  getActiveProjects, getProjectById, getAllProjectsAdmin, createProject, updateProject,
   // jira_tasks
   getTasksByProject, getTaskById,
   // worklog_entries

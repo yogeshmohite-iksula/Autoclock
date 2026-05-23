@@ -37,14 +37,35 @@ router.post('/projects', admin, (req, res) => {
   res.json({ project_id });
 });
 
+router.put('/projects/:id', admin, (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  const b  = req.body || {};
+  const changed = Q.updateProject(id, { name: b.name, jira_project_key: b.jira_project_key, is_active: b.is_active });
+  if (!changed) return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'project not found' } });
+  res.json({ ok: true });
+});
+
+const SETTING_SECTIONS = ['jira', 'google', 'email', 'reader'];
+
 // EP-22 GET/PUT /api/admin/settings — global settings
 router.get('/settings', admin, (_req, res) => {
   res.json({ settings: Q.getAllSettings() });
 });
 
 router.put('/settings', admin, (req, res) => {
-  Q.upsertSettings(req.body || {}, req.user.id);
-  res.json({ ok: true });
+  const b = req.body || {};
+  if (b.section !== undefined) {
+    if (!SETTING_SECTIONS.includes(b.section))
+      return res.status(400).json({ error: { code: 'BAD_REQUEST', message: `section must be one of: ${SETTING_SECTIONS.join(', ')}` } });
+    if (!b.body || typeof b.body !== 'object' || Array.isArray(b.body))
+      return res.status(400).json({ error: { code: 'BAD_REQUEST', message: 'body must be a non-null object' } });
+    const namespaced = {};
+    for (const [k, v] of Object.entries(b.body)) namespaced[`${b.section}.${k}`] = v;
+    Q.upsertSettings(namespaced, req.user.id);
+  } else {
+    Q.upsertSettings(b, req.user.id);
+  }
+  res.json({ ok: true, settings: Q.getAllSettings() });
 });
 
 // EP-21 leave sub-router (mounted at /api/leave by server.js)

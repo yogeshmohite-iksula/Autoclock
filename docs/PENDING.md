@@ -36,8 +36,8 @@
 | # | Item | Status | EP | Notes |
 |---|---|---|---|---|
 | B3 | EP-17 `manual` type + `recipientIds` for Compliance Console (P11) | ✅ done 2026-05-23 | EP-17 | `manual` type accepted; `schema.sql` updated to allow `run_type='manual'`. |
-| B4 | EP-20 `PUT /api/admin/projects/:id` missing (P15) | [ ] | EP-20 | Project edits silently lost on page refresh. See Gap #5 |
-| B5 | EP-22 section-scoped `{section, body}` PUT for Integrations (P16) | [ ] | EP-22 | Flat upsertSettings writes literal "section" key. See Gap #8 |
+| B4 | EP-20 `PUT /api/admin/projects/:id` missing (P15) | ✅ done 2026-05-23 | EP-20 | Route + `updateProject` query added. 404 on unknown id. |
+| B5 | EP-22 section-scoped `{section, body}` PUT for Integrations (P16) | ✅ done 2026-05-23 | EP-22 | Detects `{section,body}`, namespaces keys as `section.*`. Flat map still works. |
 
 ### B-LOW — nice-to-have
 

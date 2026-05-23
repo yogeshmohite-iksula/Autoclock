@@ -1,8 +1,8 @@
 # AutoClock — Backend Status Audit
 
-**Last updated:** 2026-05-23 (B1/B2/B3/B8 shape alignment)
+**Last updated:** 2026-05-23 (B4 PUT projects, B5 section-scoped settings)
 **Branch:** `feat/backend`
-**Tests:** 116 passing, 0 failing
+**Tests:** 126 passing, 0 failing
 
 Status legend: **REAL** = fully implemented + tested · **PARTIAL** = works but shape/params incomplete vs frontend contract · **STUB** = placeholder / 501
 
@@ -31,9 +31,9 @@ Status legend: **REAL** = fully implemented + tested · **PARTIAL** = works but 
 | EP-17 | `POST /api/ops/run-check` | **REAL** | Accepts `{type:'friday'|'monday'|'manual', recipientIds?:[…]}`. Gap #3 resolved. |
 | EP-18 | `GET /api/ops/reminders` | REAL | Returns last 50 runs from TB-08, enriched with `emailed`/`complied` counts and `recipients` array. |
 | EP-19 | `GET/POST/PUT /api/admin/users` | **PARTIAL** | GET returns all active users (no `?filter=&status=` server-side filtering). POST creates. PUT updates. **See Gap #4.** |
-| EP-20 | `GET/POST /api/admin/projects` | **PARTIAL** | GET + POST exist. **`PUT /api/admin/projects/:id` is missing** — see Gap #5. Test-connection sub-EP not wired to real Jira — see Gap #6. |
+| EP-20 | `GET/POST/PUT /api/admin/projects` | **PARTIAL** | GET + POST + PUT exist. Test-connection sub-EP not wired to real Jira — see Gap #6. |
 | EP-21 | `GET/POST /api/leave` | **PARTIAL** | GET + POST exist. No approval workflow, no overlap check, no team lookup on POST. **See Gap #7.** |
-| EP-22 | `GET/PUT /api/admin/settings` | **PARTIAL** | GET returns flat `{key:value}` map. PUT does flat `upsertSettings`. **Frontend (P16) POSTs `{section, body}` for integrations — see Gap #8.** |
+| EP-22 | `GET/PUT /api/admin/settings` | **REAL** | GET returns flat `{key:value}` map. PUT accepts both flat map and `{section, body}` — namespaces as `section.*`. Gap #8 resolved. |
 | EP-23 | `POST /api/worklogs/sync` | **STUB** | Returns 501. `services/worklogSync.js` is complete; just needs wiring. |
 
 ---
