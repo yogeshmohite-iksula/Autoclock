@@ -109,3 +109,60 @@ registerPageGate({
   heading: /Close your day/i,
   primary: /^Close My Day/,  // matches both bare button + aria-label "Close My Day — confirm and sync"
 });
+
+// ===========================================================================
+// P05 — Sync Result (/close/result)
+// EP-13 response rendered as per-system rows. The default helper drives a
+// direct visit to /close/result — there's no location.state.result, so the
+// page MUST render the empty "no recent sync" state. Heading + primary CTA
+// match that path; the success path is exercised by the bespoke test below.
+// ===========================================================================
+registerPageGate({
+  id: 'sync-result',
+  title: 'P05 Sync Result',
+  path: '/close/result',
+  heading: /No recent sync to show/i,
+  primary: /Go to Close My Day/i,
+});
+
+// Bespoke test — full flow: sign-in → onboarding → Close My Day → confirm →
+// Sync Result. Asserts the "Your day is synced." hero is visible at both
+// viewports (mock EP-13 returns overall:'ok'). No overlap / no overflow /
+// no console errors / screenshot saved.
+test.describe('P05 Sync Result — full close-my-day flow', () => {
+  for (const vp of VIEWPORTS) {
+    test(`viewport @ ${vp.name} (${vp.width}×${vp.height}) › close → /close/result success`, async ({ page }) => {
+      const errors = trackErrors(page);
+      await page.setViewportSize({ width: vp.width, height: vp.height });
+      await signInAndOnboard(page);
+      await page.waitForLoadState('networkidle');
+
+      // Navigate to /close via an in-app push (preserves the mock session).
+      await page.evaluate(() => {
+        window.history.pushState({}, '', '/close');
+        window.dispatchEvent(new PopStateEvent('popstate'));
+      });
+      await page.waitForURL(/\/close$/);
+      await expect(page.getByRole('heading', { name: /Close your day/i })).toBeVisible();
+
+      // Click the action-bar "Close My Day" button (aria-label disambiguates).
+      const confirmBtn = page.getByRole('button', { name: /^Close My Day — confirm and sync$/ });
+      await expect(confirmBtn).toBeEnabled({ timeout: 6_000 });
+      await confirmBtn.click();
+
+      // Navigation → /close/result, success state visible.
+      await page.waitForURL(/\/close\/result$/);
+      await expect(page.getByRole('heading', { name: /Your day is\s+synced/i })).toBeVisible();
+      // Counter shows 3/3.
+      await expect(page.locator('.page-sync-result .count .big')).toContainText('3');
+      // "Done" CTA in the action bar links back to /today.
+      await expect(page.getByRole('link', { name: /^Done/i })).toBeVisible();
+
+      await assertNoHorizontalOverflow(page);
+      await assertNoOverlap(page, ['.page-sync-result .hero', '.page-sync-result .results-card', '.page-sync-result .action-bar']);
+
+      await screenshot(page, `sync-result-flow--${vp.name}`);
+      expect(errors, `console errors:\n${errors.join('\n')}`).toEqual([]);
+    });
+  }
+});
