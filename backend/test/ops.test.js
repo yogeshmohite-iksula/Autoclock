@@ -217,3 +217,71 @@ test('EP-17 monday recheck: user who met target is dropped from recipients (FR-1
   db.prepare("DELETE FROM worklog_entries WHERE user_id=2 AND work_date=? AND description='test monday recheck entry'").run(today);
   db.prepare("UPDATE settings SET value='40' WHERE key='weekly_target_hours'").run();
 });
+
+// ── EP-17 manual run-check ────────────────────────────────────────────────────
+
+test('EP-17 manual run-check with recipientIds → 200 with run_id', async () => {
+  const cookie = await login('omkar@iksula.com');
+  // User id=2 (Keval) is a valid employee — send manual reminder to them.
+  const res  = await post('/api/ops/run-check', { type: 'manual', recipientIds: [2] }, cookie);
+  const body = await res.json();
+  assert.equal(res.status, 200);
+  assert.ok(body.run_id,         'run_id present');
+  assert.equal(body.type, 'manual');
+  assert.ok(Array.isArray(body.recipients), 'recipients array');
+});
+
+test('EP-17 manual run-check with empty recipientIds → 400 BAD_REQUEST', async () => {
+  const cookie = await login('omkar@iksula.com');
+  const res  = await post('/api/ops/run-check', { type: 'manual', recipientIds: [] }, cookie);
+  const body = await res.json();
+  assert.equal(res.status, 400);
+  assert.equal(body.error.code, 'BAD_REQUEST');
+});
+
+test('EP-18 reminders enriched with emailed + complied counts', async () => {
+  const cookie = await login('omkar@iksula.com');
+  const body   = await (await get('/api/ops/reminders', cookie)).json();
+  assert.ok(Array.isArray(body.runs), 'runs is array');
+  if (body.runs.length > 0) {
+    const run = body.runs[0];
+    assert.ok('emailed'    in run, 'run.emailed present');
+    assert.ok('complied'   in run, 'run.complied present');
+    assert.ok('recipients' in run, 'run.recipients present');
+    assert.ok(Array.isArray(run.recipients), 'run.recipients is array');
+  }
+});
+
+// ── EP-23 worklog sync (B9) ───────────────────────────────────────────────────
+
+test('EP-23 POST /api/worklogs/sync without reader env → 503 CONFIG_ERROR', async () => {
+  const cookie = await login('omkar@iksula.com');
+  const res  = await post('/api/worklogs/sync', {}, cookie);
+  const body = await res.json();
+  // JIRA_READER_EMAIL / JIRA_READER_TOKEN not set in test env → 503
+  assert.equal(res.status, 503);
+  assert.equal(body.error.code, 'CONFIG_ERROR');
+});
+
+test('EP-23 POST /api/worklogs/sync with invalid since → 400 BAD_REQUEST', async () => {
+  // Temporarily set reader env so we get past the config guard
+  const origEmail = process.env.JIRA_READER_EMAIL;
+  const origToken = process.env.JIRA_READER_TOKEN;
+  process.env.JIRA_READER_EMAIL = 'reader@iksula.com';
+  process.env.JIRA_READER_TOKEN = 'dummy';
+
+  const cookie = await login('omkar@iksula.com');
+  const res    = await post('/api/worklogs/sync', { since: 'not-a-date' }, cookie);
+  const body   = await res.json();
+  assert.equal(res.status, 400);
+  assert.equal(body.error.code, 'BAD_REQUEST');
+
+  process.env.JIRA_READER_EMAIL = origEmail;
+  process.env.JIRA_READER_TOKEN = origToken;
+});
+
+test('EP-23 POST /api/worklogs/sync as employee → 403 FORBIDDEN', async () => {
+  const cookie = await login('yogesh@iksula.com'); // employee
+  const res  = await post('/api/worklogs/sync', {}, cookie);
+  assert.equal(res.status, 403);
+});

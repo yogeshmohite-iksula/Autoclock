@@ -102,7 +102,7 @@ CREATE TABLE IF NOT EXISTS eod_reports (
 -- TB-08 reminder_runs — Ops Fri/Mon chase records
 CREATE TABLE IF NOT EXISTS reminder_runs (
   id                   INTEGER PRIMARY KEY AUTOINCREMENT,
-  run_type             TEXT NOT NULL CHECK (run_type IN ('friday','monday')),
+  run_type             TEXT NOT NULL CHECK (run_type IN ('friday','monday','manual')),
   run_at               TEXT NOT NULL DEFAULT (datetime('now')),
   triggered_by         TEXT NOT NULL CHECK (triggered_by IN ('cron','manual')),
   recipients_count     INTEGER NOT NULL DEFAULT 0,

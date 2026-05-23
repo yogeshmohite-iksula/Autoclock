@@ -51,28 +51,52 @@ router.get('/compliance', ops, (req, res) => {
   res.json({ week_start: weekStart, week_end: weekEnd, target_hours: targetMin / 60, rows });
 });
 
-// EP-17 POST /api/ops/run-check — Run Fri/Mon check (manual trigger)
+// EP-17 POST /api/ops/run-check — Run Fri/Mon/manual check
 router.post('/run-check', ops, async (req, res, next) => {
   try {
-    const type = req.body?.type;
-    if (!['friday', 'monday'].includes(type)) {
-      return res.status(400).json({ error: { code: 'BAD_REQUEST', message: 'type must be friday or monday' } });
+    const { type, recipientIds } = req.body || {};
+    if (!['friday', 'monday', 'manual'].includes(type)) {
+      return res.status(400).json({ error: { code: 'BAD_REQUEST', message: 'type must be friday, monday, or manual' } });
+    }
+    if (type === 'manual' && (!Array.isArray(recipientIds) || recipientIds.length === 0)) {
+      return res.status(400).json({ error: { code: 'BAD_REQUEST', message: 'manual type requires non-empty recipientIds array' } });
     }
     const { runCheck } = require('../jobs/compliance');
-    const result = await runCheck(type, 'manual', req.user.id);
+    const result = await runCheck(type, 'manual', req.user.id, { recipientIds });
     res.json(result);
   } catch (e) { next(e); }
 });
 
-// EP-18 GET /api/ops/reminders — reminder history / email log
+// EP-18 GET /api/ops/reminders — reminder history / email log (enriched with recipients)
 router.get('/reminders', ops, (_req, res) => {
-  res.json({ runs: Q.getRecentReminderRuns(50) });
+  const runs = Q.getRecentReminderRuns(50).map(run => {
+    const recipients = Q.getRecipientsForRun(run.id);
+    return {
+      ...run,
+      emailed:    recipients.filter(r => r.email_status === 'sent').length,
+      complied:   recipients.filter(r => r.result === 'complied').length,
+      recipients,
+    };
+  });
+  res.json({ runs });
 });
 
 // EP-23 POST /api/worklogs/sync — mounted separately at /api/worklogs in server.js (ERD §6)
+const { pullSince } = require('../services/worklogSync');
 const worklogsRouter = express.Router();
-worklogsRouter.post('/sync', ops, (_req, res) => {
-  res.status(501).json({ error: { code: 'NOT_IMPLEMENTED', message: 'EP-23 is a stretch goal (Hr 12 gate) — DevDoc §6.7' } });
+worklogsRouter.post('/sync', ops, async (req, res) => {
+  if (!process.env.JIRA_READER_EMAIL || !process.env.JIRA_READER_TOKEN)
+    return res.status(503).json({ error: { code: 'CONFIG_ERROR', message: 'JIRA_READER_EMAIL and JIRA_READER_TOKEN must be set' } });
+  const { since } = req.body || {};
+  const sinceMs = since ? new Date(since).getTime() : Date.now() - 7 * 24 * 60 * 60 * 1000;
+  if (isNaN(sinceMs)) return res.status(400).json({ error: { code: 'BAD_REQUEST', message: 'since must be a valid ISO date string' } });
+  try {
+    const worklogs = await pullSince(sinceMs);
+    res.json({ ok: true, count: worklogs.length, worklogs });
+  } catch (e) {
+    const status = [401, 403, 429].includes(e.status) ? e.status : 500;
+    res.status(status).json({ error: { code: 'JIRA_ERROR', message: e.message } });
+  }
 });
 
 module.exports = router;

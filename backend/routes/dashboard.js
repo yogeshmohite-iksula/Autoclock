@@ -19,28 +19,68 @@ function weekBounds(dateStr) {
 // EP-14 GET /api/dashboard/team — PM/Lead team metrics (scoped to their team)
 router.get('/team', requireRole('pm_lead', 'admin'), (req, res) => {
   const teamId = req.user.team_id;
-  if (!teamId) return res.json({ kpis: {}, by_ticket: [], not_logged_today: [], members: [] });
+  if (!teamId) return res.json({
+    team: null, range: 'week',
+    kpis: { hoursLogged: 0, onTrack: 0, behind: 0, onLeave: 0, teamSize: 0 },
+    by_ticket: [], not_logged_today: [], members: [],
+  });
 
-  const today   = new Date().toISOString().slice(0, 10);
-  const members = Q.getTeamMembersWithMinutesToday(teamId, today);
-  const totalMinToday = members.reduce((a, m) => a + m.minutes_today, 0);
+  const today  = new Date().toISOString().slice(0, 10);
+  const range  = req.query.range || 'week';
+  const { weekStart, weekEnd } = weekBounds(today);
+
+  const team      = Q.getAllTeams().find(t => t.id === teamId) || { name: '' };
+  const settings  = Q.getAllSettings();
+  const targetMin = parseInt(settings.weekly_target_hours || '40', 10) * 60;
+
+  const members   = Q.getTeamMembersWithMinutesToday(teamId, today);
+  const weeklyMap = Object.fromEntries(
+    Q.getWeeklyMinutesPerUser(weekStart, weekEnd).map(r => [r.user_id, r.minutes])
+  );
+  const closedSet = new Set(Q.getTeamEodToday(teamId, today).map(r => r.user_id));
+
+  const enriched = members.map(m => {
+    const leaveToday = Q.getLeaveDaysForWeek(m.id, today, today).leave_hours || 0;
+    let status;
+    if (leaveToday > 0)             status = 'leave';
+    else if (m.minutes_today === 0) status = 'missing';
+    else if (closedSet.has(m.id))   status = 'closed';
+    else                            status = 'logging';
+
+    return {
+      id:         m.id,
+      name:       m.name,
+      role:       m.role,
+      hue:        m.id % 8,
+      initial:    m.name.charAt(0).toUpperCase(),
+      today:      m.minutes_today,
+      week:       weeklyMap[m.id] || 0,
+      target:     targetMin,
+      weekTarget: targetMin,
+      status,
+      lastClose:  Q.getLastCloseForUser(m.id)?.work_date || null,
+    };
+  });
+
+  const hoursLogged = Math.round(enriched.reduce((a, m) => a + m.week, 0) / 60);
+  const onLeave  = enriched.filter(m => m.status === 'leave').length;
+  const onTrack  = enriched.filter(m => m.status !== 'leave' && m.week >= m.weekTarget).length;
+  const behind   = enriched.filter(m => m.status !== 'leave' && m.week < m.weekTarget).length;
 
   res.json({
-    team_id:          teamId,
-    kpis: {
-      team_logged_today: Q.getTeamLoggedTodayCount(teamId, today),
-      members_count:     members.length,
-      avg_minutes_today: members.length ? Math.round(totalMinToday / members.length) : 0,
-    },
+    team:   { id: teamId, name: team.name },
+    range,
+    kpis:   { hoursLogged, onTrack, behind, onLeave, teamSize: enriched.length },
     by_ticket:        Q.getByTicketForTeamToday(teamId, today),
     not_logged_today: Q.getUsersNotLoggedToday(teamId, today),
-    members,
+    members:          enriched,
   });
 });
 
 // EP-15 GET /api/dashboard/org — Management org metrics
-router.get('/org', requireRole('management', 'admin'), (_req, res) => {
+router.get('/org', requireRole('management', 'admin'), (req, res) => {
   const today = new Date().toISOString().slice(0, 10);
+  const range = req.query.range || 'week';
   const { weekStart, weekEnd } = weekBounds(today);
 
   const allUsers      = Q.getAllActiveUsers().filter(u =>
@@ -53,7 +93,13 @@ router.get('/org', requireRole('management', 'admin'), (_req, res) => {
   const orgCompliance = allUsers.length
     ? Math.round((compliedCount / allUsers.length) * 100) : 0;
 
+  const totalLeaveMin = allUsers.reduce((sum, u) => {
+    return sum + (Q.getLeaveDaysForWeek(u.id, weekStart, weekEnd).leave_hours || 0) * 60;
+  }, 0);
+  const untrackedMin = Math.max(0, allUsers.length * targetMin - totalWeekMin - totalLeaveMin);
+
   res.json({
+    range,
     kpis: {
       workforce_logged_today: Q.getOrgLoggedTodayCount(today),
       org_compliance_pct:     orgCompliance,
@@ -61,9 +107,15 @@ router.get('/org', requireRole('management', 'admin'), (_req, res) => {
         ? Math.round((totalWeekMin / (allUsers.length * targetMin)) * 100) : 0,
       active_projects:        Q.getActiveProjects().length,
     },
-    project_portfolio: Q.getByProjectForWeek(weekStart, weekEnd),
-    team_comparison:   Q.getTeamComparisonForWeek(weekStart, weekEnd),
-    trend_weeks:       Q.getWeeklyTrend(4),
+    donut: {
+      logged:    Math.round(totalWeekMin / 60),
+      leave:     Math.round(totalLeaveMin / 60),
+      untracked: Math.round(untrackedMin / 60),
+      holiday:   0,
+    },
+    trend8w:     Q.getWeeklyTrend(8),
+    teams:       Q.getTeamComparisonForWeek(weekStart, weekEnd),
+    topProjects: Q.getByProjectForWeek(weekStart, weekEnd),
   });
 });
 

@@ -21,6 +21,11 @@ const _allActiveUsers = db.prepare(
 );
 function getAllActiveUsers() { return _allActiveUsers.all(); }
 
+const _allUsers = db.prepare(
+  'SELECT id, name, email, role, team_id, onboarding_status, is_active FROM users ORDER BY name'
+);
+function getAllUsers() { return _allUsers.all(); }
+
 const _createUser = db.prepare(`
   INSERT INTO users (name, email, role, team_id, onboarding_status, is_active)
   VALUES (@name, @email, @role, @team_id, 'invited', 1)
@@ -68,6 +73,17 @@ const _createProject = db.prepare(
 function createProject({ name, jira_project_key }) {
   const info = _createProject.run({ name, jira_project_key });
   return info.lastInsertRowid;
+}
+
+const _updateProject = db.prepare(`
+  UPDATE projects SET
+    name             = COALESCE(@name, name),
+    jira_project_key = COALESCE(@jira_project_key, jira_project_key),
+    is_active        = COALESCE(@is_active, is_active)
+  WHERE id = @id
+`);
+function updateProject(id, { name, jira_project_key, is_active } = {}) {
+  return _updateProject.run({ id, name: name ?? null, jira_project_key: jira_project_key ?? null, is_active: is_active ?? null }).changes;
 }
 
 // ── jira_tasks ─────────────────────────────────────────────────────────────
@@ -298,9 +314,11 @@ const _upsertLeave = db.prepare(`
     hours      = excluded.hours
 `);
 function upsertLeaveDay({ user_id, leave_date, leave_type, hours = 8, created_by_user_id }) {
-  const info = _upsertLeave.run({ user_id, leave_date, leave_type, hours, created_by_user_id });
-  return info.lastInsertRowid;
+  _upsertLeave.run({ user_id, leave_date, leave_type, hours, created_by_user_id });
 }
+
+const _leaveByUserDate = db.prepare('SELECT * FROM leave_days WHERE user_id = ? AND leave_date = ?');
+function getLeaveByUserDate(userId, leaveDate) { return _leaveByUserDate.get(userId, leaveDate); }
 
 // ── reminder_runs ──────────────────────────────────────────────────────────
 
@@ -358,7 +376,7 @@ function getUsersNotLoggedToday(teamId, workDate) {
 }
 
 const _teamMembersMinutes = db.prepare(`
-  SELECT u.id, u.name, COALESCE(SUM(e.duration_minutes), 0) AS minutes_today
+  SELECT u.id, u.name, u.role, COALESCE(SUM(e.duration_minutes), 0) AS minutes_today
   FROM users u
   LEFT JOIN worklog_entries e ON e.user_id = u.id AND e.work_date = ?
   WHERE u.team_id = ? AND u.is_active = 1
@@ -486,15 +504,31 @@ function getWeeklyTrend(numWeeks) {
   return result;
 }
 
+// ── eod_reports helpers (EP-14 member status) ─────────────────────────────
+
+const _lastCloseForUser = db.prepare(`
+  SELECT work_date FROM eod_reports
+  WHERE user_id = ? AND status != 'failed'
+  ORDER BY work_date DESC LIMIT 1
+`);
+function getLastCloseForUser(userId) { return _lastCloseForUser.get(userId); }
+
+const _teamEodToday = db.prepare(`
+  SELECT DISTINCT e.user_id FROM eod_reports e
+  JOIN users u ON u.id = e.user_id
+  WHERE u.team_id = ? AND e.work_date = ? AND e.status != 'failed'
+`);
+function getTeamEodToday(teamId, workDate) { return _teamEodToday.all(teamId, workDate); }
+
 // ── exports ────────────────────────────────────────────────────────────────
 
 module.exports = {
   // users
-  getUserByEmail, getUserById, getAllActiveUsers, createUser, updateUser,
+  getUserByEmail, getUserById, getAllActiveUsers, getAllUsers, createUser, updateUser,
   // teams
   getAllTeams,
   // projects
-  getActiveProjects, getProjectById, getAllProjectsAdmin, createProject,
+  getActiveProjects, getProjectById, getAllProjectsAdmin, createProject, updateProject,
   // jira_tasks
   getTasksByProject, getTaskById,
   // worklog_entries
@@ -508,7 +542,7 @@ module.exports = {
   // settings
   getAllSettings, upsertSettings,
   // leave_days
-  getLeaveDays, getAllLeaveDays, upsertLeaveDay,
+  getLeaveDays, getAllLeaveDays, upsertLeaveDay, getLeaveByUserDate,
   // reminder_runs
   createReminderRun, getRecentReminderRuns,
   // audit_log
@@ -522,4 +556,6 @@ module.exports = {
   getPendingRecipientsFromLastFridayRun,
   // org dashboard
   getOrgLoggedTodayCount, getByProjectForWeek, getTeamComparisonForWeek, getWeeklyTrend,
+  // eod helpers
+  getLastCloseForUser, getTeamEodToday,
 };
