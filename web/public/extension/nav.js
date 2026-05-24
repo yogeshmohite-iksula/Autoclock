@@ -1,20 +1,21 @@
 // nav.js — wrapper logic for the extension click-through demo.
 // Pure vanilla JS, zero dependencies. Same-origin DOM access into the
 // iframe is fine because every frame is served from /extension/frames/
-// (same origin as this wrapper). No postMessage, no edits to the frames.
+// (same origin as this wrapper). No postMessage, no edits to the frame
+// HTML files — they stay byte-identical to source.
 //
-// Pattern: on every iframe `load`, give the design-tool's runtime a
-// moment to render, then walk the iframe's DOM looking for the primary
-// CTAs by their exact button text — captured from the source frames in
-// DEV_NOTES.md — and attach navigation handlers. In-frame interactivity
-// (tweak panel, dropdowns, form inputs) is left intact.
+// Two things happen on every iframe `load`:
+//   1) Inject a tiny <style> into the iframe's <head> that hides the
+//      design-tool's "tweak panel" (the View · With logs / Empty /
+//      Reminder ✓ toggle in the top-right of each frame). Hiding it via
+//      CSS preserves the byte-identical rule — we modify the rendered
+//      DOM at runtime, not the source file.
+//   2) Walk the iframe's DOM looking for the primary CTAs by their exact
+//      button text and attach navigation handlers. In-frame interactivity
+//      (dropdowns, form inputs, the Retry on E05) is left intact.
 
 (() => {
   // ── screen registry ────────────────────────────────────────────────────
-  // Index drives the Back / Next controls. Each entry: id, title, file,
-  // and the click-wiring map for that screen.
-  // Wiring: trim() + collapse-whitespace match against each <button>'s
-  // textContent. Pass an array of accepted labels to be liberal.
   const SCREENS = [
     {
       id: 'e02', title: 'E02 · Today',
@@ -36,13 +37,9 @@
       id: 'e04', title: 'E04 · Close My Day',
       file: 'frames/e04-close-day.html',
       wire: {
-        'Back':              'e02',
-        'Confirm & sync ⌘↵': 'e05',
-        // The source has it as `Confirm &amp; sync ⌘↵` in raw HTML; once
-        // it lands in the live DOM, textContent decodes the entity so the
-        // string we compare against is `Confirm & sync ⌘↵`. Both forms
-        // listed to be safe.
-        'Confirm &amp; sync ⌘↵': 'e05',
+        'Back':                  'e02',
+        'Confirm & sync ⌘↵':     'e05',
+        'Confirm &amp; sync ⌘↵': 'e05', // entity form, just in case
       },
     },
     {
@@ -51,18 +48,13 @@
       wire: {
         'Done': 'e02',
         'Back': 'e02',
-        // 'Retry' stays in-frame (Gmail retry is part of the design's
-        // own interactivity — not a navigation target in this demo).
       },
     },
     {
       id: 'e06', title: 'E06 · Reminder',
       file: 'frames/e06-reminder.html',
       wire: {
-        // The notification + the in-popup banner both say "Log now".
-        // Both jump to Add Entry — that's where the user goes to log.
-        'Log now':       'e03',
-        // 'Snooze 15 min' stays in-frame — informational button.
+        'Log now': 'e03',
       },
     },
     {
@@ -78,12 +70,11 @@
   const idToIndex = Object.fromEntries(SCREENS.map((s, i) => [s.id, i]));
 
   // ── DOM refs ───────────────────────────────────────────────────────────
-  const $frame   = document.getElementById('frame');
-  const $title   = document.getElementById('screen-title');
-  const $prev    = document.getElementById('ctrl-prev');
-  const $next    = document.getElementById('ctrl-next');
-  const $restart = document.getElementById('ctrl-restart');
-  const $dots    = document.querySelectorAll('.dots button[data-jump]');
+  const $frame    = document.getElementById('frame');
+  const $title    = document.getElementById('screen-title');
+  const $reminder = document.getElementById('ctrl-reminder');
+  const $offline  = document.getElementById('ctrl-offline');
+  const $restart  = document.getElementById('ctrl-restart');
 
   let currentIndex = 0;
 
@@ -95,11 +86,6 @@
     const screen = SCREENS[index];
     $title.textContent = screen.title;
     $frame.src = screen.file;
-    // Update dot active state
-    $dots.forEach((b, i) => b.setAttribute('aria-current', i === index ? 'true' : 'false'));
-    // Update Back/Next enabled state
-    $prev.disabled = index === 0;
-    $next.disabled = index === SCREENS.length - 1;
   }
   function navigateToId(id) {
     const i = idToIndex[id];
@@ -109,9 +95,30 @@
   function prev()    { navigateTo(Math.max(0, currentIndex - 1)); }
   function restart() { navigateTo(0, { force: true }); }
 
-  // ── in-iframe wiring ───────────────────────────────────────────────────
-  // Normalise button text: collapse whitespace + trim. Matches the wire
-  // map keys regardless of how the design tool emitted whitespace.
+  // ── inside-iframe work (runs on every iframe load) ─────────────────────
+
+  // Tiny CSS injected into the iframe head — hides the design-tool's
+  // scenario toggle so demo viewers don't see "developer scaffolding"
+  // floating in the top-right of each screen. Selector covers all
+  // observed variants across E02–E07.
+  const HIDE_TWEAKS_CSS = `
+    .tweak-bar, .tweaks, .tweak, [data-tweak-bar],
+    [role="toolbar"][aria-label*="weak" i],
+    [role="toolbar"][aria-label*="ariant" i],
+    [role="toolbar"][aria-label*="cenario" i],
+    [role="toolbar"][aria-label*="iew" i] {
+      display: none !important;
+    }
+  `;
+
+  function injectStyles(doc) {
+    if (doc.querySelector('style[data-ext-demo="1"]')) return;
+    const style = doc.createElement('style');
+    style.setAttribute('data-ext-demo', '1');
+    style.textContent = HIDE_TWEAKS_CSS;
+    (doc.head || doc.documentElement).appendChild(style);
+  }
+
   function btnText(btn) {
     return (btn.textContent || '').replace(/\s+/g, ' ').trim();
   }
@@ -121,6 +128,10 @@
     const doc = $frame.contentDocument;
     if (!doc) return false;
 
+    // Always inject the hide-tweaks CSS — even if no buttons match yet,
+    // so the scenario toggle disappears as early as possible.
+    injectStyles(doc);
+
     const buttons = doc.querySelectorAll('button, a[role="button"], [data-cta]');
     let wiredCount = 0;
     buttons.forEach((btn) => {
@@ -129,8 +140,6 @@
       if (!target) return;
       if (btn.dataset._extDemoWired === '1') return;
       btn.dataset._extDemoWired = '1';
-      // Capture phase + stopPropagation so we win against any in-frame
-      // handler that may want to re-render the same screen.
       btn.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -141,10 +150,7 @@
     return wiredCount > 0;
   }
 
-  // The design-tool runtime renders the popup body asynchronously after
-  // the initial `load` event fires. We poll for up to 4 s, then give up
-  // (the screen is still usable — just no wired navigation, which is
-  // expected on E06/E07 anyway since their wiring lists are minimal).
+  // Poll for up to 4 s — the design-tool runtime renders progressively.
   function onFrameLoaded() {
     const start = Date.now();
     const tick = () => {
@@ -155,15 +161,14 @@
     tick();
   }
 
-  // ── control strip wiring ───────────────────────────────────────────────
-  $prev.addEventListener('click', prev);
-  $next.addEventListener('click', next);
-  $restart.addEventListener('click', restart);
-  $dots.forEach((b) => b.addEventListener('click', () => navigateTo(+b.dataset.jump)));
-  $frame.addEventListener('load', onFrameLoaded);
+  // ── outside-iframe wiring (page-head extras + keyboard) ────────────────
+  $reminder.addEventListener('click', () => navigateToId('e06'));
+  $offline .addEventListener('click', () => navigateToId('e07'));
+  $restart .addEventListener('click', restart);
+  $frame   .addEventListener('load', onFrameLoaded);
 
-  // Keyboard: ← / → to navigate. Avoids stealing keys inside the iframe
-  // (the iframe gets its own keyboard focus when clicked).
+  // Keyboard shortcuts (handy for presenters — invisible UI):
+  //   ←  previous screen   →  next screen   r/R  restart
   window.addEventListener('keydown', (e) => {
     if (e.target !== document.body) return;
     if (e.key === 'ArrowRight') next();
@@ -171,7 +176,5 @@
     else if (e.key === 'r' || e.key === 'R') restart();
   });
 
-  // Initial state — first screen, kick the load listener for the
-  // already-loading iframe.
   navigateTo(0, { force: true });
 })();

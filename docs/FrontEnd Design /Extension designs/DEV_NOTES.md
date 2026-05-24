@@ -109,6 +109,31 @@ real CTAs in the table above).
   the row to a retrying spinner. Leaving it in-frame preserves that polish without
   pre-empting a real backend-side decision later.
 
+### D-8 — Strip down presenter chrome (per Yogesh's review)
+- After the initial PR landed, Yogesh asked to remove two visually-prominent
+  "boxes" so users explore the popup by clicking buttons directly:
+  1. The **design-tool's tweak panel** baked into each frame (top-right
+     "VIEW · With logs / Empty / Reminder ✓" toggle). It's developer
+     scaffolding from Claude's design tool and is confusing in a management
+     demo.
+  2. The **bottom presenter control strip** (dashed-bordered block with
+     Back / Next / 6 jump dots / Restart). Replaced with minimal inline text
+     links in the page-head.
+- Hide-tweaks: `nav.js` injects a tiny `<style>` into each iframe's `<head>`
+  on every `load`, with `.tweak-bar { display: none !important; }` (plus a
+  few neighbour-selector variants for safety). The frame HTML files stay
+  **byte-identical** — we modify the rendered DOM at runtime, not the source.
+- Page-head inline links: replaced the boxed strip with three subtle text
+  buttons in the top-right of the page-head — `Reminder · Offline · ↺ Restart`.
+  These are needed because E06 (Reminder) and E07 (Offline) have **no
+  in-popup button leading to them** (they're states, not destinations).
+  Keyboard ← / → / R still work invisibly for presenter convenience.
+- Playwright test updated: replaces `.dots button[data-jump]` /
+  `#ctrl-prev` / `#ctrl-next` selectors with `#ctrl-reminder` /
+  `#ctrl-offline` / `#ctrl-restart` (id-based, stable). Adds a new
+  `expectTweakBarHidden(page)` assertion verifying our CSS injection
+  actually hides `.tweak-bar` in each iframe.
+
 ### D-7 — Screenshot wait fix (found via VG first pass)
 - First Playwright run captured screenshots IMMEDIATELY after `expectScreen()` resolved
   (the wrapper updates `#screen-title` synchronously on navigateTo). But the design-tool
