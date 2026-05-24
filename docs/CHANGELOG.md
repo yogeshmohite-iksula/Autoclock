@@ -7,6 +7,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 
 ## [Unreleased]
 
+### Changed — Extension demo (feat/extension-demo, follow-up)
+- **Stripped down presenter chrome** in the `/extension/` click-through demo per Yogesh's review:
+  - The design-tool's **"View · With logs / Empty / Reminder ✓" tweak panel** (top-right of each frame) is now hidden at runtime via `<style>.tweak-bar { display: none !important; }</style>` injected into each iframe's `<head>` on every load. **Frame HTML files stay byte-identical** — we modify the rendered DOM only, per the hard rule.
+  - The **bottom presenter control strip** (dashed-bordered Back/Next/6-dots/Restart) is **removed entirely**. Replaced with three minimal inline text links in the page-head top-right — `Reminder · Offline · ↺ Restart` — because E06 and E07 have no in-popup button leading to them (states, not destinations).
+  - Keyboard ←/→/R still work invisibly for presenters.
+- Playwright test updated: dropped dot/back/next selectors, added `expectTweakBarHidden()` assertion that verifies the CSS injection actually hides `.tweak-bar` in each iframe. Switched E07's screen-ready signal from `/offline/i` to `/queued/i` to avoid matching the now-hidden tweak button. **60/60 full regression still green.**
+
 ### Added — Demo mode (feat/demo-mode)
 - **Production site flipped to DEMO MODE** — `web/.env.production` now sets `VITE_USE_MOCKS=true` so the live build runs entirely on in-memory mocks (no real Jira/Sheets/Gmail/DB calls). All 17 pages render with deterministic seeded data; any `@iksula.com` email signs in. Use to demo the UI without needing per-user OAuth or live integrations.
 - **`<DemoBanner />` ribbon** — `web/src/components/DemoBanner.{jsx,css}` — a 28 px sticky top warning ("DEMO MODE — data is not saved · all actions are simulated · Jira / Sheets / Gmail are mocked"). Rendered conditionally in `routes.jsx` via `{USE_MOCKS && <DemoBanner />}` so Vite **statically tree-shakes the component out** when `VITE_USE_MOCKS=false` (zero bytes in real-prod builds). Verified: production bundle contains `DEMO MODE` text + `.ac-demo-banner` CSS class when mocks ON; will be absent when mocks OFF.
