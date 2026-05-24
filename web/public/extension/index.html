@@ -139,6 +139,26 @@
       color: #CBD5E1;
       user-select: none;
     }
+    /* Tiny "click anywhere to enable sound" hint, shown only until the
+       first user gesture (browser autoplay policy). nav.js hides it. */
+    #sound-hint {
+      position: fixed;
+      top: 36px; right: 14px;
+      background: #1f2937;
+      color: #f1f5f9;
+      font: 600 11px/1 ui-monospace, Menlo, monospace;
+      padding: 6px 10px;
+      border-radius: 6px;
+      letter-spacing: 0.04em;
+      box-shadow: 0 6px 16px -8px rgba(15, 23, 42, 0.35);
+      pointer-events: none;
+      animation: hint-pulse 2.4s ease-in-out infinite;
+      z-index: 50;
+    }
+    @keyframes hint-pulse {
+      0%,100% { opacity: 0.88; transform: translateY(0); }
+      50%     { opacity: 1;    transform: translateY(-2px); }
+    }
 
     /* ------- iframe stage ------- */
     .stage {
@@ -174,22 +194,29 @@
   <!-- Presenter banner — the ONE piece of demo chrome that stays. -->
   <div class="demo-banner" role="status">
     <span>EXTENSION MOCKUP</span>
-    <span class="lede">click any button in the popup to navigate · static visual mockup</span>
+    <span class="lede">a reminder fires · click "Log now" to open the popup · static visual mockup</span>
   </div>
+
+  <!-- Tiny hint, hidden after the first user click (browser autoplay policy
+       requires a gesture before the chime can play). -->
+  <div id="sound-hint">🔔 click anywhere to enable chime</div>
 
   <header class="page-head">
     <div class="brand">
       <span class="dot" aria-hidden="true"></span>
       <span>Auto<span class="rd">Clock</span></span>
     </div>
-    <h1 id="screen-title">E02 · Today</h1>
-    <!-- Inline text links (not a box) for the two screens that have no
-         in-popup button leading to them (E06 Reminder, E07 Offline) + Restart. -->
+    <h1 id="screen-title">E06 · Reminder</h1>
+    <!-- Inline text links (not a box). Reminder / Offline reach screens that
+         have no in-popup button leading to them; Replay chime is for demos
+         where the presenter wants to re-trigger the sound. -->
     <nav class="extras" aria-label="Other states">
-      <span class="hint">Other states:</span>
-      <button id="ctrl-reminder" type="button" data-jump="4">Reminder</button>
+      <span class="hint">Jump to:</span>
+      <button id="ctrl-reminder" type="button">Reminder</button>
       <span class="sep">·</span>
-      <button id="ctrl-offline"  type="button" data-jump="5">Offline</button>
+      <button id="ctrl-offline"  type="button">Offline</button>
+      <span class="sep">·</span>
+      <button id="ctrl-chime"    type="button">🔔 Replay chime</button>
       <span class="sep">·</span>
       <button id="ctrl-restart"  type="button">↺ Restart</button>
     </nav>
@@ -199,7 +226,7 @@
     <div class="frame-shell">
       <iframe
         id="frame"
-        src="frames/e02-today.html"
+        src="frames/e06-reminder.html"
         title="AutoClock extension mockup"
         loading="eager"
       ></iframe>

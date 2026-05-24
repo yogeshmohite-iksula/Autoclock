@@ -7,6 +7,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 
 ## [Unreleased]
 
+### Changed — Extension demo (feat/extension-demo, narrative flow)
+- **Demo entry point is now E06 Reminder** (the OS notification + in-popup banner), with a **notification chime** generated via Web Audio API (no binary asset shipped). Two-tone bell (880 Hz → 660 Hz, ~600 ms). First-load is silent until user gestures (browser autoplay policy); a small "🔔 click anywhere to enable chime" hint appears top-right and disappears on the first click.
+- **"Log now" wires to E02 in EMPTY state** — nav.js calls `iframe.contentWindow.setView('empty')` programmatically after navigating. The frame source stays byte-identical.
+- New narrative: **E06 → "Log now" → E02 empty → "Add entry" → E03 → "Save slot" → E02 (populated) → "Close My Day" → E04 → "Confirm & sync" → E05 → "Done" → E02.** Restart returns to E06.
+- Added `🔔 Replay chime` link in the page-head extras for presenters who want to re-trigger the sound on demand.
+- Playwright test rewritten for the new flow: 7 screenshots (E06, E02-empty, E03, E02-populated, E04, E05, E07). 2/2 green.
+
 ### Changed — Extension demo (feat/extension-demo, follow-up)
 - **Stripped down presenter chrome** in the `/extension/` click-through demo per Yogesh's review:
   - The design-tool's **"View · With logs / Empty / Reminder ✓" tweak panel** (top-right of each frame) is now hidden at runtime via `<style>.tweak-bar { display: none !important; }</style>` injected into each iframe's `<head>` on every load. **Frame HTML files stay byte-identical** — we modify the rendered DOM only, per the hard rule.

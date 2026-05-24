@@ -109,6 +109,31 @@ real CTAs in the table above).
   the row to a retrying spinner. Leaving it in-frame preserves that polish without
   pre-empting a real backend-side decision later.
 
+### D-9 — Reminder-first demo flow + notification chime (per Yogesh's review)
+- New narrative arc: demo opens on **E06 Reminder** (the OS notification +
+  in-popup banner) with a **notification chime**. Clicking "Log now" opens
+  the popup in **E02 EMPTY state** (no slots logged yet). User then clicks
+  "Add entry" → E03 → Save → E02 (populated) → Close My Day → E04 → Confirm
+  → E05 → Done → E02. Restart returns to E06.
+- **Notification chime** — generated via Web Audio API (no binary asset
+  shipped). Two-tone bell: 880 Hz then 660 Hz, ~600 ms total. Plays on
+  every E06 visit, but **first load is silent** until the user gestures
+  (browser autoplay policy). A small dark "🔔 click anywhere to enable
+  chime" hint sits top-right and disappears after the first click.
+- **E02 → empty flip** — the source E02 frame has a `setView('with'|'empty')`
+  function defined in its inline JS (used by its tweak panel before we hid
+  it). nav.js calls `iframe.contentWindow.setView('empty')` programmatically
+  after navigation from "Log now". The frame source stays byte-identical.
+- **Page-head links** updated: added `🔔 Replay chime` (lets presenters
+  re-trigger the sound on demand) and dropped the `data-jump` indices
+  (the demo's narrative path is now driven by in-popup clicks, not by
+  jump dots).
+- Playwright test rewritten for the new flow: 7 screenshots captured
+  (E06 → E02-empty → E03 → E02-populated → E04 → E05 → E07). Initial
+  screen assertion changed to E06. Keyboard ←/→ walks the screen registry
+  order linearly (presenter convenience, separate from the narrative).
+- 2/2 extension tests pass in ~10 s; full regression unaffected.
+
 ### D-8 — Strip down presenter chrome (per Yogesh's review)
 - After the initial PR landed, Yogesh asked to remove two visually-prominent
   "boxes" so users explore the popup by clicking buttons directly:

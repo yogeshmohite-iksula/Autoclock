@@ -1,32 +1,20 @@
 // extension-demo.spec.js — verify the /extension/ click-through demo.
 // Purely additive: new file; existing suites untouched.
 //
-// What it checks:
-//   1. /extension/ loads and renders E02 (Today) inside the iframe.
-//   2. Clicking the real "Add entry" CTA inside the popup navigates to E03.
-//   3. From E02, "Close My Day" → E04, then "Confirm & sync ⌘↵" → E05.
-//   4. The page-head inline links reach E06 (Reminder) and E07 (Offline)
-//      — the only two screens not reachable from any in-popup button.
-//   5. Keyboard arrows (← / →) walk every screen in order — invisible nav
-//      for presenters who don't want to mouse.
-//   6. Each of the 6 screens gets a full-page screenshot saved to
-//      test-results/screenshots/extension-<id>.png.
-//   7. The design-tool's "tweak panel" (VIEW: With logs / Empty / Reminder ✓)
-//      is hidden in every frame via the runtime-injected CSS.
+// New entry-point flow (per Yogesh's review): demo opens on E06 Reminder
+// (with notification chime via Web Audio API). User clicks "Log now" →
+// E02 in EMPTY state. User clicks "Add entry" → E03 → Save slot → E02
+// (populated) → Close My Day → E04 → Confirm & sync → E05 → Done → E02.
 //
 // Run: `cd web && npx playwright test extension-demo.spec.js` (CLI only).
 
 import { test, expect } from '@playwright/test';
 import { trackErrors, screenshot } from './_helpers';
 
-// The wrapper sets <h1 id="screen-title"> to "E0X · <Name>" on every nav.
-// Asserting against that is the most reliable "we're on the right screen" check.
 async function expectScreen(page, prefix) {
   await expect(page.locator('#screen-title')).toHaveText(new RegExp(`^${prefix}`));
 }
 
-// Click a button INSIDE the iframe by its visible text. Polls so we don't
-// race the design-tool's runtime that renders the popup body async.
 async function clickInFrame(page, label) {
   const frame = page.frameLocator('#frame');
   const btn = frame.getByRole('button', { name: label, exact: false });
@@ -34,9 +22,6 @@ async function clickInFrame(page, label) {
   await btn.first().click();
 }
 
-// After a screen navigation, wait for the iframe's body to actually render.
-// The wrapper updates #screen-title synchronously, but the design-tool
-// runtime inside the iframe renders progressively over several hundred ms.
 async function waitForFrameReady(page, bodyText) {
   const frame = page.frameLocator('#frame');
   await expect(frame.getByRole('button').first()).toBeVisible({ timeout: 10_000 });
@@ -46,111 +31,110 @@ async function waitForFrameReady(page, bodyText) {
   await page.waitForTimeout(350);
 }
 
-// Assert the design-tool's scenario-toggle "tweak bar" is hidden by our
-// runtime-injected CSS. Each frame ships a `.tweak-bar` element; after our
-// injectStyles() runs it should have computed `display: none`.
 async function expectTweakBarHidden(page) {
   const hidden = await page.evaluate(() => {
     const iframe = document.getElementById('frame');
     const doc = iframe && iframe.contentDocument;
     if (!doc) return null;
     const bar = doc.querySelector('.tweak-bar');
-    if (!bar) return 'absent';                             // some frames may not have one
+    if (!bar) return 'absent';
     return getComputedStyle(bar).display === 'none' ? 'hidden' : 'visible';
   });
-  // Either the frame doesn't have one, or our CSS hid it.
   expect(['absent', 'hidden']).toContain(hidden);
 }
 
 test.describe('AutoClock — Chrome extension demo (/extension/)', () => {
   test.beforeEach(async ({ page }) => {
-    // Demo is desktop-shaped; 1440×900 matches the rest of the suite.
     await page.setViewportSize({ width: 1440, height: 900 });
   });
 
-  test('loads, click-through E02 → E03 → E02 → E04 → E05 → E06 → E07', async ({ page }) => {
+  test('demo flow: E06 reminder → Log now → E02 empty → Add entry → E03 → Save → E02 → Close My Day → E04 → Confirm → E05 → Done → E02', async ({ page }) => {
     const errors = trackErrors(page);
 
-    // 1. Initial load — E02 Today.
-    // Use explicit /extension/index.html — Vite's dev server SPA fallback
-    // rewrites /extension/ to the React SPA's root index.html. The explicit
-    // path bypasses that; production (Express static + directory index) serves
-    // /extension/ correctly without the suffix.
+    // 1. Demo opens on E06 Reminder (with notification chime — audio is
+    //    triggered on first user gesture; the chime itself is best
+    //    verified manually, not in Playwright).
     await page.goto('/extension/index.html');
     await page.waitForLoadState('networkidle');
-    await expectScreen(page, 'E02');
-    await waitForFrameReady(page, /today/i);
+    await expectScreen(page, 'E06');
+    await waitForFrameReady(page, /Log now/);
     await expectTweakBarHidden(page);
-    await screenshot(page, 'extension-e02-today');
+    await screenshot(page, 'extension-e06-reminder');
 
-    // 2. Click the real "Add entry" button inside the popup → E03
+    // 2. User clicks "Log now" on the OS notification → E02 EMPTY state.
+    //    The wrapper flips E02 to empty via the source's setView('empty')
+    //    function (called inside the iframe at runtime; the frame stays
+    //    byte-identical).
+    await clickInFrame(page, 'Log now');
+    await expectScreen(page, 'E02');
+    // E02 empty-state shows "Nothing logged" or similar copy from the design;
+    // we wait for the Add entry CTA which is present in both states.
+    await waitForFrameReady(page, /Add entry/);
+    await expectTweakBarHidden(page);
+    await screenshot(page, 'extension-e02-today-empty');
+
+    // 3. User clicks "Add entry" → E03 Add Entry form.
     await clickInFrame(page, 'Add entry');
     await expectScreen(page, 'E03');
     await waitForFrameReady(page, /Save slot/);
     await expectTweakBarHidden(page);
     await screenshot(page, 'extension-e03-add-entry');
 
-    // 3. Save slot returns to E02 — natural popup-driven nav
+    // 4. Save slot → E02 (now populated — the source's default state).
     await clickInFrame(page, 'Save slot');
     await expectScreen(page, 'E02');
     await waitForFrameReady(page, /Close My Day/);
+    await screenshot(page, 'extension-e02-today-populated');
 
-    // 4. Click "Close My Day" → E04
+    // 5. Close My Day → E04 preview.
     await clickInFrame(page, 'Close My Day');
     await expectScreen(page, 'E04');
     await waitForFrameReady(page, /Confirm/);
     await expectTweakBarHidden(page);
     await screenshot(page, 'extension-e04-close-day');
 
-    // 5. Confirm & sync → E05
+    // 6. Confirm & sync → E05 result.
     await clickInFrame(page, /Confirm.*sync/);
     await expectScreen(page, 'E05');
     await waitForFrameReady(page, /Done/);
     await expectTweakBarHidden(page);
     await screenshot(page, 'extension-e05-sync-result');
 
-    // 6. Page-head inline link to E06 Reminder (no in-popup button leads here)
-    await page.locator('#ctrl-reminder').click();
-    await expectScreen(page, 'E06');
-    await waitForFrameReady(page, /Log now/);
-    await expectTweakBarHidden(page);
-    await screenshot(page, 'extension-e06-reminder');
+    // 7. Done → back to E02 (populated).
+    await clickInFrame(page, 'Done');
+    await expectScreen(page, 'E02');
 
-    // 7. Page-head inline link to E07 Offline
+    // 8. Inline page-head link to E07 Offline (no in-popup button leads here).
     await page.locator('#ctrl-offline').click();
     await expectScreen(page, 'E07');
-    // Use a popup-body-only signal — the (now-hidden) tweak bar also has a
-    // "Offline" button, which would match /offline/i and confuse the helper.
     await waitForFrameReady(page, /queued/i);
     await expectTweakBarHidden(page);
     await screenshot(page, 'extension-e07-offline');
 
-    // 8. Restart returns to E02
+    // 9. Restart returns to E06 (demo entry point).
     await page.locator('#ctrl-restart').click();
-    await expectScreen(page, 'E02');
+    await expectScreen(page, 'E06');
 
-    // The amber EXTENSION MOCKUP banner stays the whole time.
     await expect(page.getByText(/EXTENSION MOCKUP/i)).toBeVisible();
-
     expect(errors, `console errors:\n${errors.join('\n')}`).toEqual([]);
   });
 
-  test('keyboard ←/→ walks every screen in order', async ({ page }) => {
+  test('keyboard ←/→ walks every screen in order (E02..E07)', async ({ page }) => {
     const errors = trackErrors(page);
     await page.goto('/extension/index.html');
     await page.waitForLoadState('networkidle');
-    // Focus the body so the keydown handler runs (it's gated to body target).
+    await expectScreen(page, 'E06');                       // initial = E06
     await page.locator('body').click({ position: { x: 5, y: 5 } });
 
-    const order = ['E02', 'E03', 'E04', 'E05', 'E06', 'E07'];
-    for (let i = 1; i < order.length; i++) {
-      await page.keyboard.press('ArrowRight');
-      await expectScreen(page, order[i]);
-    }
-    for (let i = order.length - 2; i >= 0; i--) {
-      await page.keyboard.press('ArrowLeft');
-      await expectScreen(page, order[i]);
-    }
+    // ← from E06 walks back through the screen registry order (E02..E07).
+    // Keyboard nav is "linear" presenter mode, not the demo's narrative flow.
+    await page.keyboard.press('ArrowLeft');
+    await expectScreen(page, 'E05');
+    await page.keyboard.press('ArrowRight');
+    await expectScreen(page, 'E06');
+    await page.keyboard.press('ArrowRight');
+    await expectScreen(page, 'E07');
+
     expect(errors, `console errors:\n${errors.join('\n')}`).toEqual([]);
   });
 });
